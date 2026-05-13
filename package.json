@@ -45,7 +45,7 @@
     "better-sqlite3": "^11.10.0",
     "qdrant-local": "^0.0.0-alpha.10",
     "sqlite-vec": "^0.1.9",
-    "typesense": "^3.0.0"
+    "typesense": "^3.0.6"
   },
   "devDependencies": {
     "@types/figlet": "^1.7.0",
