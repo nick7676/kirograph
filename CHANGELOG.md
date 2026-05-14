@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.12.1] - 2026-05-14
+
+### Added
+
+- **`sync --progress`** — new verbose per-file progress flag. Prints each file as it is parsed (`parse  [i/total]  path/to/file.ts`), shows exclude-cleanup removals with a distinct `exclude` prefix, and prints all errors inline with full detail instead of a suppressed count.
+- **Exclude rule cleanup on sync** — `kirograph sync` now removes already-indexed files that match newly added exclude patterns (e.g. `**/.vite/**`). Previously those files stayed in the index until a full `--force` re-index. The cleanup runs at the start of every sync, before processing changed files.
+- **MCP sync awareness in `kirograph_status`** — the `kirograph_status` tool now surfaces sync state. When pending unindexed files exceed a configurable threshold it warns: *"Index may be incomplete — N files pending sync. Sync is running in background. Would you like to wait before proceeding?"* This gives the agent the ability to pause rather than silently working with a stale index.
+- **`syncWarningThreshold` config field** — controls the pending-file count above which `kirograph_status` emits the staleness warning. Default `10`. Set to `0` to disable.
+- **Sync state in `kirograph status` CLI** — the status command now shows a `Sync` section with idle/running state and pending file count, with a yellow warning when the count exceeds the threshold.
+- **`LockManager.isLocked()`** — exposes whether a sync/index is currently running in another process, used by both the MCP tool and CLI status command.
+- **`KiroGraph.getPendingSyncCount()`** — returns the number of files that have changed on disk but are not yet reflected in the index. Uses `git status` first, falls back to a filesystem diff against the indexed set.
+
+### Fixed
+
+- `config-prompt.ts`: `cavemanMode` was missing from the initial `ConfigPatch` object literal, causing a TypeScript error. Default is now `'off'` (overwritten later in the prompt flow).
+- `config-prompt.ts`: `CavemanMode` type was used but never defined or imported; added local type alias.
+
+---
+
 ## [0.12.0] - 2026-05-09
 
 ### Added
@@ -257,6 +276,7 @@
 - MCP tools: `kirograph_context`, `kirograph_search`, `kirograph_callers`, `kirograph_callees`, `kirograph_impact`, `kirograph_node`, `kirograph_type_hierarchy`, `kirograph_path`, `kirograph_dead_code`, `kirograph_circular_deps`, `kirograph_files`, `kirograph_status`
 - CLI: `kirograph index`, `kirograph sync`, `kirograph query`, `kirograph context`, `kirograph files`, `kirograph affected`, `kirograph status`, `kirograph unlock`
 
+[0.12.1]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.0...v0.12.1
 [0.10.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.7.0...v0.8.0
