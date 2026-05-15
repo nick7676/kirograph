@@ -42,10 +42,10 @@ function buildAgentConfig() {
   return {
     name: 'kirograph',
     description: 'KiroGraph-aware agent — uses the semantic code graph for faster, smarter exploration.',
-    resources: ['.kiro/steering/kirograph.md'],
-    tools: ['*'],
+    resources: ['file://.kiro/steering/kirograph.md'],
+    tools: ['@builtin', '@kirograph'],
     allowedTools: KIROGRAPH_TOOLS,
-    includeMcpJson: true,
+    useLegacyMcpJson: true,
     hooks: {
       agentSpawn: [{ command: SYNC_CMD }],
       userPromptSubmit: [{ command: SYNC_CMD }],
