@@ -34,6 +34,11 @@ export { nuxtResolver, vueResolver } from './vue';
 export { solidityResolver } from './solidity';
 export { sstResolver, cdkResolver, serverlessResolver, samResolver } from './iac';
 export { terraformResolver } from './terraform';
+export { pulumiResolver } from './pulumi';
+export { cloudformationResolver } from './cloudformation';
+export { kubernetesResolver } from './kubernetes';
+export { dockerComposeResolver } from './docker';
+export { ansibleResolver } from './ansible';
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
@@ -54,6 +59,11 @@ import { nuxtResolver, vueResolver } from './vue';
 import { solidityResolver } from './solidity';
 import { sstResolver, cdkResolver, serverlessResolver, samResolver } from './iac';
 import { terraformResolver } from './terraform';
+import { pulumiResolver } from './pulumi';
+import { cloudformationResolver } from './cloudformation';
+import { kubernetesResolver } from './kubernetes';
+import { dockerComposeResolver } from './docker';
+import { ansibleResolver } from './ansible';
 
 const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   // PHP
@@ -95,6 +105,13 @@ const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   serverlessResolver,
   samResolver,
   terraformResolver,
+  pulumiResolver,
+  cloudformationResolver,
+  // Containers & Orchestration
+  kubernetesResolver,
+  dockerComposeResolver,
+  // Configuration Management
+  ansibleResolver,
 ];
 
 export function getAllFrameworkResolvers(): FrameworkResolver[] {

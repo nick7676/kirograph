@@ -1178,7 +1178,11 @@ KiroGraph automatically detects frameworks and enriches the graph with framework
 
 **Solidity:** Hardhat, Foundry, Truffle (OpenZeppelin patterns)
 
-**Infrastructure as Code:** AWS CDK, SST, Serverless Framework, AWS SAM, Terraform / OpenTofu
+**Infrastructure as Code:** AWS CDK, SST, Serverless Framework, AWS SAM, Terraform / OpenTofu, Pulumi, CloudFormation
+
+**Containers & Orchestration:** Kubernetes, Helm, Docker Compose
+
+**Configuration Management:** Ansible
 
 Detected frameworks are stored in config and used to improve symbol extraction and resolution.
 

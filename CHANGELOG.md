@@ -5,7 +5,7 @@
 ### Added
 
 - **13 new languages** — Scala (`.scala`, `.sc`, `.sbt`), Lua (`.lua`), Zig (`.zig`, `.zon`), Bash (`.sh`, `.bash`, `.zsh`), OCaml (`.ml`, `.mli`), Elm (`.elm`), Solidity (`.sol`), Vue (`.vue`), Objective-C (`.m`), YAML (`.yaml`, `.yml`), HCL/Terraform (`.tf`, `.tfvars`), CSS (`.css`), and SCSS/Sass (`.scss`, `.sass`). YAML and CSS use pre-compiled WASM grammars from `tree-sitter-wasms`. HCL uses a WASM grammar built from [tree-sitter-grammars/tree-sitter-hcl](https://github.com/tree-sitter-grammars/tree-sitter-hcl) and SCSS from [tree-sitter-grammars/tree-sitter-scss](https://github.com/tree-sitter-grammars/tree-sitter-scss), both bundled in `src/extraction/wasm/`.
-- **9 new framework resolvers:**
+- **15 new framework resolvers:**
   - **Play (Scala)** — detects Play Framework via `build.sbt`/`plugins.sbt`. Resolves controller, service, and model references. Extracts routes from `conf/routes` and Akka HTTP / http4s DSL patterns.
   - **Nuxt / Vue** — detects Nuxt via `nuxt.config.ts` and Vue via `package.json`. Resolves composables (`useXxx`), auto-imported components (PascalCase → file lookup), and Pinia stores. Extracts file-based routes from `pages/` and server API routes from `server/api/`.
   - **Solidity** — detects Hardhat/Foundry/Truffle projects. Resolves interface references (`IERC20`, etc.), contract inheritance, and library function calls.
@@ -14,6 +14,11 @@
   - **Serverless Framework** — detects via `serverless.yml`/`serverless.ts`. Resolves handler strings. Extracts HTTP event routes from YAML config (`- http: GET /users`) and TypeScript config.
   - **AWS SAM** — detects via `template.yaml` with `AWS::Serverless` transform or `samconfig.toml`. Resolves handler strings. Extracts API/HttpApi event routes from SAM template YAML.
   - **Terraform / OpenTofu** — detects via `.terraform/` directory or `.tf` files. Extracts resources, data sources, modules, variables, outputs, and locals as graph nodes via regex-based parsing. Resolves cross-file resource, module, and variable references. Extracts API Gateway routes from `aws_api_gateway_resource` and `aws_api_gateway_method` blocks.
+  - **Pulumi** — detects via `Pulumi.yaml` or `@pulumi/*` in dependencies. Resolves resource property references and component class references. Extracts API Gateway routes from route object patterns.
+  - **CloudFormation** — detects raw CloudFormation templates (non-SAM) via `AWSTemplateFormatVersion`. Extracts resources (with logical IDs and types), parameters, and outputs. Resolves `!Ref`/`!GetAtt` cross-references.
+  - **Kubernetes / Helm** — detects via `Chart.yaml` or K8s manifest directories. Extracts Deployments, Services, ConfigMaps, Ingress, and other resources as typed nodes. Extracts Ingress paths as routes and Service ports.
+  - **Docker Compose** — detects via `docker-compose.yml` or `compose.yaml`. Extracts services (as components), networks, volumes, and exposed port mappings.
+  - **Ansible** — detects via `ansible.cfg`, playbook files, or standard role directory structure. Extracts plays, tasks, handlers, roles, and variables from the Ansible project structure.
 - **4 new architecture layer detectors:**
   - **Scala** — Play controllers/models/views, SBT services/repositories, Akka actors, Slick persistence.
   - **Vue / Nuxt** — pages, components, composables, stores, server/api, layouts, plugins.
