@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KiroGraph — Semantic Code Knowledge Graph for Kiro</title>
+  <title>KiroGraph: Semantic Code Knowledge Graph for Kiro</title>
   <meta name="description" content="KiroGraph gives Kiro a semantic knowledge graph so it queries your codebase instantly instead of doing slow file scans. 100% local, no API keys.">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/logo.png">
@@ -46,7 +46,38 @@
 <section class="hero">
   <div class="container">
     <h1 class="hero-title">KiroGraph</h1>
-    <p class="hero-tagline">Semantic code knowledge graph for Kiro — fewer tool calls, instant symbol lookups, 100% local.</p>
+
+    <!-- Star, fork & contributors badges -->
+    <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <a href="https://github.com/davide-desio-eleva/kirograph/stargazers" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--yellow);">
+          <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/>
+        </svg>
+        <span id="hero-star-count">—</span>
+      </a>
+      <a href="https://github.com/davide-desio-eleva/kirograph/network/members" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--text-muted);">
+          <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 10 0-1.5.75.75 0 000 1.5zM8 12.75a.75.75 0 10 0-1.5.75.75 0 000 1.5z"/>
+        </svg>
+        <span id="hero-fork-count">—</span> forks
+      </a>
+      <a href="https://github.com/davide-desio-eleva/kirograph/graphs/contributors" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--accent);">
+          <path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.508 5.508 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-6.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z"/>
+        </svg>
+        <span id="hero-contributor-count">—</span> contributors
+      </a>
+    </div>
+
+    <!-- Contributors & Stargazers carousel -->
+    <div style="margin-top: 0.75rem; text-align: center;">
+      <div id="avatar-carousel" style="position: relative; max-width: 100%; overflow: hidden; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
+        <div id="avatar-track" style="display: flex; gap: 0.5rem; align-items: center; padding: 0.5rem 0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
+        </div>
+      </div>
+    </div>
+
+    <p class="hero-tagline">Semantic code knowledge graph for Kiro: fewer tool calls, instant symbol lookups, 100% local.</p>
 
     <div class="install-block">
       <span class="prompt">$</span>
@@ -84,7 +115,7 @@
       <div class="benefit">
         <div class="benefit-icon"><i data-lucide="lock"></i></div>
         <div>
-          <h3>100% local — no API keys, no cloud</h3>
+          <h3>100% local, no API keys, no cloud</h3>
           <p>Everything is stored in a local SQLite database at <code>.kirograph/kirograph.db</code>. No telemetry, no external services, no API keys. Your code stays on your machine.</p>
         </div>
       </div>
@@ -92,7 +123,7 @@
         <div class="benefit-icon"><i data-lucide="refresh-cw"></i></div>
         <div>
           <h3>Always up to date, zero overhead</h3>
-          <p>Kiro hooks mark the index dirty on every save and flush changes when the agent stops. No background watcher process — changes batch efficiently with no overhead during editing.</p>
+          <p>Kiro hooks mark the index dirty on every save and flush changes when the agent stops. No background watcher process; changes batch efficiently with no overhead during editing.</p>
         </div>
       </div>
     </div>
@@ -112,7 +143,7 @@
       <div class="card">
         <span class="card-icon"><i data-lucide="wrench"></i></span>
         <h3>18 MCP Tools</h3>
-        <p>Context building, symbol search, call graphs, type hierarchies, impact analysis, dead code, circular deps, architecture, coupling metrics, snapshots, and more — all auto-approved in Kiro.</p>
+        <p>Context building, symbol search, call graphs, type hierarchies, impact analysis, dead code, circular deps, architecture, coupling metrics, snapshots, and more, all auto-approved in Kiro.</p>
       </div>
 
       <div class="card">
@@ -124,13 +155,13 @@
       <div class="card">
         <span class="card-icon"><i data-lucide="webhook"></i></span>
         <h3>Auto-sync Hooks</h3>
-        <p>Four IDE hooks keep the index fresh automatically: <code>fileEdited</code>, <code>fileCreated</code>, <code>fileDeleted</code>, and <code>agentStop</code>. Changes batch efficiently — no watcher process needed.</p>
+        <p>Four IDE hooks keep the index fresh automatically: <code>fileEdited</code>, <code>fileCreated</code>, <code>fileDeleted</code>, and <code>agentStop</code>. Changes batch efficiently, no watcher process needed.</p>
       </div>
 
       <div class="card">
         <span class="card-icon"><i data-lucide="building-2"></i></span>
         <h3>Architecture Analysis</h3>
-        <p>Auto-detects packages and architectural layers (api, service, data, ui, shared). Computes coupling metrics — Ca, Ce, instability — across your entire package graph.</p>
+        <p>Auto-detects packages and architectural layers (api, service, data, ui, shared). Computes coupling metrics (Ca, Ce, instability) across your entire package graph.</p>
       </div>
 
       <div class="card">
@@ -163,7 +194,7 @@
       <div class="card">
         <span class="card-icon"><i data-lucide="message-square"></i></span>
         <h3>Caveman Mode</h3>
-        <p>Compresses the agent's communication style to cut token usage on responses. Four levels: <code>lite</code>, <code>full</code>, <code>ultra</code>. Injected via steering file — no extra tool calls.</p>
+        <p>Compresses the agent's communication style to cut token usage on responses. Four levels: <code>lite</code>, <code>full</code>, <code>ultra</code>. Injected via steering file, no extra tool calls.</p>
         <div class="card-media">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/caveman.png" alt="Caveman mode screenshot">
         </div>
@@ -172,7 +203,7 @@
       <div class="card">
         <span class="card-icon"><i data-lucide="camera"></i></span>
         <h3>Snapshots &amp; Diff</h3>
-        <p>Save lightweight graph snapshots before refactors. Diff the current graph against any snapshot to see added/removed symbols and edges — available as both CLI and MCP tool.</p>
+        <p>Save lightweight graph snapshots before refactors. Diff the current graph against any snapshot to see added/removed symbols and edges, available as both CLI and MCP tool.</p>
       </div>
 
       <div class="card">
@@ -248,7 +279,7 @@
 
     <div style="margin-top: 2.5rem; text-align: center;">
       <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 600px; margin: 0 auto 1.25rem;">
-        Kiro hooks mark the index dirty on every file save or create, then flush on agent idle — batching changes efficiently with no overhead during active editing.
+        Kiro hooks mark the index dirty on every file save or create, then flush on agent idle, batching changes efficiently with no overhead during active editing.
       </p>
       <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
         <span class="badge badge-blue">fileEdited → mark-dirty</span>
@@ -266,7 +297,7 @@
     <div class="section-header">
       <span class="label">Semantic Search</span>
       <h2>Seven pluggable vector engines</h2>
-      <p>Enable embeddings for natural-language search. Choose the engine that fits your project size and constraints — all fall back gracefully if deps are missing.</p>
+      <p>Enable embeddings for natural-language search. Choose the engine that fits your project size and constraints; all fall back gracefully if deps are missing.</p>
     </div>
 
     <div class="table-wrap" style="margin-top: 2rem;">
@@ -286,7 +317,7 @@
 
     <div style="margin-top: 2rem; text-align: center;">
       <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 600px; margin: 0 auto;">
-        Configure via <code>kirograph install</code> (interactive menu) or set <code>semanticEngine</code> in <code>.kirograph/config.json</code>. Each engine owns its embedding store exclusively — switch engines without data conflicts.
+        Configure via <code>kirograph install</code> (interactive menu) or set <code>semanticEngine</code> in <code>.kirograph/config.json</code>. Each engine owns its embedding store exclusively. Switch engines without data conflicts.
       </p>
     </div>
   </div>
@@ -470,13 +501,104 @@
 <!-- ── Footer ── -->
 <footer class="footer">
   <p>
-    KiroGraph &mdash; Inspired by <a href="https://github.com/colbymchenry/codegraph" target="_blank" rel="noopener">CodeGraph</a> by colbymchenry &mdash;
-    <a href="https://github.com/davide-desio-eleva/kirograph" target="_blank" rel="noopener">GitHub</a> &mdash;
-    <a href="docs.html">Docs</a> &mdash;
+    KiroGraph · Inspired by <a href="https://github.com/colbymchenry/codegraph" target="_blank" rel="noopener">CodeGraph</a> by colbymchenry ·
+    <a href="https://github.com/davide-desio-eleva/kirograph" target="_blank" rel="noopener">GitHub</a> ·
+    <a href="docs.html">Docs</a> ·
     <a href="changelog.html">Changelog</a>
   </p>
 </footer>
 
 <script>lucide.createIcons();</script>
+<script>
+(function() {
+  var REPO = 'davide-desio-eleva/kirograph';
+  var track = document.getElementById('avatar-track');
+
+  // Fetch repo stats
+  fetch('https://api.github.com/repos/' + REPO)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.stargazers_count !== undefined) {
+        document.getElementById('hero-star-count').textContent = data.stargazers_count + ' stars';
+      }
+      if (data.forks_count !== undefined) {
+        document.getElementById('hero-fork-count').textContent = data.forks_count;
+      }
+    })
+    .catch(function() {});
+
+  // Build avatar element
+  function makeAvatar(user, isContributor) {
+    var a = document.createElement('a');
+    a.href = 'https://github.com/' + user.login;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = user.login + (isContributor ? ' (contributor)' : '');
+    a.style.cssText = 'flex-shrink:0; display:block; position:relative;';
+
+    var img = document.createElement('img');
+    img.src = user.avatar_url + '&s=64';
+    img.alt = user.login;
+    img.loading = 'lazy';
+    img.style.cssText = 'width:36px; height:36px; border-radius:50%; border:2px solid ' + (isContributor ? 'var(--accent)' : 'var(--border)') + '; transition: border-color 0.2s, transform 0.2s;';
+    img.onmouseover = function() { this.style.transform = 'scale(1.15)'; this.style.borderColor = 'var(--accent)'; };
+    img.onmouseout = function() { this.style.transform = 'scale(1)'; this.style.borderColor = isContributor ? 'var(--accent)' : 'var(--border)'; };
+
+    a.appendChild(img);
+    return a;
+  }
+
+  // Fetch contributors first (they get priority placement with accent border)
+  fetch('https://api.github.com/repos/' + REPO + '/contributors?per_page=30')
+    .then(function(r) { return r.json(); })
+    .then(function(contributors) {
+      if (!Array.isArray(contributors)) return;
+      var contributorLogins = new Set();
+      var count = 0;
+      contributors.forEach(function(u) {
+        if (u.type === 'Bot') return;
+        count++;
+        contributorLogins.add(u.login);
+        track.appendChild(makeAvatar(u, true));
+      });
+      document.getElementById('hero-contributor-count').textContent = count;
+
+      // Then fetch stargazers (exclude contributors to avoid duplicates)
+      return fetch('https://api.github.com/repos/' + REPO + '/stargazers?per_page=100')
+        .then(function(r) { return r.json(); })
+        .then(function(stargazers) {
+          if (!Array.isArray(stargazers)) return;
+          stargazers.forEach(function(u) {
+            if (contributorLogins.has(u.login)) return;
+            track.appendChild(makeAvatar(u, false));
+          });
+        });
+    })
+    .catch(function() {});
+
+  // Auto-scroll animation
+  var scrollDir = 1;
+  var scrollSpeed = 0.5;
+  var paused = false;
+
+  track.addEventListener('mouseenter', function() { paused = true; });
+  track.addEventListener('mouseleave', function() { paused = false; });
+  track.addEventListener('touchstart', function() { paused = true; }, { passive: true });
+  track.addEventListener('touchend', function() { setTimeout(function() { paused = false; }, 2000); });
+
+  function autoScroll() {
+    if (!paused && track.scrollWidth > track.clientWidth) {
+      track.scrollLeft += scrollSpeed * scrollDir;
+      if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 1) scrollDir = -1;
+      if (track.scrollLeft <= 0) scrollDir = 1;
+    }
+    requestAnimationFrame(autoScroll);
+  }
+  requestAnimationFrame(autoScroll);
+})();
+</script>
+<style>
+  #avatar-track::-webkit-scrollbar { display: none; }
+</style>
 </body>
 </html>

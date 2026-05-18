@@ -14,7 +14,7 @@ Inspired by [CodeGraph](https://github.com/colbymchenry/codegraph) by [colbymche
 
 When you ask Kiro to work on a complex task, it explores your codebase using file reads, grep, and glob searches. Every one of those is a tool call, and tool calls consume context and slow things down.
 
-KiroGraph gives Kiro a semantic knowledge graph that's pre-indexed and always up to date. Instead of scanning files to understand your code, Kiro queries the graph instantly: symbol relationships, call graphs, type hierarchies, impact radius — all in a single MCP tool call.
+KiroGraph gives Kiro a semantic knowledge graph that's pre-indexed and always up to date. Instead of scanning files to understand your code, Kiro queries the graph instantly: symbol relationships, call graphs, type hierarchies, impact radius, all in a single MCP tool call.
 
 The result is fewer tool calls, less context used, and faster responses on complex tasks.
 
@@ -22,12 +22,12 @@ The result is fewer tool calls, less context used, and faster responses on compl
 
 KiroGraph uses [tree-sitter](https://tree-sitter.github.io/tree-sitter/) to parse your source files into an AST and extract:
 
-- **Nodes** — functions, methods, classes, interfaces, types, enums, variables, constants, routes, components, and more (24 node kinds total)
-- **Edges** — calls, imports, exports, extends, implements, contains, references, instantiates, overrides, decorates, type_of, returns
+- **Nodes**: functions, methods, classes, interfaces, types, enums, variables, constants, routes, components, and more (24 node kinds total)
+- **Edges**: calls, imports, exports, extends, implements, contains, references, instantiates, overrides, decorates, type_of, returns
 
 Everything is stored in a local SQLite database (`.kirograph/kirograph.db`). **Nothing leaves your machine.** No API keys. No external services.
 
-The index is kept fresh automatically via Kiro hooks when using the Kiro integration — no background watcher process needed.
+The index is kept fresh automatically via Kiro hooks when using the Kiro integration; no background watcher process needed.
 
 ## How Indexing Works
 
@@ -55,7 +55,7 @@ These embeddings power natural-language search in `kirograph_context` and act as
 | `qdrant` | `.kirograph/qdrant/` | ANN (HNSW), sub-linear | `qdrant-local` (embedded binary) |
 | `typesense` | `.kirograph/typesense/` | ANN (HNSW), sub-linear | `typesense` (auto-downloaded binary) |
 
-Each engine owns its embedding store exclusively — nothing is written to the SQLite `vectors` table when a non-cosine engine is active. If an engine's optional dependency is not installed, KiroGraph silently falls back to `cosine`.
+Each engine owns its embedding store exclusively; nothing is written to the SQLite `vectors` table when a non-cosine engine is active. If an engine's optional dependency is not installed, KiroGraph silently falls back to `cosine`.
 
 Enable and configure via `kirograph install` (interactive arrow-key menu) or directly in `.kirograph/config.json`:
 
@@ -68,7 +68,7 @@ Enable and configure via `kirograph install` (interactive arrow-key menu) or dir
 
 ### Architecture analysis (opt-in)
 
-When `enableArchitecture: true` is set, KiroGraph detects the high-level structure of your project — packages and architectural layers — and computes coupling metrics between them. Results are stored in `arch_*` tables inside `kirograph.db` and exposed via dedicated MCP tools and CLI commands.
+When `enableArchitecture: true` is set, KiroGraph detects the high-level structure of your project (packages and architectural layers) and computes coupling metrics between them. Results are stored in `arch_*` tables inside `kirograph.db` and exposed via dedicated MCP tools and CLI commands.
 
 Enable via `kirograph install` or directly in `.kirograph/config.json`:
 
@@ -121,7 +121,7 @@ kirograph uninit --target all --force    # Remove all integration files (Kiro + 
 Without `--force`, KiroGraph asks separately whether to remove the selected tool integration files and whether to remove the shared `.kirograph/` data. With `--force`, both are removed unconditionally.
 
 This can remove:
-- `.kirograph/` — index database, snapshots, and export directory
+- `.kirograph/`: index database, snapshots, and export directory
 - Kiro target: `.kiro/hooks/kirograph-*.json`, `.kiro/steering/kirograph.md`, `.kiro/agents/kirograph.json`
 - Claude target (experimental): `kirograph` from `.mcp.json`, plus the KiroGraph import from `CLAUDE.md`
 - Codex target (experimental): the generated KiroGraph block from `AGENTS.md`
@@ -179,11 +179,11 @@ kg install
 └───────────────────────────────────────────┘
 ```
 
-Kiro hooks mark the index dirty on every file save or create, then flush on agent idle — batching changes efficiently with no overhead during active editing.
+Kiro hooks mark the index dirty on every file save or create, then flush on agent idle, batching changes efficiently with no overhead during active editing.
 
 ## Using with Kiro
 
-`kirograph install` or `kirograph install --target kiro` sets up four things in your Kiro workspace — all coexist, so you can switch between IDE and CLI freely:
+`kirograph install` or `kirograph install --target kiro` sets up four things in your Kiro workspace (all coexist, so you can switch between IDE and CLI freely):
 
 ### MCP Server (`.kiro/settings/mcp.json`)
 
@@ -229,9 +229,9 @@ A custom agent for Kiro CLI that wires up the MCP server, inlines the steering i
 
 | Hook | Event | Action |
 |------|-------|--------|
-| `agentSpawn` | Agent starts | `kirograph sync-if-dirty --quiet` — catches edits made between sessions |
-| `userPromptSubmit` | Each prompt | `kirograph sync-if-dirty --quiet` — keeps graph fresh within a session |
-| `stop` | End of each turn | `kirograph sync-if-dirty --quiet` — deferred flush, mirrors IDE `agentStop` |
+| `agentSpawn` | Agent starts | `kirograph sync-if-dirty --quiet` (catches edits made between sessions) |
+| `userPromptSubmit` | Each prompt | `kirograph sync-if-dirty --quiet` (keeps graph fresh within a session) |
+| `stop` | End of each turn | `kirograph sync-if-dirty --quiet` (deferred flush, mirrors IDE `agentStop`) |
 
 Use it with:
 
@@ -253,9 +253,9 @@ Teaches the Kiro IDE to prefer graph tools over file scanning when `.kirograph/`
 
 ## Other Tools (Experimental)
 
-> **⚠️ Not fully tested — community-contributed.** The integrations below are outside the original scope of KiroGraph. They are provided as-is. Issues and PRs related to these targets are welcome, but there is no guarantee they will be supported or merged without active help from the contributor.
+> **⚠️ Not fully tested, community-contributed.** The integrations below are outside the original scope of KiroGraph. They are provided as-is. Issues and PRs related to these targets are welcome, but there is no guarantee they will be supported or merged without active help from the contributor.
 
-KiroGraph can also be installed for other MCP-capable coding agents. All targets share the same `.kirograph/` data — if the project is already initialized, installing another target only writes that tool's integration files and reuses the existing graph.
+KiroGraph can also be installed for other MCP-capable coding agents. All targets share the same `.kirograph/` data; if the project is already initialized, installing another target only writes that tool's integration files and reuses the existing graph.
 
 ```bash
 kirograph install --target claude  # wire up Claude Code MCP + project memory
@@ -270,9 +270,9 @@ kirograph install --target claude
 
 This writes:
 
-- `.mcp.json` — project-scoped MCP server config for Claude Code
-- `.kirograph/claude.md` — KiroGraph tool guidance
-- `CLAUDE.md` — an import of `.kirograph/claude.md`
+- `.mcp.json`: project-scoped MCP server config for Claude Code
+- `.kirograph/claude.md`: KiroGraph tool guidance
+- `CLAUDE.md`: an import of `.kirograph/claude.md`
 
 Claude Code prompts for project MCP approval the first time it sees `.mcp.json`.
 
@@ -284,8 +284,8 @@ kirograph install --target codex
 
 This writes:
 
-- `.kirograph/codex.md` — KiroGraph tool guidance
-- `AGENTS.md` — a generated KiroGraph instruction block
+- `.kirograph/codex.md`: KiroGraph tool guidance
+- `AGENTS.md`: a generated KiroGraph instruction block
 
 Codex MCP configuration is user-scoped, so the installer prints the exact `codex mcp add ...` command and equivalent `~/.codex/config.toml` snippet instead of editing files outside the project.
 
@@ -295,7 +295,7 @@ All tools are auto-approved in Kiro once installed. Other MCP clients can use th
 
 ### `kirograph_context`
 
-Comprehensive context for a task or feature — often sufficient alone without additional tool calls.
+Comprehensive context for a task or feature, often sufficient alone without additional tool calls.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -329,7 +329,7 @@ Find all functions/methods that call a specific symbol.
 | `limit` | number | 20 | Max results (1–100) |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** BFS traversal of incoming `call` edges in the graph database. No vector engine involved.
+**How it works:** BFS traversal of incoming `call` edges in the graph database; no vector engine involved.
 
 ### `kirograph_callees`
 
@@ -341,7 +341,7 @@ Find all functions/methods that a specific symbol calls.
 | `limit` | number | 20 | Max results (1–100) |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** BFS traversal of outgoing `call` edges in the graph database. No vector engine involved.
+**How it works:** BFS traversal of outgoing `call` edges in the graph database; no vector engine involved.
 
 ### `kirograph_impact`
 
@@ -353,7 +353,7 @@ Analyze what code would be affected by changing a symbol. Use before making chan
 | `depth` | number | 2 | Traversal depth |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** BFS traversal of all incoming edges (`call`, `import`, `reference`, etc.) up to the specified depth. No vector engine involved.
+**How it works:** BFS traversal of all incoming edges (`call`, `import`, `reference`, etc.) up to the specified depth; no vector engine involved.
 
 ### `kirograph_node`
 
@@ -367,7 +367,7 @@ Get details about a specific symbol, optionally including source code.
 
 Returns: kind, name, qualified name, file location, signature, docstring, and optionally source code.
 
-**How it works:** Single row lookup by symbol name in the graph database. If `includeCode` is true, reads the relevant lines directly from the source file on disk. No vector engine involved.
+**How it works:** Single row lookup by symbol name in the graph database. If `includeCode` is true, reads the relevant lines directly from the source file on disk; no vector engine involved.
 
 ### `kirograph_type_hierarchy`
 
@@ -379,7 +379,7 @@ Traverse the type hierarchy of a class or interface.
 | `direction` | string | `both` | `up` (base types), `down` (derived types), `both` |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** Recursive traversal of `extends` and `implements` edges in the graph database. No vector engine involved.
+**How it works:** Recursive traversal of `extends` and `implements` edges in the graph database; no vector engine involved.
 
 ### `kirograph_path`
 
@@ -391,7 +391,7 @@ Find the shortest path between two symbols in the dependency graph.
 | `to` | string | required | Target symbol name |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** BFS shortest-path search across all edge types in the graph database. No vector engine involved.
+**How it works:** BFS shortest-path search across all edge types in the graph database; no vector engine involved.
 
 ### `kirograph_dead_code`
 
@@ -402,7 +402,7 @@ Find symbols with no incoming references (potential dead code). Only unexported 
 | `limit` | number | 50 | Max results (1–100) |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** Queries the graph database for nodes with zero incoming edges, filtered to non-exported symbols. No vector engine involved.
+**How it works:** Queries the graph database for nodes with zero incoming edges, filtered to non-exported symbols; no vector engine involved.
 
 ### `kirograph_circular_deps`
 
@@ -412,7 +412,7 @@ Find circular import dependencies in the codebase.
 |-----------|------|---------|-------------|
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** Tarjan's strongly connected components algorithm over `import` edges in the graph database. No vector engine involved.
+**How it works:** Tarjan's strongly connected components algorithm over `import` edges in the graph database; no vector engine involved.
 
 ### `kirograph_files`
 
@@ -427,7 +427,7 @@ List the indexed file structure with filtering and format options.
 | `includeMetadata` | boolean | true | Include language and symbol counts |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** Reads file records from the graph database and builds a tree structure in memory. Filtering is applied before tree construction. No vector engine involved.
+**How it works:** Reads file records from the graph database and builds a tree structure in memory. Filtering is applied before tree construction; no vector engine involved.
 
 ### `kirograph_status`
 
@@ -460,7 +460,7 @@ Get coupling metrics for all packages or a specific one.
 | `packageId` | string | — | Package ID (e.g. `pkg:npm:src/auth`). Omit for all packages. |
 | `projectPath` | string | cwd | Project root path |
 
-Returns per-package: **Ca** (afferent — how many other packages depend on this one), **Ce** (efferent — how many packages this one depends on), and **instability** (`Ce / (Ca + Ce)`, 0 = maximally stable, 1 = maximally unstable). When `packageId` is given, also returns the full list of incoming and outgoing package dependencies.
+Returns per-package: **Ca** (afferent: how many other packages depend on this one), **Ce** (efferent: how many packages this one depends on), and **instability** (`Ce / (Ca + Ce)`, 0 = maximally stable, 1 = maximally unstable). When `packageId` is given, also returns the full list of incoming and outgoing package dependencies.
 
 ### `kirograph_package` *(requires `enableArchitecture: true`)*
 
@@ -493,7 +493,7 @@ Find non-obvious cross-file connections: direct edges between symbols in structu
 | `limit` | number | 20 | Max results (1–100) |
 | `projectPath` | string | cwd | Project root path |
 
-**How it works:** Queries all cross-file edges (excluding `contains` and `import`). Scores each by path distance between source and target files × edge-kind weight (`calls=1.0`, `references=0.8`, `type_of=0.7`, etc.). Returns the highest-scoring unique pairs — the ones that represent the most unexpected coupling in the codebase.
+**How it works:** Queries all cross-file edges (excluding `contains` and `import`). Scores each by path distance between source and target files × edge-kind weight (`calls=1.0`, `references=0.8`, `type_of=0.7`, etc.). Returns the highest-scoring unique pairs. the ones that represent the most unexpected coupling in the codebase.
 
 ### `kirograph_diff`
 
@@ -572,7 +572,7 @@ Extracts symbol tokens from the task description (CamelCase, snake_case, SCREAMI
 
 ### Affected Tests
 
-Find test files that depend on changed source files — useful in CI or pre-commit hooks.
+Find test files that depend on changed source files, useful in CI or pre-commit hooks.
 
 ```bash
 kirograph affected src/utils.ts src/api.ts           # Pass files as arguments
@@ -607,7 +607,7 @@ fi
 
 Caveman mode compresses the agent's communication style, cutting token usage on responses without affecting tool calls or code output. Inspired by [caveman](https://github.com/JuliusBrussee/caveman) 🪨 by [JuliusBrussee](https://github.com/JuliusBrussee).
 
-**Why it's useful:** KiroGraph's graph tools return compact, structured data. The bottleneck in long coding sessions isn't the tool calls — it's the verbose prose the agent wraps around them. Caveman mode strips that overhead so you get the signal without the filler. The rules are injected at session start via the steering file (IDE) and the inline agent prompt (kiro-cli), so they're always in context with no extra tool calls.
+**Why it's useful:** KiroGraph's graph tools return compact, structured data. The bottleneck in long coding sessions isn't the tool calls; it is the verbose prose the agent wraps around them. Caveman mode strips that overhead so you get the signal without the filler. The rules are injected at session start via the steering file (IDE) and the inline agent prompt (kiro-cli), so they're always in context with no extra tool calls.
 
 Four levels:
 
@@ -628,7 +628,7 @@ kirograph caveman         # show current mode
 
 Set during `kirograph install` (interactive arrow-key menu) or any time after. Takes effect on the next agent session.
 
-Caveman mode never touches code blocks, file paths, URLs, or technical terms — only prose.
+Caveman mode never touches code blocks, file paths, URLs, or technical terms, only prose.
 
 **Auto-clarity exceptions:** the agent temporarily reverts to normal prose for security warnings, confirmations of irreversible actions (delete, overwrite, force-push), and multi-step sequences where fragment order could cause misunderstanding. Compressed style resumes immediately after.
 
@@ -676,9 +676,9 @@ kirograph coupling --format json           # JSON output
 ```
 
 The table shows each package with:
-- **Ca** — afferent coupling: how many packages depend on this one (higher = more stable)
-- **Ce** — efferent coupling: how many packages this one depends on (higher = more unstable)
-- **Instability** — `Ce / (Ca + Ce)`, rendered as a color-coded bar: green (stable) → yellow (neutral) → red (unstable)
+- **Ca**: afferent coupling: how many packages depend on this one (higher = more stable)
+- **Ce**: efferent coupling: how many packages this one depends on (higher = more unstable)
+- **Instability** (`Ce / (Ca + Ce)`), rendered as a color-coded bar: green (stable) → yellow (neutral) → red (unstable)
 
 The `--package` detail view shows who depends on this package and what it depends on, with import counts for each relationship.
 
@@ -708,7 +708,7 @@ Score = path distance between files × edge-kind weight (`calls=1.0`, `reference
 
 ### Snapshots & Diff
 
-Save lightweight graph snapshots and compare them to track structural changes over time — useful before/after refactors, or in CI to audit what a PR added or removed.
+Save lightweight graph snapshots and compare them to track structural changes over time, useful before/after refactors, or in CI to audit what a PR added or removed.
 
 ```bash
 kirograph snapshot save [label]       # Save current graph state with optional label
@@ -720,13 +720,13 @@ kirograph snapshot diff --format full # Show full added/removed symbol lists
 kirograph snapshot diff --format json # JSON output
 ```
 
-Snapshots are stored in `.kirograph/snapshots/` as JSON and include all node IDs and edge tuples. The diff is computed as a set operation — O(n) regardless of codebase size.
+Snapshots are stored in `.kirograph/snapshots/` as JSON and include all node IDs and edge tuples. The diff is computed as a set operation, O(n) regardless of codebase size.
 
 The `kirograph_diff` MCP tool exposes the same capability to the agent: compare the current graph against the latest (or a named) snapshot without leaving the conversation.
 
 ### Dead Code
 
-Find unexported symbols with zero incoming references — candidates for removal.
+Find unexported symbols with zero incoming references, candidates for removal.
 
 ```bash
 kirograph dead-code [path]            # List dead code grouped by file
@@ -750,7 +750,7 @@ The command resolves symbol names using the same fuzzy search as `kirograph quer
 
 ### Graph Export
 
-Export the full graph as an interactive dashboard — three files served from a local directory, no server required, works offline.
+Export the full graph as an interactive dashboard. three files served from a local directory, no server required, works offline.
 
 ```bash
 kirograph export build [path]             # Generate .kirograph/export/{index.html,app.css,app.js}
@@ -767,10 +767,10 @@ Output lands in `.kirograph/export/` by default. Open `index.html` in any browse
 
 - **Color-coded nodes** by kind (class, function, method, component…) with size proportional to degree
 - **Directed edges** with kind labels; dashed lines for imports and references
-- **Click a node** to zoom in and inspect it — kind, file, line, degree, signature, and a copy button for the file reference
+- **Click a node** to zoom in and inspect it. kind, file, line, degree, signature, and a copy button for the file reference
 - **Click two nodes** to instantly find and highlight the shortest path between them, with detail cards for both endpoints
-- **History** — ‹ › navigation through previously inspected nodes
-- **Keyboard shortcuts** — `f` to fit the graph, `Esc` to exit focus or path mode
+- **History**: ‹ › navigation through previously inspected nodes
+- **Keyboard shortcuts**: `f` to fit the graph, `Esc` to exit focus or path mode
 
 #### Controls
 
@@ -792,9 +792,9 @@ Type to search by name, qualified name, or file path. Matching nodes are highlig
 
 #### Legend & filters
 
-- **Node kind filter** — Legend tab; click any kind to hide or show all nodes of that type
-- **Edge kind filter** — Legend tab; click any edge kind to hide or show edges of that type
-- **Degree slider** — Filters tab; hide nodes below N connections to surface the most-connected symbols
+- **Node kind filter**: Legend tab; click any kind to hide or show all nodes of that type
+- **Edge kind filter**: Legend tab; click any edge kind to hide or show edges of that type
+- **Degree slider**: Filters tab; hide nodes below N connections to surface the most-connected symbols
 
 #### Minimap
 
@@ -812,7 +812,7 @@ The 📊 Charts button opens a panel with three charts:
 |-------|--------------|
 | **Bar** | The 15 most-connected symbols |
 | **Donut** | How node kinds are distributed across the codebase |
-| **Line** | How many symbols have each connection count — reveals the overall connectivity shape of the graph |
+| **Line** | How many symbols have each connection count. reveals the overall connectivity shape of the graph |
 
 
 ### Dashboard
@@ -829,7 +829,7 @@ kirograph dashboard stop [path]    # Stop the running engine server
 Reads `semanticEngine` from `.kirograph/config.json` and dispatches accordingly:
 
 - **qdrant**: Downloads the [Qdrant Web UI](https://github.com/qdrant/qdrant-web-ui) on first use (cached at `.kirograph/qdrant/dashboard/`), spawns the Qdrant server with `QDRANT__SERVICE__STATIC_CONTENT_DIR` set so the dashboard is served natively, and opens `http://127.0.0.1:<port>/dashboard` in your browser. If the server is already running with the dashboard, reconnects instead of restarting.
-- **typesense**: Downloads the [Typesense Dashboard](https://github.com/bfritscher/typesense-dashboard) static UI on first use (cached at `.kirograph/typesense/dashboard/`), starts the Typesense server if not already running, serves the dashboard locally via a Node HTTP server, and opens it in your browser. Press Ctrl+C to stop the dashboard server — the Typesense server keeps running as a background daemon.
+- **typesense**: Downloads the [Typesense Dashboard](https://github.com/bfritscher/typesense-dashboard) static UI on first use (cached at `.kirograph/typesense/dashboard/`), starts the Typesense server if not already running, serves the dashboard locally via a Node HTTP server, and opens it in your browser. Press Ctrl+C to stop the dashboard server. the Typesense server keeps running as a background daemon.
 
 Both servers run as persistent daemons. The state file (`.kirograph/qdrant-server.json` or `.kirograph/typesense-server.json`) tracks the PID and port for reconnection across `kg` commands.
 
@@ -879,7 +879,7 @@ By default, KiroGraph uses exact name lookup and full-text search. Enable semant
 }
 ```
 
-This generates vector embeddings for all functions, methods, classes, interfaces, type aliases, components, and modules using a local embedding model (downloaded automatically to `~/.kirograph/models/` on first use). Embeddings are kept in sync automatically via Kiro hooks — on every file save, create, or delete.
+This generates vector embeddings for all functions, methods, classes, interfaces, type aliases, components, and modules using a local embedding model (downloaded automatically to `~/.kirograph/models/` on first use). Embeddings are kept in sync automatically via Kiro hooks. on every file save, create, or delete.
 
 Run `kirograph install` to be guided through model and engine selection interactively with arrow-key menus, or set the fields manually in `.kirograph/config.json`.
 
@@ -909,7 +909,7 @@ Configure manually:
 
 #### Storage architecture
 
-Each engine owns its embedding store exclusively — there is no redundant write to the main graph database:
+Each engine owns its embedding store exclusively. there is no redundant write to the main graph database:
 
 | Engine | Graph store | Vector store |
 |--------|-------------|--------------|
@@ -950,7 +950,7 @@ In-process cosine similarity over all stored embeddings. No extra dependencies. 
 
 #### sqlite-vec
 
-Approximate nearest-neighbour (ANN) index stored in `.kirograph/vec.db`. Sub-linear search time — ideal for large codebases with thousands of indexed symbols. The SQLite `vectors` table is not written to; `vec.db` is the sole embedding store.
+Approximate nearest-neighbour (ANN) index stored in `.kirograph/vec.db`. Sub-linear search time. ideal for large codebases with thousands of indexed symbols. The SQLite `vectors` table is not written to; `vec.db` is the sole embedding store.
 
 ```json
 {
@@ -967,7 +967,7 @@ Requires two native dependencies (compiled C extensions). If not installed, fall
 
 #### orama
 
-Hybrid search powered by [Orama](https://github.com/oramasearch/orama) — combines full-text relevance and vector similarity in a **single query**, producing higher-quality results than running the two searches separately. The index is persisted to `.kirograph/orama.json` and is the sole embedding store. Pure JS, no native compilation required.
+Hybrid search powered by [Orama](https://github.com/oramasearch/orama). combines full-text relevance and vector similarity in a **single query**, producing higher-quality results than running the two searches separately. The index is persisted to `.kirograph/orama.json` and is the sole embedding store. Pure JS, no native compilation required.
 
 ```json
 {
@@ -984,7 +984,7 @@ If not installed, falls back to `cosine`.
 
 #### pglite
 
-Hybrid search powered by [PGlite](https://github.com/electric-sql/pglite) — a WASM-compiled PostgreSQL with the [pgvector](https://github.com/pgvector/pgvector) extension. Combines **exact** nearest-neighbour vector search with full-text ranking (`ts_rank`) in a single SQL query. The database is persisted to `.kirograph/pglite/` using PostgreSQL's WAL-based storage and is the sole embedding store. Pure WASM — no native compilation required.
+Hybrid search powered by [PGlite](https://github.com/electric-sql/pglite), a WASM-compiled PostgreSQL with the [pgvector](https://github.com/pgvector/pgvector) extension. Combines **exact** nearest-neighbour vector search with full-text ranking (`ts_rank`) in a single SQL query. The database is persisted to `.kirograph/pglite/` using PostgreSQL's WAL-based storage and is the sole embedding store. Pure WASM, no native compilation required.
 
 ```json
 {
@@ -998,8 +998,8 @@ npm install @electric-sql/pglite
 ```
 
 Key advantages:
-- **Exact** vector results (not approximate) — deterministic and reproducible
-- Native SQL `ON CONFLICT` upsert — no remove+insert workaround
+- **Exact** vector results (not approximate). deterministic and reproducible
+- Native SQL `ON CONFLICT` upsert, no remove+insert workaround
 - HNSW index (`vector_cosine_ops`) keeps search fast as the index grows
 - Single dependency, zero native binaries
 
@@ -1007,7 +1007,7 @@ If not installed, falls back to `cosine`.
 
 #### LanceDB
 
-ANN vector search powered by [LanceDB](https://github.com/lancedb/lancedb) — stores embeddings in Apache Lance columnar format at `.kirograph/lancedb/`. Sub-linear search time using cosine distance. Pure JS, no native compilation required.
+ANN vector search powered by [LanceDB](https://github.com/lancedb/lancedb). stores embeddings in Apache Lance columnar format at `.kirograph/lancedb/`. Sub-linear search time using cosine distance. Pure JS, no native compilation required.
 
 ```json
 {
@@ -1021,9 +1021,9 @@ npm install @lancedb/lancedb
 ```
 
 Key characteristics:
-- **Columnar storage** (Apache Lance format) — efficient for batch reads and writes
-- **ANN cosine search** — fast, sub-linear query time
-- Pure JS — no native binaries or WASM required
+- **Columnar storage** (Apache Lance format). efficient for batch reads and writes
+- **ANN cosine search**: fast, sub-linear query time
+- Pure JS, no native binaries or WASM required
 
 If not installed, falls back to `cosine`.
 
@@ -1043,11 +1043,11 @@ npm install qdrant-local
 ```
 
 Key characteristics:
-- **HNSW index** — high-quality ANN search with Qdrant's native indexing
-- **Embedded binary** — no separate server setup; the process is spawned and managed automatically
-- **Persistent daemon** — the server stays running between `kg` commands; state tracked in `.kirograph/qdrant-server.json`
-- **Built-in dashboard** — run `kg dashboard start` to download the [Qdrant Web UI](https://github.com/qdrant/qdrant-web-ui) and open it (cached at `.kirograph/qdrant/dashboard/`, served via Qdrant's built-in static content feature)
-- **Async startup** — polls `/readyz` instead of blocking with a fixed sleep
+- **HNSW index**: high-quality ANN search with Qdrant's native indexing
+- **Embedded binary**: no separate server setup; the process is spawned and managed automatically
+- **Persistent daemon**: the server stays running between `kg` commands; state tracked in `.kirograph/qdrant-server.json`
+- **Built-in dashboard**: run `kg dashboard start` to download the [Qdrant Web UI](https://github.com/qdrant/qdrant-web-ui) and open it (cached at `.kirograph/qdrant/dashboard/`, served via Qdrant's built-in static content feature)
+- **Async startup**: polls `/readyz` instead of blocking with a fixed sleep
 - **Cosine distance** metric
 - Data persists across restarts in `.kirograph/qdrant/`
 
@@ -1076,11 +1076,11 @@ npm install typesense
 ```
 
 Key characteristics:
-- **HNSW index** — high-quality ANN search with Typesense's native indexing
-- **Auto-downloaded binary** — no manual server setup; the binary is fetched and cached at `~/.kirograph/bin/` on first run
-- **Persistent daemon** — the server stays running between `kg` commands; state tracked in `.kirograph/typesense-server.json`
-- **Local dashboard** — run `kg dashboard start` to open the built-in Typesense Dashboard UI (served locally, cached at `.kirograph/typesense/dashboard/`)
-- **Async startup** — polls `/health` instead of blocking with a fixed sleep
+- **HNSW index**: high-quality ANN search with Typesense's native indexing
+- **Auto-downloaded binary**: no manual server setup; the binary is fetched and cached at `~/.kirograph/bin/` on first run
+- **Persistent daemon**: the server stays running between `kg` commands; state tracked in `.kirograph/typesense-server.json`
+- **Local dashboard**: run `kg dashboard start` to open the built-in Typesense Dashboard UI (served locally, cached at `.kirograph/typesense/dashboard/`)
+- **Async startup**: polls `/health` instead of blocking with a fixed sleep
 - **Cosine distance** metric
 - Data persists across restarts in `.kirograph/typesense/`
 
@@ -1099,12 +1099,12 @@ When `enableArchitecture: true` is set, KiroGraph analyses the high-level struct
 
 #### What it detects
 
-**Packages** — logical groupings of files. Detected two ways:
+**Packages**: logical groupings of files. Detected two ways:
 
-1. **Manifest-based** — parsed from `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`/`setup.py`/`setup.cfg`, `pom.xml`, `build.gradle`/`build.gradle.kts`, and `.csproj` files. Produces IDs like `pkg:npm:src/auth`.
-2. **Directory fallback** — for files not covered by any manifest, groups them by their nearest ancestor directory. Produces IDs like `pkg:dir:src/utils`.
+1. **Manifest-based**: parsed from `package.json`, `go.mod`, `Cargo.toml`, `pyproject.toml`/`setup.py`/`setup.cfg`, `pom.xml`, `build.gradle`/`build.gradle.kts`, and `.csproj` files. Produces IDs like `pkg:npm:src/auth`.
+2. **Directory fallback**: for files not covered by any manifest, groups them by their nearest ancestor directory. Produces IDs like `pkg:dir:src/utils`.
 
-**Layers** — architectural tiers detected from file paths using per-language glob patterns:
+**Layers**: architectural tiers detected from file paths using per-language glob patterns:
 
 | Layer | Examples |
 |-------|---------|
@@ -1116,12 +1116,12 @@ When `enableArchitecture: true` is set, KiroGraph analyses the high-level struct
 
 Layer detection is per-language (TypeScript/JS, Python, Go, Java, Ruby, Rust, C#) with framework-specific patterns where applicable (Django, Rails, Spring MVC, ASP.NET, etc.). Custom layer overrides are supported via `architectureLayers` in config.
 
-**Package dependencies** — rolled up from existing `imports` edges in the graph. No re-parsing required.
+**Package dependencies**: rolled up from existing `imports` edges in the graph. No re-parsing required.
 
-**Coupling metrics** — computed per package:
-- **Ca** (afferent) — how many other packages depend on this one
-- **Ce** (efferent) — how many packages this one depends on
-- **Instability** — `Ce / (Ca + Ce)`: 0 = maximally stable (everyone depends on it, it depends on nothing), 1 = maximally unstable (depends on everything, nobody depends on it)
+**Coupling metrics**: computed per package:
+- **Ca** (afferent). how many other packages depend on this one
+- **Ce** (efferent). how many packages this one depends on
+- **Instability** (`Ce / (Ca + Ce)`): 0 = maximally stable (everyone depends on it, it depends on nothing), 1 = maximally unstable (depends on everything, nobody depends on it)
 
 #### Custom layer definitions
 
@@ -1261,11 +1261,20 @@ Ansible
 
 Detected frameworks are stored in config and used to improve symbol extraction and resolution.
 
+## Credits
+
+KiroGraph is inspired by [CodeGraph](https://github.com/colbymchenry/codegraph) by [Colby McHenry](https://www.linkedin.com/in/colby-mchenry/). the original concept of building a semantic code graph for AI coding agents comes from his work.
+
+### Contributors
+
+- [Alessandro Franceschi](https://www.linkedin.com/in/alessandrofranceschi/). Claude Code and Codex integration, Elixir/Phoenix language and framework support.
+- [Mauro Argo](https://www.linkedin.com/in/argomauro/). original idea for the architecture layer analysis feature.
+
 ## Requirements
 
 - Node.js >= 18
 - Kiro IDE (fully supported)
-- Other MCP-capable tools (experimental — see [Other Tools](#other-tools-experimental))
+- Other MCP-capable tools (experimental. see [Other Tools](#other-tools-experimental))
 
 ## License
 

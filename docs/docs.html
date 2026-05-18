@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KiroGraph Docs — Full Reference</title>
+  <title>KiroGraph Docs: Full Reference</title>
   <meta name="description" content="Full documentation for KiroGraph: installation, quick start, MCP tools, CLI reference, configuration, and more.">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/logo.png">
@@ -69,6 +69,7 @@
     <div class="sidebar-section">
       <div class="sidebar-heading">Advanced</div>
       <a href="#caveman-mode" class="sidebar-link">Caveman Mode</a>
+      <a href="#credits" class="sidebar-link">Credits</a>
     </div>
   </aside>
 
@@ -78,26 +79,26 @@
     <!-- ── Why KiroGraph ── -->
     <h2 id="why-kirograph">Why KiroGraph</h2>
 
-    <p>KiroGraph is a semantic code knowledge graph built specifically for <a href="https://kiro.dev" target="_blank" rel="noopener">Kiro</a>. It gives Kiro a pre-indexed understanding of your codebase — symbol relationships, call graphs, type hierarchies, impact radius — so it can answer complex questions in a single MCP tool call instead of cascading through file reads, greps, and globs.</p>
+    <p>KiroGraph is a semantic code knowledge graph built specifically for <a href="https://kiro.dev" target="_blank" rel="noopener">Kiro</a>. It gives Kiro a pre-indexed understanding of your codebase: symbol relationships, call graphs, type hierarchies, impact radius, so it can answer complex questions in a single MCP tool call instead of cascading through file reads, greps, and globs.</p>
 
     <h3>The problem</h3>
-    <p>When an AI coding agent works on a complex task, it explores your codebase one tool call at a time: read a file, grep for a symbol, glob for related files, read another file. Each of those burns context window and adds latency. On large codebases this becomes the bottleneck — not the reasoning, but the exploration.</p>
+    <p>When an AI coding agent works on a complex task, it explores your codebase one tool call at a time: read a file, grep for a symbol, glob for related files, read another file. Each of those burns context window and adds latency. On large codebases this becomes the bottleneck: not the reasoning, but the exploration.</p>
 
     <h3>The approach</h3>
-    <p>KiroGraph parses your entire codebase with <a href="https://tree-sitter.github.io/tree-sitter/" target="_blank" rel="noopener">tree-sitter</a>, extracts symbols and their relationships into a local SQLite graph database, and optionally generates vector embeddings for natural-language search. The result is a structured knowledge graph that can answer "who calls this function?", "what breaks if I change this?", or "find code related to authentication" in milliseconds — without reading a single file.</p>
+    <p>KiroGraph parses your entire codebase with <a href="https://tree-sitter.github.io/tree-sitter/" target="_blank" rel="noopener">tree-sitter</a>, extracts symbols and their relationships into a local SQLite graph database, and optionally generates vector embeddings for natural-language search. The result is a structured knowledge graph that can answer "who calls this function?", "what breaks if I change this?", or "find code related to authentication" in milliseconds, without reading a single file.</p>
 
     <h3>Why Kiro</h3>
     <p>KiroGraph is designed around Kiro's architecture:</p>
     <ul>
-      <li><strong>MCP integration</strong> — Kiro's native MCP support means KiroGraph tools are auto-approved and always available, no manual configuration needed.</li>
-      <li><strong>Hooks system</strong> — Kiro's file event hooks (<code>fileEdited</code>, <code>fileCreated</code>, <code>fileDeleted</code>, <code>agentStop</code>) keep the index fresh automatically with zero overhead during editing. No background watcher process.</li>
-      <li><strong>Steering files</strong> — Kiro's steering mechanism teaches the agent to prefer graph tools over file scanning, always in context with no extra tool calls.</li>
-      <li><strong>CLI agent</strong> — Kiro CLI's agent system allows a dedicated KiroGraph agent with inlined instructions and session-boundary sync hooks.</li>
+      <li><strong>MCP integration</strong>: Kiro's native MCP support means KiroGraph tools are auto-approved and always available, no manual configuration needed.</li>
+      <li><strong>Hooks system</strong>: Kiro's file event hooks (<code>fileEdited</code>, <code>fileCreated</code>, <code>fileDeleted</code>, <code>agentStop</code>) keep the index fresh automatically with zero overhead during editing. No background watcher process.</li>
+      <li><strong>Steering files</strong>: Kiro's steering mechanism teaches the agent to prefer graph tools over file scanning, always in context with no extra tool calls.</li>
+      <li><strong>CLI agent</strong>: Kiro CLI's agent system allows a dedicated KiroGraph agent with inlined instructions and session-boundary sync hooks.</li>
     </ul>
     <p>This tight integration is why Kiro is the primary and fully supported target. The hooks, steering, and agent config are all Kiro-native concepts that make the experience seamless.</p>
 
     <h3>Scope and other tools</h3>
-    <p>The core of KiroGraph — the graph database, tree-sitter parsing, MCP server, and CLI — is tool-agnostic. Any MCP-capable client can query the same graph. Experimental integrations for Claude Code and Codex are available via <code>kirograph install --target claude|codex</code>, but they lack the automatic sync hooks and steering that make the Kiro experience seamless.</p>
+    <p>The core of KiroGraph (the graph database, tree-sitter parsing, MCP server, and CLI) is tool-agnostic. Any MCP-capable client can query the same graph. Experimental integrations for Claude Code and Codex are available via <code>kirograph install --target claude|codex</code>, but they lack the automatic sync hooks and steering that make the Kiro experience seamless.</p>
     <p>Issues and PRs for non-Kiro targets are welcome, but there is no guarantee they will be supported or merged without active help from the contributor. The project's development focus remains on the Kiro integration.</p>
 
     <!-- ── Installation ── -->
@@ -133,7 +134,7 @@ cd kirograph && npm uninstall -g .</code></pre>
 
     <p>Run this inside any project you want to index:</p>
 
-    <pre><code>kirograph install    # interactive setup — wires MCP + hooks + steering + CLI agent</code></pre>
+    <pre><code>kirograph install    # interactive setup: wires MCP + hooks + steering + CLI agent</code></pre>
 
     <p>The installer prompts you for:</p>
     <ul>
@@ -364,7 +365,7 @@ cd kirograph && npm uninstall -g .</code></pre>
     <!-- ── Using with Kiro ── -->
     <h2 id="using-with-kiro">Using with Kiro</h2>
 
-    <p><code>kirograph install</code> sets up four things in your Kiro workspace — all coexist so you can switch between IDE and CLI freely. <strong>Kiro is the primary and fully supported target.</strong></p>
+    <p><code>kirograph install</code> sets up four things in your Kiro workspace. All coexist, so you can switch between IDE and CLI freely. <strong>Kiro is the primary and fully supported target.</strong></p>
 
     <h3 id="mcp-server">MCP Server (<code>.kiro/settings/mcp.json</code>)</h3>
     <p>Registers the KiroGraph MCP server with all 18 tools auto-approved. Used by both the IDE and the CLI agent.</p>
@@ -405,9 +406,9 @@ cd kirograph && npm uninstall -g .</code></pre>
       <table>
         <thead><tr><th>Event</th><th>Action</th></tr></thead>
         <tbody>
-          <tr><td><code>agentSpawn</code></td><td><code>kirograph sync-if-dirty --quiet</code> — catches edits made between sessions</td></tr>
-          <tr><td><code>userPromptSubmit</code></td><td><code>kirograph sync-if-dirty --quiet</code> — keeps graph fresh within a session</td></tr>
-          <tr><td><code>stop</code></td><td><code>kirograph sync-if-dirty --quiet</code> — deferred flush, mirrors IDE agentStop</td></tr>
+          <tr><td><code>agentSpawn</code></td><td><code>kirograph sync-if-dirty --quiet</code> (catches edits made between sessions)</td></tr>
+          <tr><td><code>userPromptSubmit</code></td><td><code>kirograph sync-if-dirty --quiet</code> (keeps graph fresh within a session)</td></tr>
+          <tr><td><code>stop</code></td><td><code>kirograph sync-if-dirty --quiet</code> (deferred flush, mirrors IDE agentStop)</td></tr>
         </tbody>
       </table>
     </div>
@@ -422,10 +423,10 @@ cd kirograph && npm uninstall -g .</code></pre>
     <h2 id="other-tools">Other Tools (Experimental)</h2>
 
     <div class="callout" style="border-color: var(--yellow); background: rgba(210,153,34,0.05);">
-      <strong>⚠️ Not fully tested — community-contributed.</strong> The integrations below are outside the original scope of KiroGraph. They are provided as-is. Issues and PRs related to these targets are welcome, but there is no guarantee they will be supported or merged without active help from the contributor.
+      <strong>⚠️ Not fully tested, community-contributed.</strong> The integrations below are outside the original scope of KiroGraph. They are provided as-is. Issues and PRs related to these targets are welcome, but there is no guarantee they will be supported or merged without active help from the contributor.
     </div>
 
-    <p>KiroGraph can also be installed for other MCP-capable coding agents. All targets share the same <code>.kirograph/</code> data — if the project is already initialized, installing another target only writes that tool's integration files.</p>
+    <p>KiroGraph can also be installed for other MCP-capable coding agents. All targets share the same <code>.kirograph/</code> data; if the project is already initialized, installing another target only writes that tool's integration files.</p>
 
     <h3 id="claude-code">Claude Code</h3>
     <pre><code>kirograph install --target claude</code></pre>
@@ -480,7 +481,7 @@ cd kirograph && npm uninstall -g .</code></pre>
       </table>
     </div>
 
-    <p>Caveman mode never touches code blocks, file paths, URLs, or technical terms — only prose.</p>
+    <p>Caveman mode never touches code blocks, file paths, URLs, or technical terms, only prose.</p>
 
     <p><strong>Auto-clarity exceptions:</strong> the agent temporarily reverts to normal prose for security warnings, confirmations of irreversible actions (delete, overwrite, force-push), and multi-step sequences where fragment order could cause misunderstanding. Compressed style resumes immediately after.</p>
 
@@ -490,6 +491,110 @@ kirograph caveman         # show current mode</code></pre>
     <div class="callout">
       Takes effect on the <strong>next agent session</strong>. The steering file and CLI agent config are regenerated immediately when you run the command.
     </div>
+
+    <!-- ── Credits ── -->
+    <h2 id="credits">Credits</h2>
+
+    <h3 id="credits-origin">Original idea</h3>
+    <p>KiroGraph is inspired by <a href="https://github.com/colbymchenry/codegraph" target="_blank" rel="noopener">CodeGraph</a> by <a href="https://www.linkedin.com/in/colby-mchenry/" target="_blank" rel="noopener">Colby McHenry</a>. The original concept of building a semantic code graph for AI coding agents comes from his work.</p>
+
+    <h3 id="credits-contributors">Contributors</h3>
+    <ul>
+      <li><a href="https://www.linkedin.com/in/alessandrofranceschi/" target="_blank" rel="noopener">Alessandro Franceschi</a>: Claude Code and Codex integration, Elixir/Phoenix language and framework support.</li>
+      <li><a href="https://www.linkedin.com/in/argomauro/" target="_blank" rel="noopener">Mauro Argo</a>: original idea for the architecture layer analysis feature.</li>
+    </ul>
+
+    <h3 id="credits-stargazers">Stargazers & Community</h3>
+    <p>Thank you to everyone who contributed and starred the project on GitHub.</p>
+
+    <!-- Badges -->
+    <div style="margin-top: 1rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <a href="https://github.com/davide-desio-eleva/kirograph/stargazers" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--yellow);">
+          <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/>
+        </svg>
+        <span id="docs-star-count">—</span> stars
+      </a>
+      <a href="https://github.com/davide-desio-eleva/kirograph/network/members" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--text-muted);">
+          <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013.5 6.25v-.878a2.25 2.25 0 111.5 0zM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0zm6.75.75a.75.75 0 10 0-1.5.75.75 0 000 1.5zM8 12.75a.75.75 0 10 0-1.5.75.75 0 000 1.5z"/>
+        </svg>
+        <span id="docs-fork-count">—</span> forks
+      </a>
+      <a href="https://github.com/davide-desio-eleva/kirograph/graphs/contributors" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 0.85rem; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px; color: var(--accent);">
+          <path d="M2 5.5a3.5 3.5 0 115.898 2.549 5.508 5.508 0 013.034 4.084.75.75 0 11-1.482.235 4.001 4.001 0 00-6.9 0 .75.75 0 01-1.482-.236A5.507 5.507 0 013.102 8.05 3.49 3.49 0 012 5.5zM11 4a.75.75 0 100 1.5 1.5 1.5 0 01.666 2.844.75.75 0 00-.416.672v.352a.75.75 0 00.574.73c1.2.289 2.162 1.2 2.522 2.372a.75.75 0 101.434-.44 5.01 5.01 0 00-2.56-3.012A3 3 0 0011 4z"/>
+        </svg>
+        <span id="docs-contributor-count">—</span> contributors
+      </a>
+    </div>
+
+    <!-- Avatar carousel -->
+    <div style="margin-top: 1rem;">
+      <div id="docs-avatar-carousel" style="position: relative; max-width: 100%; overflow: hidden; mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
+        <div id="docs-avatar-track" style="display: flex; gap: 0.5rem; align-items: center; padding: 0.5rem 0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;">
+        </div>
+      </div>
+    </div>
+
+    <script>
+    (function() {
+      var REPO = 'davide-desio-eleva/kirograph';
+      var track = document.getElementById('docs-avatar-track');
+
+      fetch('https://api.github.com/repos/' + REPO)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.stargazers_count !== undefined) document.getElementById('docs-star-count').textContent = data.stargazers_count;
+          if (data.forks_count !== undefined) document.getElementById('docs-fork-count').textContent = data.forks_count;
+        }).catch(function() {});
+
+      function makeAvatar(user, isContributor) {
+        var a = document.createElement('a');
+        a.href = 'https://github.com/' + user.login;
+        a.target = '_blank'; a.rel = 'noopener';
+        a.title = user.login + (isContributor ? ' (contributor)' : '');
+        a.style.cssText = 'flex-shrink:0; display:block;';
+        var img = document.createElement('img');
+        img.src = user.avatar_url + '&s=64';
+        img.alt = user.login; img.loading = 'lazy';
+        img.style.cssText = 'width:36px; height:36px; border-radius:50%; border:2px solid ' + (isContributor ? 'var(--accent)' : 'var(--border)') + '; transition: border-color 0.2s, transform 0.2s;';
+        img.onmouseover = function() { this.style.transform='scale(1.15)'; this.style.borderColor='var(--accent)'; };
+        img.onmouseout = function() { this.style.transform='scale(1)'; this.style.borderColor=isContributor?'var(--accent)':'var(--border)'; };
+        a.appendChild(img);
+        return a;
+      }
+
+      fetch('https://api.github.com/repos/' + REPO + '/contributors?per_page=30')
+        .then(function(r) { return r.json(); })
+        .then(function(contributors) {
+          if (!Array.isArray(contributors)) return;
+          var logins = new Set(); var count = 0;
+          contributors.forEach(function(u) { if (u.type==='Bot') return; count++; logins.add(u.login); track.appendChild(makeAvatar(u, true)); });
+          document.getElementById('docs-contributor-count').textContent = count;
+          return fetch('https://api.github.com/repos/' + REPO + '/stargazers?per_page=100')
+            .then(function(r) { return r.json(); })
+            .then(function(stargazers) {
+              if (!Array.isArray(stargazers)) return;
+              stargazers.forEach(function(u) { if (logins.has(u.login)) return; track.appendChild(makeAvatar(u, false)); });
+            });
+        }).catch(function() {});
+
+      var scrollDir = 1, paused = false;
+      track.addEventListener('mouseenter', function() { paused = true; });
+      track.addEventListener('mouseleave', function() { paused = false; });
+      function autoScroll() {
+        if (!paused && track.scrollWidth > track.clientWidth) {
+          track.scrollLeft += 0.5 * scrollDir;
+          if (track.scrollLeft >= track.scrollWidth - track.clientWidth - 1) scrollDir = -1;
+          if (track.scrollLeft <= 0) scrollDir = 1;
+        }
+        requestAnimationFrame(autoScroll);
+      }
+      requestAnimationFrame(autoScroll);
+    })();
+    </script>
+    <style>#docs-avatar-track::-webkit-scrollbar { display: none; }</style>
 
   </main>
 
@@ -506,9 +611,9 @@ kirograph caveman         # show current mode</code></pre>
 <!-- ── Footer ── -->
 <footer class="footer">
   <p>
-    KiroGraph &mdash;
-    <a href="index.html">Home</a> &mdash;
-    <a href="changelog.html">Changelog</a> &mdash;
+    KiroGraph ·
+    <a href="index.html">Home</a> ·
+    <a href="changelog.html">Changelog</a> ·
     <a href="https://github.com/davide-desio-eleva/kirograph" target="_blank" rel="noopener">GitHub</a>
   </p>
 </footer>

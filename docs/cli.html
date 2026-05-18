@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KiroGraph — CLI Reference</title>
+  <title>KiroGraph: CLI Reference</title>
   <meta name="description" content="Full CLI reference for KiroGraph: all commands, flags, and usage examples.">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/logo.png">
@@ -98,7 +98,7 @@ kirograph context "refactor payment service" --max-nodes 30
 kirograph context "validate token" --no-code</code></pre>
 
     <h3 id="cli-affected">Affected Tests</h3>
-    <p>Find test files that depend on changed source files — useful in CI or pre-commit hooks.</p>
+    <p>Find test files that depend on changed source files, useful in CI or pre-commit hooks.</p>
     <pre><code>kirograph affected src/utils.ts src/api.ts           # Pass files as arguments
 git diff --name-only | kirograph affected --stdin     # Pipe from git diff
 kirograph affected --stdin --json &lt; changed.txt       # JSON output

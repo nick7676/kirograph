@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.13.1] - 2026-05-18
+
+### Added
+
+- **Multi-client installer targets** (`--target claude`, `--target codex`). KiroGraph can now be installed for Claude Code and Codex in addition to Kiro. All targets share the same `.kirograph/` data; installing another target only writes that tool's integration files. Contributed by [Alessandro Franceschi](https://www.linkedin.com/in/alessandrofranceschi/).
+  - `kirograph install --target claude`: writes `.mcp.json`, `.kirograph/claude.md`, and imports it from `CLAUDE.md`.
+  - `kirograph install --target codex`: writes `.kirograph/codex.md`, generates a KiroGraph block in `AGENTS.md`, and prints the `codex mcp add` command.
+- **Centralized MCP tool name list** (`src/mcp/tool-names.ts`): single source of truth for all 18 tool names, used by the installer, CLI agent config, and MCP server registration.
+- **Split uninstall prompts**: `kirograph uninit` now asks separately whether to remove integration files and whether to remove `.kirograph/` data. Supports `--target kiro|claude|codex|all`.
+- **`kirograph uninstall` alias** for `kirograph uninit`.
+- **Shared agent instructions builder** (`src/bin/installer/instructions.ts`): generates tool guidance for Claude and Codex targets, with caveman mode support.
+- **Credits section** in README and docs with contributor attributions.
+
+### Changed
+
+- `kirograph install` without `--target` defaults to `kiro` (no behavior change for existing users).
+- `autoApprove` list in Kiro MCP config now includes all 18 tools (previously missing `kirograph_hotspots`, `kirograph_surprising`, `kirograph_diff`).
+- README and docs restructured to clearly position Kiro as the primary supported target, with other tools marked as experimental.
+
+---
+
 ## [0.13.0] - 2026-05-18
 
 ### Added
@@ -332,6 +353,7 @@
 - MCP tools: `kirograph_context`, `kirograph_search`, `kirograph_callers`, `kirograph_callees`, `kirograph_impact`, `kirograph_node`, `kirograph_type_hierarchy`, `kirograph_path`, `kirograph_dead_code`, `kirograph_circular_deps`, `kirograph_files`, `kirograph_status`
 - CLI: `kirograph index`, `kirograph sync`, `kirograph query`, `kirograph context`, `kirograph files`, `kirograph affected`, `kirograph status`, `kirograph unlock`
 
+[0.13.1]: https://github.com/davide-desio-eleva/kirograph/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.0...v0.12.1
