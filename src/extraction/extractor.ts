@@ -242,7 +242,7 @@ const KIND_MAP: Record<string, NodeKind> = {
   function_declaration: 'function',
   function_expression: 'function',
   arrow_function: 'function',
-  function_definition: 'function',    // Python
+  function_definition: 'function',    // Python, Scala
   function_item: 'function',          // Rust
   function_declaration_go: 'function',
   // Methods
@@ -252,12 +252,14 @@ const KIND_MAP: Record<string, NodeKind> = {
   // Classes / structs
   class_declaration: 'class',
   class_expression: 'class',
-  class_definition: 'class',          // Python
+  class_definition: 'class',          // Python, Scala
   impl_item: 'class',                 // Rust (impl blocks)
   struct_item: 'struct',              // Rust
+  struct_definition: 'struct',        // Zig
   // Interfaces / traits
   interface_declaration: 'interface',
   trait_item: 'trait',                // Rust
+  trait_definition: 'trait',          // Scala
   protocol_declaration: 'interface',  // Swift
   // Enums
   enum_declaration: 'enum',
@@ -270,6 +272,7 @@ const KIND_MAP: Record<string, NodeKind> = {
   type_alias: 'type_alias',           // Kotlin
   // Namespaces / modules
   namespace_declaration: 'namespace',
+  module_definition: 'namespace',     // OCaml
   // Variables / constants (language-specific, see extractVariableKind)
   lexical_declaration: 'variable',    // TS/JS (const/let/var) — refined below
   variable_declaration: 'variable',   // TS/JS (var)
@@ -435,6 +438,46 @@ function getLanguageSpecificKind(type: string, lang: Language): NodeKind | null 
       break;
     case 'ruby':
       if (type === 'singleton_method') return 'method';
+      break;
+    case 'scala':
+      if (type === 'object_definition') return 'class';
+      if (type === 'val_definition') return 'variable';
+      if (type === 'var_definition') return 'variable';
+      if (type === 'type_definition') return 'type_alias';
+      break;
+    case 'lua':
+      if (type === 'local_function') return 'function';
+      if (type === 'local_variable_declaration') return 'variable';
+      if (type === 'variable_assignment') return 'variable';
+      break;
+    case 'zig':
+      if (type === 'VarDecl') return 'variable';
+      if (type === 'ContainerDecl') return 'struct';
+      break;
+    case 'bash':
+      if (type === 'variable_assignment') return 'variable';
+      break;
+    case 'ocaml':
+      if (type === 'let_binding') return 'variable';
+      if (type === 'type_binding') return 'type_alias';
+      if (type === 'module_binding') return 'namespace';
+      break;
+    case 'elm':
+      if (type === 'function_declaration_left') return 'function';
+      if (type === 'type_alias_declaration') return 'type_alias';
+      break;
+    case 'solidity':
+      if (type === 'contract_declaration') return 'class';
+      if (type === 'event_definition') return 'function';
+      if (type === 'modifier_definition') return 'function';
+      if (type === 'state_variable_declaration') return 'variable';
+      break;
+    case 'objc':
+      if (type === 'class_interface') return 'class';
+      if (type === 'class_implementation') return 'class';
+      if (type === 'protocol_declaration') return 'interface';
+      if (type === 'method_declaration') return 'method';
+      if (type === 'property_declaration') return 'property';
       break;
   }
   return null;

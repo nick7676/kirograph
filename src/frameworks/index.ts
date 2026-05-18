@@ -29,6 +29,9 @@ export { aspnetResolver } from './csharp';
 export { swiftUIResolver, uikitResolver, vaporResolver } from './swift';
 export { laravelResolver, FACADE_MAPPINGS } from './laravel';
 export { phoenixResolver } from './elixir';
+export { playResolver } from './scala';
+export { nuxtResolver, vueResolver } from './vue';
+export { solidityResolver } from './solidity';
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
@@ -44,6 +47,9 @@ import { aspnetResolver } from './csharp';
 import { swiftUIResolver, uikitResolver, vaporResolver } from './swift';
 import { laravelResolver } from './laravel';
 import { phoenixResolver } from './elixir';
+import { playResolver } from './scala';
+import { nuxtResolver, vueResolver } from './vue';
+import { solidityResolver } from './solidity';
 
 const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   // PHP
@@ -52,6 +58,9 @@ const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   expressResolver,
   reactResolver,
   svelteResolver,
+  // Vue / Nuxt
+  nuxtResolver,
+  vueResolver,
   // Python
   djangoResolver,
   flaskResolver,
@@ -72,6 +81,10 @@ const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   vaporResolver,
   // Elixir
   phoenixResolver,
+  // Scala
+  playResolver,
+  // Solidity
+  solidityResolver,
 ];
 
 export function getAllFrameworkResolvers(): FrameworkResolver[] {

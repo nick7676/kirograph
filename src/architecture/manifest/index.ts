@@ -15,6 +15,9 @@ import { pythonParser } from './python';
 import { mavenParser } from './maven';
 import { gradleParser } from './gradle';
 import { csprojParser } from './csproj';
+import { sbtParser } from './scala';
+import { ocamlParser } from './ocaml';
+import { elmParser } from './elm';
 
 // All registered manifest parsers, in priority order
 const MANIFEST_PARSERS: ManifestParser[] = [
@@ -25,6 +28,9 @@ const MANIFEST_PARSERS: ManifestParser[] = [
   mavenParser,
   gradleParser,
   csprojParser,
+  sbtParser,
+  ocamlParser,
+  elmParser,
 ];
 
 // All manifest filenames we care about (for fast lookup during directory walk)
@@ -35,7 +41,8 @@ const MANIFEST_FILENAMES = new Set(
 // Directories to never descend into when scanning for manifests
 const SKIP_DIRS = new Set([
   'node_modules', '.git', 'dist', 'build', 'target', '.gradle', '__pycache__',
-  '.kirograph', 'vendor', '.cache', 'coverage', '.nyc_output',
+  '.kirograph', 'vendor', '.cache', 'coverage', '.nyc_output', '_build', '_opam',
+  'elm-stuff', 'zig-cache', 'zig-out',
 ]);
 
 export function getAllManifestParsers(): ManifestParser[] {

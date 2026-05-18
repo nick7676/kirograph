@@ -1134,6 +1134,15 @@ Architecture analysis runs as a dedicated phase during `kirograph index`. Progre
 | Dart | `.dart` |
 | Svelte | `.svelte` |
 | Elixir | `.ex`, `.exs` |
+| Scala | `.scala`, `.sc`, `.sbt` |
+| Lua | `.lua` |
+| Zig | `.zig`, `.zon` |
+| Bash | `.sh`, `.bash`, `.zsh` |
+| OCaml | `.ml`, `.mli` |
+| Elm | `.elm` |
+| Solidity | `.sol` |
+| Vue | `.vue` |
+| Objective-C | `.m` |
 
 ## Framework Detection
 
@@ -1141,11 +1150,15 @@ KiroGraph automatically detects frameworks and enriches the graph with framework
 
 **JavaScript / TypeScript:** React, Next.js, React Native, Svelte, SvelteKit, Express, Fastify, Koa
 
+**Vue:** Vue, Nuxt
+
 **Python:** Django, Flask, FastAPI
 
 **Ruby:** Rails
 
 **Java:** Spring, Spring Boot, Spring MVC
+
+**Scala:** Play, Akka HTTP, http4s
 
 **Go:** generic Go resolver
 
@@ -1158,6 +1171,8 @@ KiroGraph automatically detects frameworks and enriches the graph with framework
 **PHP:** Laravel
 
 **Elixir:** Phoenix
+
+**Solidity:** Hardhat, Foundry, Truffle (OpenZeppelin patterns)
 
 Detected frameworks are stored in config and used to improve symbol extraction and resolution.
 

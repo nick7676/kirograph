@@ -40,6 +40,15 @@ export const GRAMMAR_FILE_MAP: Record<Language, string> = {
   dart: 'tree-sitter-dart',
   svelte: 'tree-sitter-svelte',
   elixir: 'tree-sitter-elixir',
+  scala: 'tree-sitter-scala',
+  lua: 'tree-sitter-lua',
+  zig: 'tree-sitter-zig',
+  bash: 'tree-sitter-bash',
+  ocaml: 'tree-sitter-ocaml',
+  elm: 'tree-sitter-elm',
+  solidity: 'tree-sitter-solidity',
+  vue: 'tree-sitter-vue',
+  objc: 'tree-sitter-objc',
   // Pascal is bundled in src/extraction/wasm/ (not in tree-sitter-wasms)
   pascal: 'tree-sitter-pascal',
   // No WASM available

@@ -13,6 +13,10 @@ import { rubyLayerDetector } from './ruby';
 import { rustLayerDetector } from './rust';
 import { csharpLayerDetector } from './csharp';
 import { elixirLayerDetector } from './elixir';
+import { scalaLayerDetector } from './scala';
+import { vueLayerDetector } from './vue';
+import { solidityLayerDetector } from './solidity';
+import { ocamlLayerDetector } from './ocaml';
 
 const LAYER_DETECTORS: LayerDetector[] = [
   typescriptLayerDetector,
@@ -23,6 +27,10 @@ const LAYER_DETECTORS: LayerDetector[] = [
   rustLayerDetector,
   csharpLayerDetector,
   elixirLayerDetector,
+  scalaLayerDetector,
+  vueLayerDetector,
+  solidityLayerDetector,
+  ocamlLayerDetector,
 ];
 
 export function getAllLayerDetectors(): LayerDetector[] {
