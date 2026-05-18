@@ -162,7 +162,7 @@ export class GraphQueryManager {
     const picomatch = require('picomatch');
     const depth = opts?.depth ?? 5;
     const isTest = picomatch(
-      opts?.testPattern ?? '{**/*.spec.*,**/*.test.*,**/e2e/**,**/tests/**,**/__tests__/**}'
+      opts?.testPattern ?? '{**/*.spec.*,**/*.test.*,**/*_test.*,**/*Test.*,**/*Spec.*,**/*.t.sol,**/*.bats,**/e2e/**,**/test/**,**/tests/**,**/spec/**,**/__tests__/**,**/src/test/**}'
     );
 
     const results = new Set<string>();

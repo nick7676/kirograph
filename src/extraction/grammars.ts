@@ -40,6 +40,22 @@ export const GRAMMAR_FILE_MAP: Record<Language, string> = {
   dart: 'tree-sitter-dart',
   svelte: 'tree-sitter-svelte',
   elixir: 'tree-sitter-elixir',
+  scala: 'tree-sitter-scala',
+  lua: 'tree-sitter-lua',
+  zig: 'tree-sitter-zig',
+  bash: 'tree-sitter-bash',
+  ocaml: 'tree-sitter-ocaml',
+  elm: 'tree-sitter-elm',
+  solidity: 'tree-sitter-solidity',
+  vue: 'tree-sitter-vue',
+  objc: 'tree-sitter-objc',
+  yaml: 'tree-sitter-yaml',
+  // HCL (Terraform) is bundled in src/extraction/wasm/ (not in tree-sitter-wasms)
+  hcl: 'tree-sitter-hcl',
+  // CSS is in tree-sitter-wasms; SCSS is bundled in src/extraction/wasm/
+  css: 'tree-sitter-css',
+  scss: 'tree-sitter-scss',
+  html: 'tree-sitter-html',
   // Pascal is bundled in src/extraction/wasm/ (not in tree-sitter-wasms)
   pascal: 'tree-sitter-pascal',
   // No WASM available
@@ -69,13 +85,19 @@ export async function initGrammars(): Promise<void> {
 
 /**
  * Resolves the filesystem path to the WASM file for a given language.
- * Pascal uses the bundled wasm in src/extraction/wasm/.
+ * Pascal and HCL use bundled wasm files in src/extraction/wasm/.
  * All others are resolved from the tree-sitter-wasms npm package.
  * Returns null if the file cannot be located.
  */
 function resolveWasmPath(lang: Language): string | null {
   if (lang === 'pascal') {
     return path.join(__dirname, 'wasm', 'tree-sitter-pascal.wasm');
+  }
+  if (lang === 'hcl') {
+    return path.join(__dirname, 'wasm', 'tree-sitter-hcl.wasm');
+  }
+  if (lang === 'scss') {
+    return path.join(__dirname, 'wasm', 'tree-sitter-scss.wasm');
   }
   const grammarFile = GRAMMAR_FILE_MAP[lang];
   if (!grammarFile) return null;

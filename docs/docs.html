@@ -160,28 +160,81 @@ cd kirograph && npm uninstall -g .</code></pre>
     <!-- ── Languages & Frameworks ── -->
     <h2 id="languages">Supported Languages</h2>
 
-    <div class="table-wrap">
+    <!-- Search filter -->
+    <div style="max-width: 400px; margin: 0 auto 1.5rem; position: relative;">
+      <input type="text" id="lang-fw-search" placeholder="Search languages & frameworks..." autocomplete="off"
+        style="width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      <svg style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    </div>
+
+    <h3 id="lang-general">General-purpose</h3>
+    <div class="table-wrap" data-searchable>
       <table>
         <thead><tr><th>Language</th><th>Extensions</th></tr></thead>
         <tbody>
-          <tr><td>TypeScript</td><td><code>.ts</code></td></tr>
-          <tr><td>JavaScript</td><td><code>.js</code></td></tr>
-          <tr><td>TSX</td><td><code>.tsx</code></td></tr>
-          <tr><td>JSX</td><td><code>.jsx</code></td></tr>
-          <tr><td>Python</td><td><code>.py</code></td></tr>
-          <tr><td>Go</td><td><code>.go</code></td></tr>
-          <tr><td>Rust</td><td><code>.rs</code></td></tr>
-          <tr><td>Java</td><td><code>.java</code></td></tr>
-          <tr><td>C</td><td><code>.c</code>, <code>.h</code></td></tr>
-          <tr><td>C++</td><td><code>.cpp</code>, <code>.cc</code>, <code>.cxx</code>, <code>.hpp</code></td></tr>
-          <tr><td>C#</td><td><code>.cs</code></td></tr>
-          <tr><td>PHP</td><td><code>.php</code></td></tr>
-          <tr><td>Ruby</td><td><code>.rb</code></td></tr>
-          <tr><td>Swift</td><td><code>.swift</code></td></tr>
-          <tr><td>Kotlin</td><td><code>.kt</code></td></tr>
-          <tr><td>Dart</td><td><code>.dart</code></td></tr>
-          <tr><td>Svelte</td><td><code>.svelte</code></td></tr>
-          <tr><td>Elixir</td><td><code>.ex</code>, <code>.exs</code></td></tr>
+          <tr data-tags="typescript tsx"><td>TypeScript</td><td><code>.ts</code></td></tr>
+          <tr data-tags="javascript jsx"><td>JavaScript</td><td><code>.js</code></td></tr>
+          <tr data-tags="typescript tsx react"><td>TSX</td><td><code>.tsx</code></td></tr>
+          <tr data-tags="javascript jsx react"><td>JSX</td><td><code>.jsx</code></td></tr>
+          <tr data-tags="python django flask fastapi"><td>Python</td><td><code>.py</code></td></tr>
+          <tr data-tags="go golang"><td>Go</td><td><code>.go</code></td></tr>
+          <tr data-tags="rust"><td>Rust</td><td><code>.rs</code></td></tr>
+          <tr data-tags="java spring"><td>Java</td><td><code>.java</code></td></tr>
+          <tr data-tags="c"><td>C</td><td><code>.c</code>, <code>.h</code></td></tr>
+          <tr data-tags="cpp c++"><td>C++</td><td><code>.cpp</code>, <code>.cc</code>, <code>.cxx</code>, <code>.hpp</code></td></tr>
+          <tr data-tags="csharp c# dotnet aspnet"><td>C#</td><td><code>.cs</code></td></tr>
+          <tr data-tags="php laravel"><td>PHP</td><td><code>.php</code></td></tr>
+          <tr data-tags="ruby rails"><td>Ruby</td><td><code>.rb</code></td></tr>
+          <tr data-tags="swift ios macos swiftui"><td>Swift</td><td><code>.swift</code></td></tr>
+          <tr data-tags="kotlin android"><td>Kotlin</td><td><code>.kt</code></td></tr>
+          <tr data-tags="dart flutter"><td>Dart</td><td><code>.dart</code></td></tr>
+          <tr data-tags="scala jvm play akka"><td>Scala</td><td><code>.scala</code>, <code>.sc</code>, <code>.sbt</code></td></tr>
+          <tr data-tags="lua"><td>Lua</td><td><code>.lua</code></td></tr>
+          <tr data-tags="zig"><td>Zig</td><td><code>.zig</code>, <code>.zon</code></td></tr>
+          <tr data-tags="bash shell sh zsh"><td>Bash</td><td><code>.sh</code>, <code>.bash</code>, <code>.zsh</code></td></tr>
+          <tr data-tags="ocaml ml functional"><td>OCaml</td><td><code>.ml</code>, <code>.mli</code></td></tr>
+          <tr data-tags="elm functional frontend"><td>Elm</td><td><code>.elm</code></td></tr>
+          <tr data-tags="objective-c objc ios macos"><td>Objective-C</td><td><code>.m</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="lang-frontend">Frontend &amp; UI</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Language</th><th>Extensions</th></tr></thead>
+        <tbody>
+          <tr data-tags="react nextjs react native tsx jsx frontend"><td>React / React Native</td><td><code>.tsx</code>, <code>.jsx</code> (via TypeScript/JSX grammars)</td></tr>
+          <tr data-tags="nextjs react typescript frontend ssr"><td>Next.js</td><td><code>.tsx</code>, <code>.jsx</code> (via TypeScript/JSX grammars)</td></tr>
+          <tr data-tags="angular typescript frontend spa"><td>Angular</td><td><code>.ts</code>, <code>.html</code> (via TypeScript/HTML grammars)</td></tr>
+          <tr data-tags="svelte sveltekit frontend"><td>Svelte</td><td><code>.svelte</code></td></tr>
+          <tr data-tags="vue nuxt frontend"><td>Vue</td><td><code>.vue</code></td></tr>
+          <tr data-tags="html angular templates"><td>HTML</td><td><code>.html</code>, <code>.htm</code></td></tr>
+          <tr data-tags="css styles"><td>CSS</td><td><code>.css</code></td></tr>
+          <tr data-tags="scss sass styles css"><td>SCSS / Sass</td><td><code>.scss</code>, <code>.sass</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="lang-domain">Domain-specific</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Language</th><th>Domain</th><th>Extensions</th></tr></thead>
+        <tbody>
+          <tr data-tags="solidity ethereum blockchain web3 smart contract"><td>Solidity</td><td>Blockchain / Web3</td><td><code>.sol</code></td></tr>
+          <tr data-tags="elixir erlang phoenix"><td>Elixir</td><td>Distributed systems / Real-time</td><td><code>.ex</code>, <code>.exs</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="lang-config">Configuration &amp; Infrastructure</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Language</th><th>Extensions</th></tr></thead>
+        <tbody>
+          <tr data-tags="yaml yml config"><td>YAML</td><td><code>.yaml</code>, <code>.yml</code></td></tr>
+          <tr data-tags="hcl terraform opentofu iac"><td>HCL (Terraform)</td><td><code>.tf</code>, <code>.tfvars</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -190,25 +243,96 @@ cd kirograph && npm uninstall -g .</code></pre>
 
     <p>KiroGraph auto-detects frameworks and enriches the graph with framework-specific semantics (routes, components, lifecycle methods).</p>
 
-    <div class="table-wrap">
+    <h3 id="fw-web">Web Frameworks</h3>
+    <div class="table-wrap" data-searchable>
       <table>
         <thead><tr><th>Language</th><th>Frameworks</th></tr></thead>
         <tbody>
-          <tr><td>JavaScript / TypeScript</td><td>React, Next.js, React Native, Svelte, SvelteKit, Express, Fastify, Koa</td></tr>
-          <tr><td>Python</td><td>Django, Flask, FastAPI</td></tr>
-          <tr><td>Ruby</td><td>Rails</td></tr>
-          <tr><td>Java</td><td>Spring, Spring Boot, Spring MVC</td></tr>
-          <tr><td>Go</td><td>Generic Go resolver</td></tr>
-          <tr><td>Rust</td><td>Generic Rust resolver</td></tr>
-          <tr><td>C#</td><td>ASP.NET Core</td></tr>
-          <tr><td>Swift</td><td>SwiftUI, UIKit, Vapor</td></tr>
-          <tr><td>PHP</td><td>Laravel</td></tr>
-          <tr><td>Elixir</td><td>Phoenix</td></tr>
+          <tr data-tags="javascript typescript react nextjs angular express fastify koa"><td>JavaScript / TypeScript</td><td>React, Next.js, React Native, Angular, Svelte, SvelteKit, Express, Fastify, Koa</td></tr>
+          <tr data-tags="vue nuxt frontend"><td>Vue</td><td>Vue, Nuxt</td></tr>
+          <tr data-tags="python django flask fastapi"><td>Python</td><td>Django, Flask, FastAPI</td></tr>
+          <tr data-tags="ruby rails"><td>Ruby</td><td>Rails</td></tr>
+          <tr data-tags="java spring"><td>Java</td><td>Spring, Spring Boot, Spring MVC</td></tr>
+          <tr data-tags="scala play akka http4s"><td>Scala</td><td>Play, Akka HTTP, http4s</td></tr>
+          <tr data-tags="go golang"><td>Go</td><td>Generic Go resolver</td></tr>
+          <tr data-tags="rust"><td>Rust</td><td>Generic Rust resolver</td></tr>
+          <tr data-tags="csharp dotnet aspnet"><td>C#</td><td>ASP.NET Core</td></tr>
+          <tr data-tags="swift ios macos swiftui uikit vapor"><td>Swift</td><td>SwiftUI, UIKit, Vapor</td></tr>
+          <tr data-tags="php laravel"><td>PHP</td><td>Laravel</td></tr>
+          <tr data-tags="elixir phoenix"><td>Elixir</td><td>Phoenix</td></tr>
+          <tr data-tags="solidity hardhat foundry truffle ethereum web3"><td>Solidity</td><td>Hardhat, Foundry, Truffle (OpenZeppelin patterns)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="fw-iac">Infrastructure as Code</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Tool</th><th>Detection</th></tr></thead>
+        <tbody>
+          <tr data-tags="aws cdk typescript python iac cloud"><td>AWS CDK</td><td><code>cdk.json</code> or <code>aws-cdk-lib</code> in deps</td></tr>
+          <tr data-tags="sst typescript aws iac cloud serverless"><td>SST</td><td><code>sst.config.ts</code> or <code>sst</code> in deps</td></tr>
+          <tr data-tags="serverless framework aws lambda iac cloud"><td>Serverless Framework</td><td><code>serverless.yml</code> or <code>serverless.ts</code></td></tr>
+          <tr data-tags="aws sam lambda iac cloud serverless"><td>AWS SAM</td><td><code>template.yaml</code> with <code>AWS::Serverless</code></td></tr>
+          <tr data-tags="terraform opentofu hcl iac cloud hashicorp"><td>Terraform / OpenTofu</td><td><code>.terraform/</code> or <code>.tf</code> files</td></tr>
+          <tr data-tags="pulumi typescript python go iac cloud"><td>Pulumi</td><td><code>Pulumi.yaml</code> or <code>@pulumi/*</code> deps</td></tr>
+          <tr data-tags="cloudformation aws iac cloud yaml"><td>CloudFormation</td><td><code>AWSTemplateFormatVersion</code> in template</td></tr>
+          <tr data-tags="amplify aws iac cloud typescript backend"><td>AWS Amplify Gen 2</td><td><code>amplify/backend.ts</code> or <code>@aws-amplify/backend</code> in deps</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="fw-containers">Containers &amp; Orchestration</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Tool</th><th>Detection</th></tr></thead>
+        <tbody>
+          <tr data-tags="kubernetes k8s helm containers orchestration yaml"><td>Kubernetes / Helm</td><td><code>Chart.yaml</code> or K8s manifest directories</td></tr>
+          <tr data-tags="docker compose containers yaml"><td>Docker Compose</td><td><code>docker-compose.yml</code> or <code>compose.yaml</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="fw-config">Configuration Management</h3>
+    <div class="table-wrap" data-searchable>
+      <table>
+        <thead><tr><th>Tool</th><th>Detection</th></tr></thead>
+        <tbody>
+          <tr data-tags="ansible automation yaml devops"><td>Ansible</td><td><code>ansible.cfg</code> or standard role directory structure</td></tr>
         </tbody>
       </table>
     </div>
 
     <p>Detected frameworks are stored in config and used to improve symbol extraction and resolution. Routes, components, and lifecycle methods are extracted as first-class nodes in the graph.</p>
+
+    <script>
+    (function() {
+      const input = document.getElementById('lang-fw-search');
+      if (!input) return;
+      const tables = document.querySelectorAll('.table-wrap[data-searchable]');
+      input.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        tables.forEach(wrap => {
+          const rows = wrap.querySelectorAll('tbody tr[data-tags]');
+          let anyVisible = false;
+          rows.forEach(row => {
+            if (!query) { row.style.display = ''; anyVisible = true; return; }
+            const text = row.textContent.toLowerCase();
+            const tags = (row.getAttribute('data-tags') || '').toLowerCase();
+            const match = text.includes(query) || tags.includes(query);
+            row.style.display = match ? '' : 'none';
+            if (match) anyVisible = true;
+          });
+          // Hide the heading if no rows visible
+          const heading = wrap.previousElementSibling;
+          if (heading && heading.tagName === 'H3') {
+            heading.style.display = (!query || anyVisible) ? '' : 'none';
+          }
+          wrap.style.display = (!query || anyVisible) ? '' : 'none';
+        });
+      });
+    })();
+    </script>
 
     <!-- ── Using with Kiro ── -->
     <h2 id="using-with-kiro">Using with Kiro</h2>

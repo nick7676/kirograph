@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.13.0] - 2026-05-18
+
+### Added
+
+- **14 new languages** — Scala (`.scala`, `.sc`, `.sbt`), Lua (`.lua`), Zig (`.zig`, `.zon`), Bash (`.sh`, `.bash`, `.zsh`), OCaml (`.ml`, `.mli`), Elm (`.elm`), Solidity (`.sol`), Vue (`.vue`), Objective-C (`.m`), YAML (`.yaml`, `.yml`), HCL/Terraform (`.tf`, `.tfvars`), CSS (`.css`), SCSS/Sass (`.scss`, `.sass`), and HTML (`.html`, `.htm`). YAML, CSS, and HTML use pre-compiled WASM grammars from `tree-sitter-wasms`. HCL uses a WASM grammar built from [tree-sitter-grammars/tree-sitter-hcl](https://github.com/tree-sitter-grammars/tree-sitter-hcl) and SCSS from [tree-sitter-grammars/tree-sitter-scss](https://github.com/tree-sitter-grammars/tree-sitter-scss), both bundled in `src/extraction/wasm/`.
+- **17 new framework resolvers:**
+  - **Play (Scala)** — detects Play Framework via `build.sbt`/`plugins.sbt`. Resolves controller, service, and model references. Extracts routes from `conf/routes` and Akka HTTP / http4s DSL patterns.
+  - **Nuxt / Vue** — detects Nuxt via `nuxt.config.ts` and Vue via `package.json`. Resolves composables (`useXxx`), auto-imported components (PascalCase → file lookup), and Pinia stores. Extracts file-based routes from `pages/` and server API routes from `server/api/`.
+  - **Solidity** — detects Hardhat/Foundry/Truffle projects. Resolves interface references (`IERC20`, etc.), contract inheritance, and library function calls.
+  - **SST** — detects SST via `sst.config.ts` or `sst` in `package.json`. Resolves Lambda handler strings to actual function symbols. Extracts API routes from `api.route()` calls and route object literals.
+  - **AWS CDK** — detects CDK via `cdk.json` or `aws-cdk-lib` in dependencies. Resolves handler strings and Stack/Construct class references. Extracts API Gateway routes from `addMethod`/`addResource`/`addRoutes` patterns.
+  - **Serverless Framework** — detects via `serverless.yml`/`serverless.ts`. Resolves handler strings. Extracts HTTP event routes from YAML config (`- http: GET /users`) and TypeScript config.
+  - **AWS SAM** — detects via `template.yaml` with `AWS::Serverless` transform or `samconfig.toml`. Resolves handler strings. Extracts API/HttpApi event routes from SAM template YAML.
+  - **Terraform / OpenTofu** — detects via `.terraform/` directory or `.tf` files. Extracts resources, data sources, modules, variables, outputs, and locals as graph nodes via regex-based parsing. Resolves cross-file resource, module, and variable references. Extracts API Gateway routes from `aws_api_gateway_resource` and `aws_api_gateway_method` blocks.
+  - **Pulumi** — detects via `Pulumi.yaml` or `@pulumi/*` in dependencies. Resolves resource property references and component class references. Extracts API Gateway routes from route object patterns.
+  - **CloudFormation** — detects raw CloudFormation templates (non-SAM) via `AWSTemplateFormatVersion`. Extracts resources (with logical IDs and types), parameters, and outputs. Resolves `!Ref`/`!GetAtt` cross-references.
+  - **Kubernetes / Helm** — detects via `Chart.yaml` or K8s manifest directories. Extracts Deployments, Services, ConfigMaps, Ingress, and other resources as typed nodes. Extracts Ingress paths as routes and Service ports.
+  - **Docker Compose** — detects via `docker-compose.yml` or `compose.yaml`. Extracts services (as components), networks, volumes, and exposed port mappings.
+  - **Ansible** — detects via `ansible.cfg`, playbook files, or standard role directory structure. Extracts plays, tasks, handlers, roles, and variables from the Ansible project structure.
+  - **Angular** — detects via `angular.json` or `@angular/core` in dependencies. Resolves services, components, modules, guards, pipes, directives, and interceptors using Angular's naming conventions. Extracts routes from routing modules.
+  - **AWS Amplify Gen 2** — detects via `amplify/backend.ts` or `@aws-amplify/backend` in dependencies. Extracts data models from `a.model()`, functions from `defineFunction()`, custom queries/mutations as routes, and resource definitions (`defineAuth`, `defineStorage`, `defineData`). Resolves function handler entry points to actual code.
+- **4 new architecture layer detectors:**
+  - **Scala** — Play controllers/models/views, SBT services/repositories, Akka actors, Slick persistence.
+  - **Vue / Nuxt** — pages, components, composables, stores, server/api, layouts, plugins.
+  - **Solidity** — contracts (service), interfaces (api), libraries (shared), storage/migrations (data), mocks.
+  - **OCaml** — bin (api), domain/service, db/repo (data), lib (shared). Dune-aware patterns.
+- **3 new manifest parsers:**
+  - **SBT** (`build.sbt`) — extracts project name, version, library dependencies, and multi-module sub-project detection.
+  - **OCaml** (`dune-project`, `.opam`) — extracts project name, version, dependencies, and discovers sub-libraries via `dune` files.
+  - **Elm** (`elm.json`) — handles both application and package types, extracts direct dependencies.
+- **Language-specific AST node mappings** — added `getLanguageSpecificKind` entries for all 9 new code languages (Scala `object_definition`/`val_definition`/`type_definition`, Lua `local_function`/`local_variable_declaration`, Zig `VarDecl`/`ContainerDecl`, Bash `variable_assignment`, OCaml `let_binding`/`type_binding`/`module_binding`, Elm `function_declaration_left`/`type_alias_declaration`, Solidity `contract_declaration`/`event_definition`/`modifier_definition`/`state_variable_declaration`, Objective-C `class_interface`/`class_implementation`/`protocol_declaration`/`method_declaration`/`property_declaration`).
+- **Generic KIND_MAP additions** — `trait_definition` (Scala), `struct_definition` (Zig), `module_definition` (OCaml) added to the shared node type map.
+- **Manifest skip directories** — `_build`, `_opam`, `elm-stuff`, `zig-cache`, `zig-out` added to the directory exclusion list during manifest scanning.
+- **Expanded test file detection** — `getAffectedTests` default pattern now covers all languages: `*_test.*` (Go, Python, Zig, Lua, OCaml, Elixir), `*Test.*` (Java, Scala), `*Spec.*` (Scala, Ruby), `**/test/**`, `**/spec/**`, `**/src/test/**`, `*.t.sol` (Foundry), `*.bats` (Bash).
+- **Hook file patterns** — `kirograph install` now generates hooks that trigger for all supported languages including `.scala`, `.lua`, `.zig`, `.sh`, `.ml`, `.elm`, `.sol`, `.vue`, `.m`, `.yaml`, `.yml`, `.tf`, `.css`, `.scss`, `.html`.
+
+---
+
 ## [0.12.2] - 2026-05-16
 
 ### Added
@@ -294,6 +332,7 @@
 - MCP tools: `kirograph_context`, `kirograph_search`, `kirograph_callers`, `kirograph_callees`, `kirograph_impact`, `kirograph_node`, `kirograph_type_hierarchy`, `kirograph_path`, `kirograph_dead_code`, `kirograph_circular_deps`, `kirograph_files`, `kirograph_status`
 - CLI: `kirograph index`, `kirograph sync`, `kirograph query`, `kirograph context`, `kirograph files`, `kirograph affected`, `kirograph status`, `kirograph unlock`
 
+[0.13.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.2...v0.13.0
 [0.12.2]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/davide-desio-eleva/kirograph/compare/v0.12.0...v0.12.1
 [0.10.0]: https://github.com/davide-desio-eleva/kirograph/compare/v0.9.0...v0.10.0

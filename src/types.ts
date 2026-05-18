@@ -15,7 +15,10 @@ export type EdgeKind =
 export type Language =
   | 'typescript' | 'javascript' | 'tsx' | 'jsx' | 'python' | 'go' | 'rust'
   | 'java' | 'c' | 'cpp' | 'csharp' | 'php' | 'ruby' | 'swift' | 'kotlin'
-  | 'dart' | 'svelte' | 'pascal' | 'liquid' | 'elixir' | 'unknown';
+  | 'dart' | 'svelte' | 'pascal' | 'liquid' | 'elixir'
+  | 'scala' | 'lua' | 'zig' | 'bash' | 'ocaml' | 'elm' | 'solidity' | 'vue' | 'objc'
+  | 'yaml' | 'hcl' | 'css' | 'scss' | 'html'
+  | 'unknown';
 
 export interface Node {
   id: string;

@@ -297,50 +297,160 @@
   <div class="container">
     <div class="section-header">
       <span class="label">Languages &amp; Frameworks</span>
-      <h2>18 languages, 20+ frameworks</h2>
+      <h2>31 languages, 35+ frameworks</h2>
       <p>All languages use WASM-compiled tree-sitter grammars. Frameworks are auto-detected and enrich the graph with routes, components, and lifecycle methods.</p>
     </div>
-    <div class="lang-grid">
-      <span class="lang-badge">TypeScript / TSX</span>
-      <span class="lang-badge">JavaScript / JSX</span>
-      <span class="lang-badge">Python</span>
-      <span class="lang-badge">Go</span>
-      <span class="lang-badge">Rust</span>
-      <span class="lang-badge">Java</span>
-      <span class="lang-badge">C / C++</span>
-      <span class="lang-badge">C#</span>
-      <span class="lang-badge">Ruby</span>
-      <span class="lang-badge">PHP</span>
-      <span class="lang-badge">Swift</span>
-      <span class="lang-badge">Kotlin</span>
-      <span class="lang-badge">Dart</span>
-      <span class="lang-badge">Svelte</span>
-      <span class="lang-badge">Elixir</span>
+
+    <!-- Search filter -->
+    <div style="max-width: 420px; margin: 0 auto 2.5rem; position: relative;">
+      <input type="text" id="lang-search" placeholder="Search languages & frameworks..." autocomplete="off"
+        style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem; border-radius: 999px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
+        onfocus="this.style.borderColor='var(--accent)';this.style.boxShadow='0 0 0 3px var(--accent-glow)'" onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <svg style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     </div>
 
-    <h3 style="text-align: center; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em;">Detected Frameworks</h3>
-    <div class="lang-grid">
-      <span class="lang-badge">React</span>
-      <span class="lang-badge">Next.js</span>
-      <span class="lang-badge">React Native</span>
-      <span class="lang-badge">Svelte / SvelteKit</span>
-      <span class="lang-badge">Express</span>
-      <span class="lang-badge">Fastify</span>
-      <span class="lang-badge">Koa</span>
-      <span class="lang-badge">Django</span>
-      <span class="lang-badge">Flask</span>
-      <span class="lang-badge">FastAPI</span>
-      <span class="lang-badge">Rails</span>
-      <span class="lang-badge">Spring / Spring Boot</span>
-      <span class="lang-badge">ASP.NET Core</span>
-      <span class="lang-badge">Laravel</span>
-      <span class="lang-badge">Phoenix</span>
-      <span class="lang-badge">SwiftUI</span>
-      <span class="lang-badge">UIKit</span>
-      <span class="lang-badge">Vapor</span>
+    <!-- ─── LANGUAGES ─── -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem 2rem; margin-bottom: 2rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 0.3rem 1rem;">Languages</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--green);" data-scope>General-purpose</h3>
+      <div class="lang-grid" data-category="languages">
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="typescript tsx">TypeScript / TSX</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="javascript jsx">JavaScript / JSX</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="python">Python</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="go golang">Go</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="rust">Rust</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="java">Java</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="c cpp c++">C / C++</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="csharp c# dotnet">C#</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="ruby">Ruby</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="php">PHP</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="swift ios macos">Swift</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="kotlin android">Kotlin</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="dart flutter">Dart</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="scala jvm">Scala</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="lua">Lua</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="zig">Zig</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="bash shell sh zsh">Bash</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="ocaml ml functional">OCaml</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="elm functional frontend">Elm</span>
+        <span class="lang-badge" style="border-color: rgba(63,185,80,0.3); color: var(--green);" data-tags="objective-c objc ios macos">Objective-C</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--purple);" data-scope>Frontend &amp; UI</h3>
+      <div class="lang-grid" data-category="languages">
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="react nextjs javascript typescript frontend tsx jsx">React / React Native</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="nextjs react typescript frontend ssr">Next.js</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="angular typescript frontend spa">Angular</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="svelte sveltekit frontend">Svelte</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="vue nuxt frontend">Vue</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="html angular templates">HTML</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="css styles">CSS</span>
+        <span class="lang-badge" style="border-color: rgba(188,140,255,0.3); color: var(--purple);" data-tags="scss sass styles css">SCSS / Sass</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--yellow);" data-scope>Domain-specific</h3>
+      <div class="lang-grid" data-category="languages">
+        <span class="lang-badge" style="border-color: rgba(210,153,34,0.3); color: var(--yellow);" data-tags="solidity ethereum blockchain web3 smart contract">Solidity <span style="font-size:0.7rem;opacity:0.7">Blockchain</span></span>
+        <span class="lang-badge" style="border-color: rgba(210,153,34,0.3); color: var(--yellow);" data-tags="elixir erlang phoenix">Elixir <span style="font-size:0.7rem;opacity:0.7">Distributed</span></span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--orange);" data-scope>Configuration &amp; Infrastructure</h3>
+      <div class="lang-grid" data-category="languages">
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="yaml yml config">YAML</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="hcl terraform opentofu iac">HCL (Terraform)</span>
+      </div>
+    </div>
+
+    <!-- ─── FRAMEWORKS ─── -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem 2rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 0.3rem 1rem;">Frameworks &amp; Tools</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--accent);" data-scope>Web Frameworks</h3>
+      <div class="lang-grid" data-category="frameworks">
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="react nextjs javascript typescript frontend">React</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="react nextjs javascript typescript frontend ssr">Next.js</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="react native mobile javascript typescript">React Native</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="angular typescript frontend spa">Angular</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="svelte sveltekit javascript typescript frontend">Svelte / SvelteKit</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="vue nuxt javascript typescript frontend">Vue</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="vue nuxt javascript typescript frontend ssr">Nuxt</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="express nodejs javascript typescript backend api">Express</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="fastify nodejs javascript typescript backend api">Fastify</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="koa nodejs javascript typescript backend api">Koa</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="django python backend api">Django</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="flask python backend api">Flask</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="fastapi python backend api async">FastAPI</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="rails ruby backend api">Rails</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="spring java kotlin backend api">Spring / Spring Boot</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="play scala jvm backend api">Play (Scala)</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="akka scala jvm backend api">Akka HTTP</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="aspnet csharp dotnet backend api">ASP.NET Core</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="laravel php backend api">Laravel</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="phoenix elixir backend api">Phoenix</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="swiftui swift ios macos ui">SwiftUI</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="uikit swift ios ui">UIKit</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="vapor swift backend api">Vapor</span>
+        <span class="lang-badge" style="border-color: rgba(167,139,250,0.3); color: var(--accent);" data-tags="hardhat foundry solidity ethereum blockchain web3">Hardhat / Foundry</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--orange);" data-scope>Infrastructure as Code</h3>
+      <div class="lang-grid" data-category="frameworks">
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="aws cdk typescript python iac cloud">AWS CDK</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="sst typescript aws iac cloud serverless">SST</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="serverless framework aws lambda iac cloud">Serverless Framework</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="aws sam lambda iac cloud serverless">AWS SAM</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="terraform opentofu hcl iac cloud hashicorp">Terraform / OpenTofu</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="pulumi typescript python go iac cloud">Pulumi</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="cloudformation aws iac cloud yaml">CloudFormation</span>
+        <span class="lang-badge" style="border-color: rgba(255,166,87,0.3); color: var(--orange);" data-tags="amplify aws iac cloud typescript backend">AWS Amplify</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: #58a6ff;" data-scope>Containers &amp; Orchestration</h3>
+      <div class="lang-grid" data-category="frameworks">
+        <span class="lang-badge" style="border-color: rgba(88,166,255,0.3); color: #58a6ff;" data-tags="kubernetes k8s helm containers orchestration yaml">Kubernetes / Helm</span>
+        <span class="lang-badge" style="border-color: rgba(88,166,255,0.3); color: #58a6ff;" data-tags="docker compose containers yaml">Docker Compose</span>
+      </div>
+
+      <h3 class="scope-heading" style="text-align:center; margin-top:2rem; margin-bottom:1rem; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em; color: var(--red);" data-scope>Configuration Management</h3>
+      <div class="lang-grid" data-category="frameworks">
+        <span class="lang-badge" style="border-color: rgba(248,81,73,0.3); color: var(--red);" data-tags="ansible automation yaml devops">Ansible</span>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+(function() {
+  var input = document.getElementById('lang-search');
+  if (!input) return;
+  var badges = document.querySelectorAll('.lang-badge[data-tags]');
+  var headings = document.querySelectorAll('[data-scope]');
+  input.addEventListener('input', function() {
+    var query = this.value.toLowerCase().trim();
+    if (!query) {
+      badges.forEach(function(b) { b.style.display = ''; });
+      headings.forEach(function(h) { h.style.display = ''; });
+      return;
+    }
+    badges.forEach(function(b) {
+      var text = b.textContent.toLowerCase();
+      var tags = (b.getAttribute('data-tags') || '').toLowerCase();
+      b.style.display = (text.indexOf(query) !== -1 || tags.indexOf(query) !== -1) ? '' : 'none';
+    });
+    headings.forEach(function(h) {
+      var grid = h.nextElementSibling;
+      if (!grid || !grid.classList.contains('lang-grid')) return;
+      var visible = Array.from(grid.querySelectorAll('.lang-badge')).some(function(b) { return b.style.display !== 'none'; });
+      h.style.display = visible ? '' : 'none';
+    });
+  });
+})();
+</script>
 
 <!-- ── CTA ── -->
 <section class="section-sm">
