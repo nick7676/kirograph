@@ -1143,6 +1143,7 @@ Architecture analysis runs as a dedicated phase during `kirograph index`. Progre
 | Solidity | `.sol` |
 | Vue | `.vue` |
 | Objective-C | `.m` |
+| YAML | `.yaml`, `.yml` |
 
 ## Framework Detection
 
@@ -1173,6 +1174,8 @@ KiroGraph automatically detects frameworks and enriches the graph with framework
 **Elixir:** Phoenix
 
 **Solidity:** Hardhat, Foundry, Truffle (OpenZeppelin patterns)
+
+**Infrastructure as Code:** AWS CDK, SST, Serverless Framework, AWS SAM
 
 Detected frameworks are stored in config and used to improve symbol extraction and resolution.
 

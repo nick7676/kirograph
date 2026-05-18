@@ -32,6 +32,7 @@ export { phoenixResolver } from './elixir';
 export { playResolver } from './scala';
 export { nuxtResolver, vueResolver } from './vue';
 export { solidityResolver } from './solidity';
+export { sstResolver, cdkResolver, serverlessResolver, samResolver } from './iac';
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ import { phoenixResolver } from './elixir';
 import { playResolver } from './scala';
 import { nuxtResolver, vueResolver } from './vue';
 import { solidityResolver } from './solidity';
+import { sstResolver, cdkResolver, serverlessResolver, samResolver } from './iac';
 
 const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   // PHP
@@ -85,6 +87,11 @@ const FRAMEWORK_RESOLVERS: FrameworkResolver[] = [
   playResolver,
   // Solidity
   solidityResolver,
+  // Infrastructure as Code
+  sstResolver,
+  cdkResolver,
+  serverlessResolver,
+  samResolver,
 ];
 
 export function getAllFrameworkResolvers(): FrameworkResolver[] {

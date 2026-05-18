@@ -56,6 +56,8 @@ export const EXTENSION_MAP: Record<string, Language> = {
   '.sol': 'solidity',
   '.vue': 'vue',
   '.m': 'objc',
+  '.yaml': 'yaml',
+  '.yml': 'yaml',
 };
 
 export const GRAMMAR_MAP: Record<Language, string> = {
@@ -86,6 +88,7 @@ export const GRAMMAR_MAP: Record<Language, string> = {
   solidity: 'tree-sitter-solidity',
   vue: 'tree-sitter-vue',
   objc: 'tree-sitter-objc',
+  yaml: 'tree-sitter-yaml',
   // Pascal and Liquid require custom WASM not bundled in tree-sitter-wasms
   pascal: '',
   liquid: '',

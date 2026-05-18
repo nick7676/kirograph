@@ -4,11 +4,15 @@
 
 ### Added
 
-- **9 new languages** — Scala (`.scala`, `.sc`, `.sbt`), Lua (`.lua`), Zig (`.zig`, `.zon`), Bash (`.sh`, `.bash`, `.zsh`), OCaml (`.ml`, `.mli`), Elm (`.elm`), Solidity (`.sol`), Vue (`.vue`), and Objective-C (`.m`). All use pre-compiled WASM grammars already bundled in `tree-sitter-wasms` — no new dependencies required.
-- **4 new framework resolvers:**
+- **10 new languages** — Scala (`.scala`, `.sc`, `.sbt`), Lua (`.lua`), Zig (`.zig`, `.zon`), Bash (`.sh`, `.bash`, `.zsh`), OCaml (`.ml`, `.mli`), Elm (`.elm`), Solidity (`.sol`), Vue (`.vue`), Objective-C (`.m`), and YAML (`.yaml`, `.yml`). All use pre-compiled WASM grammars already bundled in `tree-sitter-wasms` — no new dependencies required.
+- **8 new framework resolvers:**
   - **Play (Scala)** — detects Play Framework via `build.sbt`/`plugins.sbt`. Resolves controller, service, and model references. Extracts routes from `conf/routes` and Akka HTTP / http4s DSL patterns.
   - **Nuxt / Vue** — detects Nuxt via `nuxt.config.ts` and Vue via `package.json`. Resolves composables (`useXxx`), auto-imported components (PascalCase → file lookup), and Pinia stores. Extracts file-based routes from `pages/` and server API routes from `server/api/`.
   - **Solidity** — detects Hardhat/Foundry/Truffle projects. Resolves interface references (`IERC20`, etc.), contract inheritance, and library function calls.
+  - **SST** — detects SST via `sst.config.ts` or `sst` in `package.json`. Resolves Lambda handler strings to actual function symbols. Extracts API routes from `api.route()` calls and route object literals.
+  - **AWS CDK** — detects CDK via `cdk.json` or `aws-cdk-lib` in dependencies. Resolves handler strings and Stack/Construct class references. Extracts API Gateway routes from `addMethod`/`addResource`/`addRoutes` patterns.
+  - **Serverless Framework** — detects via `serverless.yml`/`serverless.ts`. Resolves handler strings. Extracts HTTP event routes from YAML config (`- http: GET /users`) and TypeScript config.
+  - **AWS SAM** — detects via `template.yaml` with `AWS::Serverless` transform or `samconfig.toml`. Resolves handler strings. Extracts API/HttpApi event routes from SAM template YAML.
 - **4 new architecture layer detectors:**
   - **Scala** — Play controllers/models/views, SBT services/repositories, Akka actors, Slick persistence.
   - **Vue / Nuxt** — pages, components, composables, stores, server/api, layouts, plugins.
@@ -18,7 +22,7 @@
   - **SBT** (`build.sbt`) — extracts project name, version, library dependencies, and multi-module sub-project detection.
   - **OCaml** (`dune-project`, `.opam`) — extracts project name, version, dependencies, and discovers sub-libraries via `dune` files.
   - **Elm** (`elm.json`) — handles both application and package types, extracts direct dependencies.
-- **Language-specific AST node mappings** — added `getLanguageSpecificKind` entries for all 9 new languages (Scala `object_definition`/`val_definition`/`type_definition`, Lua `local_function`/`local_variable_declaration`, Zig `VarDecl`/`ContainerDecl`, Bash `variable_assignment`, OCaml `let_binding`/`type_binding`/`module_binding`, Elm `function_declaration_left`/`type_alias_declaration`, Solidity `contract_declaration`/`event_definition`/`modifier_definition`/`state_variable_declaration`, Objective-C `class_interface`/`class_implementation`/`protocol_declaration`/`method_declaration`/`property_declaration`).
+- **Language-specific AST node mappings** — added `getLanguageSpecificKind` entries for all 9 new code languages (Scala `object_definition`/`val_definition`/`type_definition`, Lua `local_function`/`local_variable_declaration`, Zig `VarDecl`/`ContainerDecl`, Bash `variable_assignment`, OCaml `let_binding`/`type_binding`/`module_binding`, Elm `function_declaration_left`/`type_alias_declaration`, Solidity `contract_declaration`/`event_definition`/`modifier_definition`/`state_variable_declaration`, Objective-C `class_interface`/`class_implementation`/`protocol_declaration`/`method_declaration`/`property_declaration`).
 - **Generic KIND_MAP additions** — `trait_definition` (Scala), `struct_definition` (Zig), `module_definition` (OCaml) added to the shared node type map.
 - **Manifest skip directories** — `_build`, `_opam`, `elm-stuff`, `zig-cache`, `zig-out` added to the directory exclusion list during manifest scanning.
 
