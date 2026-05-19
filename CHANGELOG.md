@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.14.0] - 2026-05-19: Output Compression
+
+### Added
+
+- **Output compression engine** (`src/compression/`) — Filters and compresses shell command outputs to reduce token consumption by 60-90%. Inspired by [rtk](https://github.com/rtk-ai/rtk), implemented in pure TypeScript with no external dependencies.
+  - **6 command family filters**: git, test runners (jest/vitest/pytest/cargo test/go test/rspec/minitest), linters/build (eslint/tsc/ruff/clippy/cargo build/prettier/biome/golangci-lint/rubocop/next build), file listings (ls/find/tree), docker/k8s (docker ps/images/logs, kubectl pods/logs/services), package managers (npm/pip/bundle/pnpm/yarn).
+  - **Generic fallback filter**: deduplication + truncation for unrecognized commands.
+  - **3 compression levels**: `normal` (balanced), `aggressive` (grouped/limited), `ultra` (counts and summaries only).
+  - **Error preservation**: failed commands always show full diagnostic output regardless of compression level.
+- **`kirograph_exec` MCP tool** — Run any shell command and return token-optimized output. Works standalone without requiring KiroGraph to be initialized. Supports `command`, `cwd`, `level`, and `timeout` parameters.
+- **`kirograph_gain` MCP tool** — Query token savings statistics by period (`session`, `today`, `week`, `all`). Returns total commands, savings percentage, breakdown by command family, and recent history.
+- **`kirograph gain` CLI command** — Token savings analytics with `--graph` (ASCII chart), `--history`, `--daily`, `--json`, and `--period` options.
+- **`kirograph compression` CLI command** — Set output compression level (`off | normal | aggressive | ultra`). Mirrors the caveman command pattern with arrow-key display of available levels.
+- **`compressionLevel` config field** (default: `'normal'`) — Controls the default compression level and whether the hook/steering are installed. Supports legacy `enableCompression` boolean via automatic migration.
+- **Installer prompt** — "Enable output compression (kirograph_exec)?" added to the interactive installer alongside caveman mode.
+- **`kirograph-compress-hint.json` hook** — `preToolUse` hook on shell commands that reminds the agent to use `kirograph_exec` for supported command families. Only installed when compression is enabled.
+- **Steering file compression section** — Teaches the agent when and how to use `kirograph_exec`, with examples and level descriptions. Conditionally included based on `enableCompression`.
+- **Token savings tracker** (`src/compression/tracker.ts`) — JSONL-based analytics stored in `.kirograph/token-savings.jsonl`. Session-aware, auto-rotating at 500KB.
+- **`compact` format for `kirograph_files`** — New output format showing directory summaries with file counts and language breakdown.
+- **Token savings in `kirograph_status`** — Status output now includes session compression stats when available.
+- **Documentation updates** — MCP tools docs page updated with `kirograph_exec` and `kirograph_gain` tool cards and sidebar links.
+
+### Changed
+
+- MCP tool count: 18 → 20 (`kirograph_exec`, `kirograph_gain`).
+- `kirograph_files` format enum: `tree | flat | grouped` → `tree | flat | grouped | compact`.
+- `writeHooks()` now accepts `{ enableCompression?: boolean }` to conditionally include the compression hint hook.
+- `writeSteering()` now accepts a `SteeringOptions` object (backward-compatible with the old string signature).
+- `TargetInstaller.installLate()` signature extended with `enableCompression` parameter.
+- Help output updated with `compression` and `gain` commands in the Agent & Configuration section.
+
+---
+
 ## [0.13.1] - 2026-05-18: Multi-client Support
 
 ### Added

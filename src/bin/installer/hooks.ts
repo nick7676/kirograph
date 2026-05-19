@@ -64,6 +64,19 @@ const HOOKS: Array<{ filename: string; hook: object }> = [
       then: { type: 'runCommand', command: 'kirograph sync-if-dirty --quiet 2>/dev/null || true' },
     },
   },
+  {
+    filename: 'kirograph-compress-hint.json',
+    hook: {
+      name: 'KiroGraph Compression Hint',
+      version: '1.0.0',
+      description: 'Remind the agent to use kirograph_exec for shell commands that benefit from token compression (git, test, lint, build, docker).',
+      when: { type: 'preToolUse', toolTypes: ['shell'] },
+      then: {
+        type: 'askAgent',
+        prompt: 'If this shell command is a git operation, test runner, linter, build tool, or file listing, consider using the kirograph_exec MCP tool instead for 60-90% token savings. The tool compresses output automatically while preserving error details.',
+      },
+    },
+  },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -113,7 +126,7 @@ function migrateOnIdleHooks(hooksDir: string): void {
 
 // ── Public ────────────────────────────────────────────────────────────────────
 
-export function writeHooks(kiroDir: string): void {
+export function writeHooks(kiroDir: string, opts?: { enableCompression?: boolean }): void {
   const hooksDir = path.join(kiroDir, 'hooks');
   ensureDir(hooksDir);
 
@@ -126,6 +139,13 @@ export function writeHooks(kiroDir: string): void {
   }
 
   for (const { filename, hook } of HOOKS) {
+    // Skip compression hook if compression is disabled
+    if (filename === 'kirograph-compress-hint.json' && opts?.enableCompression === false) {
+      // Remove the hook file if it exists from a previous install
+      const p = path.join(hooksDir, filename);
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+      continue;
+    }
     writeJson(path.join(hooksDir, filename), hook);
   }
 

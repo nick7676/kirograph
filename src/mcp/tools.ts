@@ -5,9 +5,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import { execSync } from 'child_process';
 import KiroGraph, { findNearestKiroGraphRoot } from '../index';
 import type { NodeKind } from '../types';
 import { logError } from '../errors';
+import { compress, estimateTokens, detectCommandFamily } from '../compression/index';
+import { TokenTracker } from '../compression/tracker';
 export { KIROGRAPH_TOOL_NAMES } from './tool-names';
 
 const MAX_OUTPUT = 15_000;
@@ -151,8 +154,8 @@ export const tools: ToolDefinition[] = [
         maxDepth: { type: 'number', description: 'Limit tree depth' },
         format: {
           type: 'string',
-          description: 'Output format: "tree" (default, visual tree), "flat" (one path per line), "grouped" (grouped by directory)',
-          enum: ['tree', 'flat', 'grouped'],
+          description: 'Output format: "tree" (default, visual tree), "flat" (one path per line), "grouped" (grouped by directory), "compact" (rtk-style summary with counts)',
+          enum: ['tree', 'flat', 'grouped', 'compact'],
           default: 'tree',
         },
         includeMetadata: { type: 'boolean', description: 'Include language and symbol count (default: true)', default: true },
@@ -292,6 +295,42 @@ export const tools: ToolDefinition[] = [
       required: ['symbol'],
     },
   },
+  {
+    name: 'kirograph_exec',
+    description: 'Run a shell command and return token-optimized output. Automatically filters noise from git, test runners, linters, build tools, docker, and package managers. Use instead of raw shell for 60-90% token savings on verbose commands.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: 'Shell command to execute (e.g., "git status", "npm test", "cargo build")' },
+        cwd: { type: 'string', description: 'Working directory (default: project root)' },
+        level: {
+          type: 'string',
+          description: 'Compression level: "normal" (balanced), "aggressive" (more compact), "ultra" (maximum compression)',
+          enum: ['normal', 'aggressive', 'ultra'],
+          default: 'normal',
+        },
+        timeout: { type: 'number', description: 'Timeout in seconds (default: 60)', default: 60 },
+        projectPath: { type: 'string', description: 'Project root path (optional)' },
+      },
+      required: ['command'],
+    },
+  },
+  {
+    name: 'kirograph_gain',
+    description: 'Show token savings statistics from compressed command outputs via kirograph_exec.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        period: {
+          type: 'string',
+          description: 'Time period: "session" (current), "today", "week", or "all"',
+          enum: ['session', 'today', 'week', 'all'],
+          default: 'session',
+        },
+        projectPath: { type: 'string', description: 'Project root path (optional)' },
+      },
+    },
+  },
 ];
 
 export class ToolHandler {
@@ -339,6 +378,91 @@ export class ToolHandler {
   }
 
   private async dispatch(toolName: string, args: Record<string, unknown>): Promise<string> {
+    // Tools that don't require an initialized graph
+    if (toolName === 'kirograph_exec') {
+      const cmd = args.command as string;
+      if (!cmd) return 'Error: command is required.';
+
+      const projectRoot = (args.projectPath as string) || (args.cwd as string) || process.cwd();
+      const execCwd = (args.cwd as string) || projectRoot;
+
+      // Read default level from config if not explicitly provided
+      let defaultLevel: 'normal' | 'aggressive' | 'ultra' = 'normal';
+      try {
+        const { loadConfig } = await import('../config');
+        const config = await loadConfig(projectRoot);
+        if (config.compressionLevel && config.compressionLevel !== 'off') {
+          defaultLevel = config.compressionLevel as 'normal' | 'aggressive' | 'ultra';
+        }
+      } catch { /* no config — use default */ }
+
+      const level = (args.level as 'normal' | 'aggressive' | 'ultra') ?? defaultLevel;
+      const timeout = ((args.timeout as number) ?? 60) * 1000;
+
+      let rawOutput: string;
+      let exitCode = 0;
+      try {
+        rawOutput = execSync(cmd, {
+          cwd: execCwd,
+          timeout,
+          encoding: 'utf8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+          maxBuffer: 10 * 1024 * 1024,
+        });
+      } catch (err: any) {
+        // Command failed — capture output anyway
+        rawOutput = (err.stdout || '') + (err.stderr || '');
+        exitCode = err.status ?? 1;
+      }
+
+      const result = compress(cmd, rawOutput, { level, preserveErrors: exitCode !== 0 });
+
+      // Track savings
+      const tracker = new TokenTracker(projectRoot);
+      tracker.record(cmd, result.originalTokens, result.compressedTokens, result.strategy);
+
+      const header = exitCode !== 0 ? `[exit ${exitCode}] ` : '';
+      const footer = result.savings > 5
+        ? `\n\n[${result.savings}% tokens saved | ${result.originalTokens}→${result.compressedTokens} | ${result.strategy}]`
+        : '';
+
+      return `${header}${result.output}${footer}`;
+    }
+
+    if (toolName === 'kirograph_gain') {
+      const projectRoot = (args.projectPath as string) || process.cwd();
+      const period = (args.period as string) ?? 'session';
+      const tracker = new TokenTracker(projectRoot);
+      const stats = tracker.getStats(period as 'session' | 'today' | 'week' | 'all');
+
+      if (stats.totalCommands === 0) {
+        return 'No compressed commands recorded yet. Use kirograph_exec to run commands with compression.';
+      }
+
+      const lines = [
+        `Token Savings (${period}):`,
+        `  Commands: ${stats.totalCommands}`,
+        `  Original tokens: ${stats.totalOriginal.toLocaleString()}`,
+        `  Compressed tokens: ${stats.totalCompressed.toLocaleString()}`,
+        `  Saved: ${stats.totalSaved.toLocaleString()} tokens (${stats.savingsPercent}%)`,
+        '',
+        `Top command families:`,
+      ];
+
+      for (const [family, data] of Object.entries(stats.byFamily).slice(0, 5)) {
+        lines.push(`  ${family}: ${data.count} calls, ${data.savings}% avg savings`);
+      }
+
+      if (stats.recentCommands.length > 0) {
+        lines.push('', 'Recent:');
+        for (const cmd of stats.recentCommands.slice(0, 5)) {
+          lines.push(`  ${cmd.command.slice(0, 40)} → ${cmd.savings}% saved`);
+        }
+      }
+
+      return lines.join('\n');
+    }
+
     const cg = await this.getConnection(args.projectPath as string | undefined);
     if (!cg) return 'KiroGraph not initialized. Run `kirograph init` in your project first.';
 
@@ -486,6 +610,14 @@ export class ToolHandler {
           );
         }
 
+        // Token savings summary
+        const tracker = new TokenTracker(cg.getProjectRoot());
+        const gainStats = tracker.getStats('session');
+        const gainLines: string[] = [];
+        if (gainStats.totalCommands > 0) {
+          gainLines.push(`  Compression: ${gainStats.totalCommands} commands, ${gainStats.savingsPercent}% avg savings (${gainStats.totalSaved.toLocaleString()} tokens saved this session)`);
+        }
+
         return [
           `KiroGraph Status`,
           `  Project: ${cg.getProjectRoot()}`,
@@ -499,6 +631,7 @@ export class ToolHandler {
           `  DB size: ${dbMb} MB`,
           ...semanticLines,
           ...syncLines,
+          ...gainLines,
         ].filter(Boolean).join('\n');
       }
 
@@ -548,6 +681,33 @@ export class ToolHandler {
             }
           }
           return lines.length > 0 ? lines.join('\n') : 'No indexed files found.';
+        }
+
+        if (format === 'compact') {
+          // rtk-style compact: directory summary with file counts and language breakdown
+          const dirStats = new Map<string, { files: number; symbols: number; langs: Map<string, number> }>();
+          function compactTree(nodes: import('../index').FileTreeNode[]): void {
+            for (const node of nodes) {
+              if (node.type === 'file') {
+                const dir = node.path.includes('/') ? node.path.slice(0, node.path.lastIndexOf('/')) : '.';
+                const stat = dirStats.get(dir) || { files: 0, symbols: 0, langs: new Map() };
+                stat.files++;
+                stat.symbols += node.symbolCount || 0;
+                if (node.language) stat.langs.set(node.language, (stat.langs.get(node.language) || 0) + 1);
+                dirStats.set(dir, stat);
+              }
+              if (node.children?.length) compactTree(node.children);
+            }
+          }
+          compactTree(tree);
+          const totalFiles = [...dirStats.values()].reduce((s, d) => s + d.files, 0);
+          const totalSymbols = [...dirStats.values()].reduce((s, d) => s + d.symbols, 0);
+          const lines: string[] = [`${totalFiles} files, ${totalSymbols} symbols in ${dirStats.size} directories:\n`];
+          for (const [dir, stat] of [...dirStats.entries()].sort()) {
+            const langSummary = [...stat.langs.entries()].map(([l, c]) => `${l}:${c}`).join(' ');
+            lines.push(`${dir}/ (${stat.files} files, ${stat.symbols} symbols) ${langSummary}`);
+          }
+          return lines.join('\n');
         }
 
         // Default: tree format

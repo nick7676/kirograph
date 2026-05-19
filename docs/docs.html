@@ -69,6 +69,7 @@
     <div class="sidebar-section">
       <div class="sidebar-heading">Advanced</div>
       <a href="#caveman-mode" class="sidebar-link">Caveman Mode</a>
+      <a href="#output-compression" class="sidebar-link">Output Compression</a>
       <a href="#credits" class="sidebar-link">Credits</a>
     </div>
   </aside>
@@ -142,6 +143,7 @@ cd kirograph && npm uninstall -g .</code></pre>
       <li>Embedding model and semantic engine</li>
       <li>Whether to enable architecture analysis</li>
       <li>Caveman mode level</li>
+      <li>Output compression (on/off)</li>
       <li>Whether to run an initial index immediately</li>
     </ul>
 
@@ -368,7 +370,7 @@ cd kirograph && npm uninstall -g .</code></pre>
     <p><code>kirograph install</code> sets up four things in your Kiro workspace. All coexist, so you can switch between IDE and CLI freely. <strong>Kiro is the primary and fully supported target.</strong></p>
 
     <h3 id="mcp-server">MCP Server (<code>.kiro/settings/mcp.json</code>)</h3>
-    <p>Registers the KiroGraph MCP server with all 18 tools auto-approved. Used by both the IDE and the CLI agent.</p>
+    <p>Registers the KiroGraph MCP server with all 20 tools auto-approved. Used by both the IDE and the CLI agent.</p>
     <pre><code>{
   "mcpServers": {
     "kirograph": {
@@ -380,7 +382,8 @@ cd kirograph && npm uninstall -g .</code></pre>
         "kirograph_status", "kirograph_files", "kirograph_dead_code",
         "kirograph_circular_deps", "kirograph_path", "kirograph_type_hierarchy",
         "kirograph_architecture", "kirograph_coupling", "kirograph_package",
-        "kirograph_hotspots", "kirograph_surprising", "kirograph_diff"
+        "kirograph_hotspots", "kirograph_surprising", "kirograph_diff",
+        "kirograph_exec", "kirograph_gain"
       ]
     }
   }
@@ -452,6 +455,7 @@ cd kirograph && npm uninstall -g .</code></pre>
           <tr><td><code>enableArchitecture</code></td><td>boolean</td><td><code>false</code></td><td>Enable architecture analysis layer</td></tr>
           <tr><td><code>architectureLayers</code></td><td>object</td><td>—</td><td>Override layer glob patterns</td></tr>
           <tr><td><code>cavemanMode</code></td><td>string</td><td><code>"off"</code></td><td>Communication compression: <code>off</code>, <code>lite</code>, <code>full</code>, <code>ultra</code></td></tr>
+          <tr><td><code>compressionLevel</code></td><td>string</td><td><code>"normal"</code></td><td>Output compression level: <code>off</code>, <code>normal</code>, <code>aggressive</code>, <code>ultra</code></td></tr>
           <tr><td><code>syncWarningThreshold</code></td><td>number</td><td><code>10</code></td><td>Pending-file count above which <code>kirograph_status</code> warns. Set <code>0</code> to disable.</td></tr>
           <tr><td><code>extractDocstrings</code></td><td>boolean</td><td><code>true</code></td><td>Extract docstrings/comments during indexing</td></tr>
           <tr><td><code>trackCallSites</code></td><td>boolean</td><td><code>true</code></td><td>Track precise call-site locations</td></tr>
@@ -490,6 +494,40 @@ kirograph caveman         # show current mode</code></pre>
 
     <div class="callout">
       Takes effect on the <strong>next agent session</strong>. The steering file and CLI agent config are regenerated immediately when you run the command.
+    </div>
+
+    <!-- ── Output Compression ── -->
+    <h2 id="output-compression">Output Compression</h2>
+
+    <p>KiroGraph includes a built-in output compression engine inspired by <a href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">rtk</a>. The <code>kirograph_exec</code> MCP tool runs shell commands and returns token-optimized output, saving 60-90% of tokens on verbose commands.</p>
+
+    <p>Supported command families: <strong>git</strong> (status, log, diff, push, pull, commit), <strong>test runners</strong> (jest, vitest, pytest, cargo test, go test, rspec), <strong>linters/build</strong> (eslint, tsc, ruff, clippy, cargo build, prettier, biome), <strong>file listings</strong> (ls, find, tree), <strong>docker/k8s</strong> (docker ps, images, logs, kubectl), <strong>package managers</strong> (npm, pip, bundle).</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Level</th><th>Style</th></tr></thead>
+        <tbody>
+          <tr><td><code>normal</code></td><td>Balanced — removes noise, keeps structure (default)</td></tr>
+          <tr><td><code>aggressive</code></td><td>More compact — groups by category, limits output</td></tr>
+          <tr><td><code>ultra</code></td><td>Maximum compression — counts and summaries only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre><code>kirograph compression normal     # balanced (default)
+kirograph compression aggressive # more compact
+kirograph compression ultra      # maximum compression
+kirograph compression off        # disable hook (tool still available)
+kirograph compression            # show current level
+kirograph gain                   # show token savings stats
+kirograph gain --graph           # ASCII graph (last 30 days)</code></pre>
+
+    <p>Set during <code>kirograph install</code> (interactive arrow-key menu) or any time after. The configured level is used as the default when the agent calls <code>kirograph_exec</code> without specifying one explicitly.</p>
+
+    <p><strong>Error preservation:</strong> Failed commands always show full diagnostic output regardless of compression level.</p>
+
+    <div class="callout">
+      Configure in <code>.kirograph/config.json</code>: <code>"compressionLevel": "normal"</code> (default). Set to <code>"off"</code> to disable the hook and steering section. The <code>kirograph_exec</code> tool remains available regardless.
     </div>
 
     <!-- ── Credits ── -->

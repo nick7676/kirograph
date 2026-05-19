@@ -71,6 +71,9 @@ export function printColoredHelp(): void {
       title: '⚙️ Agent & Configuration',
       commands: [
         { name: 'caveman', args: '[mode]', desc: 'Set agent communication style (off | lite | full | ultra)' },
+        { name: 'compression', args: '[level]', desc: 'Set output compression level (off | normal | aggressive | ultra)' },
+        { name: 'exec', args: '<command...>', desc: 'Run a shell command with token-optimized output', opts: ['-l, --level <l>  normal | aggressive | ultra', '-t, --timeout <s> Timeout in seconds (default 60)', '--raw         Show raw + compressed for comparison', '--json        Output as JSON'] },
+        { name: 'gain', desc: 'Show token savings from compressed command outputs', opts: ['--graph       ASCII graph (last 30 days)', '--history     Recent command history', '--daily       Day-by-day breakdown', '--period <p>  session | today | week | all'] },
         { name: 'serve',   desc: 'Start the MCP server', opts: ['--mcp        Run as MCP stdio server', '--path <p>   Project path'] },
         { name: 'dashboard', desc: 'Manage the Qdrant or Typesense dashboard server', opts: ['start [path]  Start server and open dashboard', 'stop [path]   Stop the running server'] },
       ],
@@ -169,6 +172,12 @@ export function printColoredHelp(): void {
       examples: [
         ['kirograph caveman full',                         'Enable full caveman mode for the agent'],
         ['kirograph caveman off',                          'Disable caveman mode'],
+        ['kirograph compression aggressive',              'Set compression to aggressive level'],
+        ['kirograph compression off',                      'Disable compression hook (tool still available)'],
+        ['kirograph exec git status',                      'Run git status with compression'],
+        ['kirograph exec --level ultra npm test',          'Run tests with ultra compression'],
+        ['kirograph exec --raw cargo build',               'Show raw vs compressed comparison'],
+        ['kirograph gain --graph',                         'Show token savings graph'],
         ['kirograph serve --mcp',                          'Start the MCP server'],
       ],
     },

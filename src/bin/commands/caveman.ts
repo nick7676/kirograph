@@ -87,7 +87,12 @@ export function register(program: Command): void {
       // Regenerate steering file if .kiro/steering/kirograph.md exists
       const steeringPath = path.join(kiroDir, 'steering', 'kirograph.md');
       if (fs.existsSync(steeringPath)) {
-        writeSteering(kiroDir, normalized as CavemanMode | 'off');
+        const config = await loadConfig(cwd);
+        writeSteering(kiroDir, {
+          cavemanMode: normalized as CavemanMode | 'off',
+          enableCompression: config.compressionLevel !== 'off',
+          compressionLevel: config.compressionLevel,
+        });
       }
 
       // Regenerate CLI agent config if .kiro/agents/kirograph.json exists

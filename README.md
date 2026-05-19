@@ -506,6 +506,31 @@ Compare the current graph state against a saved snapshot. Shows added/removed sy
 
 Use `kirograph snapshot save` (CLI) to save a snapshot before a refactor or PR. Run `kirograph_diff` after to see what changed structurally.
 
+### `kirograph_exec`
+
+Run a shell command and return token-optimized output. Automatically filters noise from git, test runners, linters, build tools, docker, and package managers.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `command` | string | required | Shell command to execute |
+| `cwd` | string | project root | Working directory |
+| `level` | string | `normal` | Compression level: `normal`, `aggressive`, `ultra` |
+| `timeout` | number | 60 | Timeout in seconds |
+| `projectPath` | string | cwd | Project root path |
+
+**How it works:** Executes the command, detects the command family (git, test, lint, etc.), applies the appropriate filter strategy, and returns compressed output with a savings footer. Error output is always preserved. Does not require KiroGraph to be initialized — works standalone.
+
+### `kirograph_gain`
+
+Show token savings statistics from compressed command outputs.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `period` | string | `session` | Time period: `session`, `today`, `week`, `all` |
+| `projectPath` | string | cwd | Project root path |
+
+Returns total commands, original/compressed token counts, savings percentage, breakdown by command family, and recent command history.
+
 ## CLI Reference
 
 ### Setup
@@ -631,6 +656,55 @@ Set during `kirograph install` (interactive arrow-key menu) or any time after. T
 Caveman mode never touches code blocks, file paths, URLs, or technical terms, only prose.
 
 **Auto-clarity exceptions:** the agent temporarily reverts to normal prose for security warnings, confirmations of irreversible actions (delete, overwrite, force-push), and multi-step sequences where fragment order could cause misunderstanding. Compressed style resumes immediately after.
+
+### Output Compression (`kirograph_exec`)
+
+KiroGraph includes a built-in output compression engine inspired by [rtk](https://github.com/rtk-ai/rtk). The `kirograph_exec` MCP tool runs shell commands and returns token-optimized output, saving 60-90% of tokens on verbose commands like git, test runners, linters, and build tools.
+
+**Why it's useful:** LLM context is expensive. A raw `git status` might be 2,000 tokens; compressed it's 200. A passing test suite might be 25,000 tokens of noise; compressed it's a single "PASSED: 42/42 tests" line. The compression engine knows how to extract the signal from each command family.
+
+Supported command families:
+
+| Family | Commands | Typical savings |
+|--------|----------|----------------|
+| Git | status, log, diff, push, pull, commit, add, fetch, branch | 75-96% |
+| Test runners | jest, vitest, pytest, cargo test, go test, rspec, minitest | 80-90% |
+| Linters/build | eslint, tsc, ruff, clippy, cargo build, prettier, biome, next build | 70-85% |
+| File listings | ls, find, tree | 60-80% |
+| Docker/k8s | docker ps, images, logs, kubectl pods, logs, services | 70-80% |
+| Package managers | npm install/list, pip list/install, bundle install | 75-92% |
+
+Three compression levels:
+
+| Level | Style |
+|-------|-------|
+| `normal` | Balanced — removes noise, keeps structure *(default)* |
+| `aggressive` | More compact — groups by category, limits output |
+| `ultra` | Maximum compression — counts and summaries only |
+
+```bash
+kirograph compression normal     # balanced (default)
+kirograph compression aggressive # more compact
+kirograph compression ultra      # maximum compression
+kirograph compression off        # disable hook (tool still available)
+kirograph compression            # show current level
+```
+
+Set during `kirograph install` (interactive arrow-key menu) or any time after. When set to anything other than `off`, a `preToolUse` hook reminds the agent to use `kirograph_exec` for supported commands. The configured level is used as the default when the agent doesn't specify one explicitly.
+
+**Error preservation:** Failed commands always show full diagnostic output regardless of compression level. The engine detects error patterns and preserves detail when it matters.
+
+**Token analytics:**
+
+```bash
+kirograph gain               # summary stats
+kirograph gain --graph       # ASCII graph (last 30 days)
+kirograph gain --history     # recent command history
+kirograph gain --daily       # day-by-day breakdown
+kirograph gain --json        # JSON export
+```
+
+The `kirograph_gain` MCP tool exposes the same stats to the agent.
 
 ### Architecture Analysis *(requires `enableArchitecture: true`)*
 
@@ -866,6 +940,7 @@ KiroGraph stores its config in `.kirograph/config.json`. You can edit it directl
 | `minLogLevel` | string | `warn` | Log level: `debug`, `info`, `warn`, `error` |
 | `fuzzyResolutionThreshold` | number | `0.5` | Name matching threshold for cross-file resolution (0.0–1.0) |
 | `cavemanMode` | string | `off` | Agent communication style: `off`, `lite`, `full`, `ultra` |
+| `compressionLevel` | string | `normal` | Output compression level: `off`, `normal`, `aggressive`, `ultra` |
 
 Default exclude patterns: `node_modules/**`, `dist/**`, `build/**`, `.git/**`, `*.min.js`, `.kirograph/**`
 

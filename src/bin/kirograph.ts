@@ -31,6 +31,9 @@ import { register as registerSurprising } from './commands/surprising';
 import { register as registerSnapshot } from './commands/snapshot';
 import { register as registerPath } from './commands/path';
 import { register as registerExport } from './commands/export';
+import { register as registerGain } from './commands/gain';
+import { register as registerCompression } from './commands/compression';
+import { register as registerExec } from './commands/exec';
 
 // ── Global error handler for WASM runtime crashes ─────────────────────────────
 //
@@ -107,6 +110,9 @@ registerSurprising(program);
 registerSnapshot(program);
 registerPath(program);
 registerExport(program);
+registerGain(program);
+registerCompression(program);
+registerExec(program);
 
 // Show banner + help when called with no arguments, otherwise parse normally
 if (process.argv.length === 2) {

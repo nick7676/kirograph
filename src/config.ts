@@ -42,6 +42,8 @@ export interface KiroGraphConfig {
   architectureLayers?: Record<string, string[]>;
   /** Agent communication style injected at agentSpawn. Default: 'off'. */
   cavemanMode: 'off' | 'lite' | 'full' | 'ultra';
+  /** Output compression level for kirograph_exec. 'off' disables the hook/steering. Default: 'normal'. */
+  compressionLevel: 'off' | 'normal' | 'aggressive' | 'ultra';
   /**
    * Number of pending (unindexed) files above which kirograph_status warns the agent.
    * Set to 0 to disable the warning. Default: 10.
@@ -59,7 +61,7 @@ const KNOWN_FIELDS = new Set<string>([
   'extractDocstrings', 'trackCallSites', 'enableEmbeddings', 'embeddingModel', 'embeddingDim',
   'useVecIndex', 'semanticEngine', 'typesenseDashboard', 'qdrantDashboard',
   'minLogLevel', 'frameworkHints', 'fuzzyResolutionThreshold',
-  'enableArchitecture', 'architectureLayers', 'cavemanMode', 'syncWarningThreshold',
+  'enableArchitecture', 'architectureLayers', 'cavemanMode', 'compressionLevel', 'syncWarningThreshold',
 ]);
 
 const LOG_LEVELS = new Set(['debug', 'info', 'warn', 'error']);
@@ -102,6 +104,7 @@ export function createDefaultConfig(_projectRoot?: string): KiroGraphConfig {
     fuzzyResolutionThreshold: 0.5,
     enableArchitecture: false,
     cavemanMode: 'off',
+    compressionLevel: 'normal',
     syncWarningThreshold: 10,
   };
 }
@@ -180,6 +183,16 @@ export function validateConfig(config: unknown): KiroGraphConfig {
   const cavemanMode = typeof raw.cavemanMode === 'string' && CAVEMAN_MODES.has(raw.cavemanMode)
     ? (raw.cavemanMode as KiroGraphConfig['cavemanMode'])
     : defaults.cavemanMode;
+  const COMPRESSION_LEVELS = new Set(['off', 'normal', 'aggressive', 'ultra']);
+  // Support legacy enableCompression boolean → map to 'normal' or 'off'
+  let compressionLevel: KiroGraphConfig['compressionLevel'];
+  if (typeof raw.compressionLevel === 'string' && COMPRESSION_LEVELS.has(raw.compressionLevel)) {
+    compressionLevel = raw.compressionLevel as KiroGraphConfig['compressionLevel'];
+  } else if (typeof raw.enableCompression === 'boolean') {
+    compressionLevel = raw.enableCompression ? 'normal' : 'off';
+  } else {
+    compressionLevel = defaults.compressionLevel;
+  }
   const syncWarningThreshold = typeof raw.syncWarningThreshold === 'number' && raw.syncWarningThreshold >= 0
     ? Math.round(raw.syncWarningThreshold)
     : defaults.syncWarningThreshold;
@@ -208,6 +221,7 @@ export function validateConfig(config: unknown): KiroGraphConfig {
     fuzzyResolutionThreshold,
     enableArchitecture,
     cavemanMode,
+    compressionLevel,
     syncWarningThreshold,
     ...(architectureLayers !== undefined ? { architectureLayers } : {}),
   };

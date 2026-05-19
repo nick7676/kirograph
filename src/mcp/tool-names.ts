@@ -17,5 +17,7 @@ export const KIROGRAPH_TOOL_NAMES = [
   'kirograph_surprising',
   'kirograph_diff',
   'kirograph_type_hierarchy',
+  'kirograph_exec',
+  'kirograph_gain',
 ];
 

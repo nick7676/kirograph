@@ -119,6 +119,21 @@ kirograph caveman ultra   # maximum compression
 kirograph caveman off     # back to normal
 kirograph caveman         # show current mode</code></pre>
 
+    <h3 id="cli-compression">Output Compression</h3>
+    <pre><code>kirograph compression off        # disable hook (tool still available)
+kirograph compression normal     # balanced — removes noise, keeps structure
+kirograph compression aggressive # more compact — groups by category
+kirograph compression ultra      # maximum compression — counts only
+kirograph compression            # show current level</code></pre>
+
+    <h3 id="cli-gain">Token Savings</h3>
+    <pre><code>kirograph gain               # summary stats
+kirograph gain --graph       # ASCII graph (last 30 days)
+kirograph gain --history     # recent command history
+kirograph gain --daily       # day-by-day breakdown
+kirograph gain --period week # filter by period
+kirograph gain --json        # JSON export</code></pre>
+
     <h3 id="cli-architecture">Architecture Analysis</h3>
     <pre><code>kirograph architecture [path]              # Packages + layers + all deps
 kirograph architecture --packages          # Packages section only
@@ -179,6 +194,8 @@ kirograph export --output ./report    # Custom output directory</code></pre>
       <a href="#cli-context" class="sidebar-link">Context Building</a>
       <a href="#cli-affected" class="sidebar-link">Affected Tests</a>
       <a href="#cli-caveman" class="sidebar-link">Caveman Mode</a>
+      <a href="#cli-compression" class="sidebar-link">Output Compression</a>
+      <a href="#cli-gain" class="sidebar-link">Token Savings</a>
       <a href="#cli-architecture" class="sidebar-link">Architecture</a>
       <a href="#cli-insights" class="sidebar-link">Graph Insights</a>
       <a href="#cli-snapshots" class="sidebar-link">Snapshots &amp; Diff</a>

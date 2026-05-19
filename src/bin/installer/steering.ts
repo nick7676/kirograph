@@ -36,6 +36,8 @@ KiroGraph builds a semantic knowledge graph of your codebase. Use its MCP tools 
 | What packages/layers exist? | \`kirograph_architecture\` |
 | How coupled is package X? | \`kirograph_coupling\` |
 | What does package X depend on? | \`kirograph_package\` |
+| Run a command with token savings | \`kirograph_exec\` |
+| Check token savings stats | \`kirograph_gain\` |
 
 ---
 
@@ -237,16 +239,106 @@ kirograph_package(package: "src/services", includeFiles: false)
 Ask the user: "This project doesn't have KiroGraph initialized. Run \`kirograph init -i\` to build a code knowledge graph for faster exploration?"
 `;
 
-function buildSteeringContent(cavemanMode?: CavemanMode | 'off'): string {
-  const caveman = cavemanMode && cavemanMode !== 'off' ? CAVEMAN_RULES[cavemanMode] : null;
-  if (!caveman) return STEERING_CONTENT;
-  return STEERING_CONTENT.trimEnd() + '\n\n' + caveman + '\n';
+// ── Compression section builder (level-aware) ─────────────────────────────────
+
+const LEVEL_DESCRIPTIONS: Record<string, string> = {
+  normal: 'Balanced — removes noise, keeps structure.',
+  aggressive: 'Compact — groups by category, limits output.',
+  ultra: 'Maximum compression — counts and summaries only.',
+};
+
+const LEVEL_EXAMPLES: Record<string, string> = {
+  normal: `\\\`\\\`\\\`
+kirograph_exec(command: "git status")
+kirograph_exec(command: "npm test")
+kirograph_exec(command: "cargo build")
+kirograph_exec(command: "ls -la src/")
+\\\`\\\`\\\``,
+  aggressive: `\\\`\\\`\\\`
+kirograph_exec(command: "git status", level: "aggressive")
+kirograph_exec(command: "npm test", level: "aggressive")
+kirograph_exec(command: "eslint .", level: "aggressive")
+kirograph_exec(command: "find . -name '*.ts'", level: "aggressive")
+\\\`\\\`\\\``,
+  ultra: `\\\`\\\`\\\`
+kirograph_exec(command: "git status", level: "ultra")
+kirograph_exec(command: "npm test", level: "ultra")
+kirograph_exec(command: "docker ps", level: "ultra")
+kirograph_exec(command: "ls -la src/", level: "ultra")
+\\\`\\\`\\\``,
+};
+
+function buildCompressionSection(level: 'normal' | 'aggressive' | 'ultra'): string {
+  return `
+---
+
+## Output Compression (\\\`kirograph_exec\\\`)
+
+When running shell commands, prefer \\\`kirograph_exec\\\` over raw shell execution for:
+- **git** operations (status, log, diff, push, pull, commit)
+- **test runners** (jest, vitest, pytest, cargo test, go test, rspec)
+- **linters/build** (eslint, tsc, ruff, clippy, cargo build, prettier, biome)
+- **file listings** (ls, find, tree)
+- **docker/k8s** (docker ps, images, logs, kubectl pods, logs)
+- **package managers** (npm install/list, pip list, bundle install)
+
+This saves 60-90% of tokens compared to raw output.
+
+Compression level: **${level}** — ${LEVEL_DESCRIPTIONS[level]}
+
+${LEVEL_EXAMPLES[level]}
+
+**Important:** Error details are always preserved. Failed commands show full diagnostic output regardless of level.
+
+Use \\\`kirograph_gain\\\` to check token savings statistics.`;
 }
 
-export function writeSteering(kiroDir: string, cavemanMode?: CavemanMode | 'off'): void {
+export interface SteeringOptions {
+  cavemanMode?: CavemanMode | 'off';
+  enableCompression?: boolean;
+  compressionLevel?: 'off' | 'normal' | 'aggressive' | 'ultra';
+}
+
+function buildSteeringContent(opts?: SteeringOptions): string {
+  const cavemanMode = opts?.cavemanMode;
+  const enableCompression = opts?.enableCompression !== false && opts?.compressionLevel !== 'off';
+  const compressionLevel = opts?.compressionLevel ?? 'normal';
+
+  let content = STEERING_CONTENT;
+
+  // Insert compression section before the "If .kirograph/ does NOT exist" section
+  if (enableCompression && compressionLevel !== 'off') {
+    const section = buildCompressionSection(compressionLevel as 'normal' | 'aggressive' | 'ultra');
+    content = content.replace(
+      '---\n\n## If `.kirograph/` does NOT exist',
+      section.trim() + '\n\n---\n\n## If `.kirograph/` does NOT exist',
+    );
+  }
+
+  // Remove compression tools from decision guide if disabled
+  if (!enableCompression) {
+    content = content.replace('| Run a command with token savings | `kirograph_exec` |\n', '');
+    content = content.replace('| Check token savings stats | `kirograph_gain` |\n', '');
+  }
+
+  const caveman = cavemanMode && cavemanMode !== 'off' ? CAVEMAN_RULES[cavemanMode] : null;
+  if (caveman) {
+    content = content.trimEnd() + '\n\n' + caveman + '\n';
+  }
+
+  return content;
+}
+
+export function writeSteering(kiroDir: string, opts?: SteeringOptions | CavemanMode | 'off'): void {
   const steeringDir = path.join(kiroDir, 'steering');
   fs.mkdirSync(steeringDir, { recursive: true });
   const steeringPath = path.join(steeringDir, 'kirograph.md');
-  fs.writeFileSync(steeringPath, buildSteeringContent(cavemanMode));
+
+  // Support both old signature (cavemanMode string) and new signature (options object)
+  const resolvedOpts: SteeringOptions = typeof opts === 'string'
+    ? { cavemanMode: opts }
+    : opts ?? {};
+
+  fs.writeFileSync(steeringPath, buildSteeringContent(resolvedOpts));
   console.log(`  ✓ Steering file written to ${steeringPath}`);
 }
