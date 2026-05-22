@@ -1,8 +1,10 @@
 import { Command } from 'commander';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as readline from 'readline';
 import { printBanner } from '../banner';
 import { dim, reset, violet, bold, green } from '../ui';
+import { askToggle } from '../installer/prompts';
 
 export const UNINIT_FAREWELLS = [
   "Oh. So it's come to this.",
@@ -20,15 +22,6 @@ export const UNINIT_FAREWELLS = [
 type UninitTarget = 'kiro' | 'claude' | 'codex' | 'all';
 
 const UNINIT_TARGETS: UninitTarget[] = ['kiro', 'claude', 'codex', 'all'];
-
-async function confirm(question: string): Promise<boolean> {
-  const readline = await import('readline');
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise<boolean>(resolve => rl.question(question, ans => {
-    rl.close();
-    resolve(ans.toLowerCase() === 'y');
-  }));
-}
 
 async function runUninit(projectPath: string | undefined, opts: { force?: boolean; target?: string }): Promise<void> {
   const target = path.resolve(projectPath ?? process.cwd());
@@ -48,10 +41,14 @@ async function runUninit(projectPath: string | undefined, opts: { force?: boolea
     const farewell = UNINIT_FAREWELLS[Math.floor(Math.random() * UNINIT_FAREWELLS.length)]!;
     console.log(`  ${violet}${bold}${farewell}${reset}`);
     console.log(`\n  ${dim}This can remove ${integration} integration files and, separately, the shared .kirograph/ data.${reset}`);
-    console.log(`  ${dim}Your source code is untouched.${reset}\n`);
+    console.log(`  ${dim}Your source code is untouched.${reset}`);
 
-    removeIntegration = await confirm(`  ${violet}Remove ${integration} integration files?${reset} ${dim}(y/N)${reset} `);
-    removeGraph = await confirm(`  ${violet}Remove shared .kirograph/ data too?${reset} ${dim}(y/N)${reset} `);
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+    removeIntegration = await askToggle(rl, `Remove ${integration} integration files?`, 'Removes hooks, steering, MCP config, and agent instructions for this target.', false);
+    removeGraph = await askToggle(rl, 'Remove shared .kirograph/ data too?', 'Deletes the graph database, snapshots, and all indexed data. Cannot be undone.', false);
+
+    rl.close();
 
     if (!removeIntegration && !removeGraph) {
       console.log(`\n  ${dim}Cancelled. Nothing removed.${reset}\n`);

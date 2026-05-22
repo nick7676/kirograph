@@ -16,7 +16,7 @@ import { loadConfig, updateConfig } from '../../config';
 import { printBanner } from '../banner';
 import { renderIndexProgress } from '../progress';
 import { dim, reset } from '../ui';
-import { ask } from './prompts';
+import { ask, askToggle } from './prompts';
 import { promptConfigOptions } from './config-prompt';
 import { openTypesenseDashboard } from './dashboard';
 import { ensureQdrantUI, openQdrantDashboard } from './qdrant-dashboard';
@@ -35,8 +35,8 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
 
     console.log(`  Workspace: ${cwd}\n`);
 
-    const proceed = await ask(rl, `  Install KiroGraph for ${installer.label}? (Y/n) `);
-    if (proceed.toLowerCase() === 'n') { console.log('  Cancelled.'); rl.close(); return; }
+    const proceed = await askToggle(rl, `Install KiroGraph for ${installer.label}?`, 'Registers the MCP server and writes integration files for this workspace.');
+    if (!proceed) { console.log('  Cancelled.'); rl.close(); return; }
     console.log();
 
     installer.installEarly(cwd);
@@ -157,7 +157,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
     }
 
     // 6. Optionally init + index
-    if (shouldOfferIndex && (await ask(rl, '\n  Initialize and index this project now? (Y/n) ')).toLowerCase() !== 'n') {
+    if (shouldOfferIndex && await askToggle(rl, 'Initialize and index this project now?', 'Creates .kirograph/ and indexes all source files. Takes a few seconds for small projects, longer for large ones.')) {
       const KiroGraph = (await import('../../index')).default;
 
       const fileBytes = new Map<string, { loaded: number; total: number }>();

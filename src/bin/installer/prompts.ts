@@ -11,6 +11,8 @@ export const reset  = '\x1b[0m';
 export const dim    = '\x1b[2m';
 const bold          = '\x1b[1m';
 const green         = '\x1b[32m';
+const yellow        = '\x1b[33m';
+const cyan          = '\x1b[36m';
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 
@@ -40,6 +42,22 @@ export async function askBool(
 }
 
 /**
+ * Interactive enable/disable toggle using arrow keys.
+ * More visual alternative to askBool.
+ */
+export async function askToggle(
+  rl: readline.Interface,
+  label: string,
+  description: string,
+  defaultEnabled = true,
+): Promise<boolean> {
+  return arrowSelect<boolean>(rl, label, [
+    { value: true,  label: 'yes',  description },
+    { value: false, label: 'no', description: 'Skip' },
+  ], defaultEnabled ? 0 : 1);
+}
+
+/**
  * Prompt for a string value, returning the default on empty input.
  */
 export async function askString(
@@ -51,6 +69,30 @@ export async function askString(
   console.log(`\n  ${dim}${description}${reset}`);
   const raw = await ask(rl, `  ${violet}${question}${reset} ${dim}(${defaultValue})${reset} `);
   return raw === '' ? defaultValue : raw;
+}
+
+/**
+ * Print a styled section header with an icon.
+ */
+export function printSection(icon: string, title: string): void {
+  console.log(`\n  ${violet}${bold}${icon}  ${title}${reset}`);
+  console.log(`  ${violet}${'─'.repeat(title.length + 4)}${reset}`);
+}
+
+/**
+ * Print a separator line.
+ */
+export function printSeparator(): void {
+  console.log(`\n  ${dim}${'·'.repeat(50)}${reset}`);
+}
+
+/**
+ * Print a feature summary line.
+ */
+export function printFeature(enabled: boolean, label: string): void {
+  const icon = enabled ? `${green}✓${reset}` : `${dim}✗${reset}`;
+  const text = enabled ? label : `${dim}${label}${reset}`;
+  console.log(`    ${icon} ${text}`);
 }
 
 /**
@@ -114,14 +156,16 @@ export async function arrowSelect<T>(
         if (wasTTY) stdin.setRawMode(false);
         stdin.pause();
         rl.resume();
-        process.stdout.write(`\x1b[${options.length + prevDescLines}A`);
-        for (let i = 0; i < options.length; i++) {
-          const active = i === selected;
-          const cursor = active ? `${green}${bold}❯${reset}` : ' ';
-          const text   = active ? `${green}${bold}${options[i]!.label}${reset}` : `${dim}${options[i]!.label}${reset}`;
-          process.stdout.write(`${CLEAR_LINE}  ${cursor} ${text}\n`);
+        // Clear all rendered lines (options + desc + label + blank line before label)
+        const totalLines = options.length + prevDescLines + 2;
+        process.stdout.write(`\x1b[${options.length + prevDescLines}A`); // go up to first option
+        process.stdout.write(`\x1b[1A`); // go up past label
+        process.stdout.write(`\x1b[1A`); // go up past blank line
+        for (let i = 0; i < totalLines; i++) {
+          process.stdout.write(`${CLEAR_LINE}\n`);
         }
-        process.stdout.write(`${CLEAR_LINE}\n`);
+        process.stdout.write(`\x1b[${totalLines}A`);
+        process.stdout.write(`${CLEAR_LINE}  ${green}${bold}✓${reset} ${label} ${green}${bold}${options[selected]!.label}${reset}\n`);
         resolve(options[selected]!.value);
       } else if (key === '\x03') {
         stdin.removeListener('data', onData);
