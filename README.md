@@ -215,7 +215,7 @@ Up to two hooks are installed (`.kiro.hook` extension):
 
 | Hook file | Event | Type | Behavior |
 |-----------|-------|------|----------|
-| `kirograph-sync-if-dirty.kiro.hook` | `agentStop` | `askAgent` | Asks the agent to run `kirograph sync --quiet` if any source files were created, edited, or deleted during the session. Does nothing otherwise. |
+| `kirograph-sync-if-dirty.kiro.hook` | `agentStop` | `runCommand` | Runs `kirograph sync --quiet` when the agent stops, syncing any file changes from the session. The sync command skips unchanged files via content hashing, so it's fast even when nothing changed. |
 | `kirograph-compress-hint.kiro.hook` | `preToolUse` (shell) | `askAgent` | Reminds the agent to use `kirograph_exec` for commands that benefit from token compression (git, gh, test, lint, build, docker, aws, grep). Only installed when shell compression is enabled. |
 
 The sync hook replaces the previous per-file approach (mark-dirty-on-save, mark-dirty-on-create, sync-on-delete). A single `agentStop` hook handles all file changes in one pass with zero overhead during active editing.

@@ -397,7 +397,7 @@ cd kirograph && npm uninstall -g .</code></pre>
       <table>
         <thead><tr><th>Hook file</th><th>Event</th><th>Type</th><th>Behavior</th></tr></thead>
         <tbody>
-          <tr><td><code>kirograph-sync-if-dirty.kiro.hook</code></td><td><code>agentStop</code></td><td><code>askAgent</code></td><td>Asks the agent to run <code>kirograph sync --quiet</code> if any source files were created, edited, or deleted during the session. Does nothing otherwise.</td></tr>
+          <tr><td><code>kirograph-sync-if-dirty.kiro.hook</code></td><td><code>agentStop</code></td><td><code>runCommand</code></td><td>Runs <code>kirograph sync --quiet</code> when the agent stops. Skips unchanged files via content hashing, so it's fast even when nothing changed.</td></tr>
           <tr><td><code>kirograph-compress-hint.kiro.hook</code></td><td><code>preToolUse</code> (shell)</td><td><code>askAgent</code></td><td>Reminds the agent to use <code>kirograph_exec</code> for commands that benefit from token compression. Only installed when shell compression is enabled.</td></tr>
         </tbody>
       </table>
