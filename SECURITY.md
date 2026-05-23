@@ -13,7 +13,7 @@ If you discover a security vulnerability in KiroGraph, please report it responsi
 
 **Do NOT open a public issue.**
 
-Instead, email: **davide.desio@eleva.it**
+Instead, email: **d.desio@eleva.it**
 
 Include:
 

@@ -24,7 +24,6 @@ npm run build
 npm run dev       # watch mode (rebuilds on change)
 npm run build     # production build
 npm run typecheck # TypeScript type checking
-npm run test      # run tests
 ```
 
 ## How to Contribute
@@ -98,12 +97,6 @@ src/
 - Prefer named exports
 - Keep functions focused and small
 - Add JSDoc comments for public APIs
-
-### Testing
-
-- Add tests for new features and bug fixes
-- Tests use [Vitest](https://vitest.dev/) — run with `npm run test`
-- Place test files alongside source: `src/memory/compress.test.ts`
 
 ### Pull Request Scope
 
