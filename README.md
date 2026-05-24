@@ -795,6 +795,8 @@ Caveman mode never touches code blocks, file paths, URLs, or technical terms, on
 
 ### Shell Compression (`kirograph_exec`)
 
+![KiroGraph caveman](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/rtk.png)
+
 KiroGraph includes a built-in shell compression engine inspired by [rtk](https://github.com/rtk-ai/rtk). The `kirograph_exec` MCP tool runs shell commands and returns token-optimized output, saving 60-90% of tokens on verbose commands like git, test runners, linters, and build tools.
 
 **Why it's useful:** LLM context is expensive. A raw `git status` might be 2,000 tokens; compressed it's 200. A passing test suite might be 25,000 tokens of noise; compressed it's a single "PASSED: 42/42 tests" line. The compression engine knows how to extract the signal from each command family.

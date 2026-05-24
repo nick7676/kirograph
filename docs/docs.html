@@ -701,6 +701,8 @@ kirograph caveman         # show current mode</code></pre>
     <!-- ── Shell Compression ── -->
     <h2 id="shell-compression">Shell Compression</h2>
 
+    <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/rtk.png" alt="shell compression mode" style="border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1.5rem; max-width: 100%;">
+
     <p>KiroGraph includes a built-in shell compression engine inspired by <a href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">rtk</a>. The <code>kirograph_exec</code> MCP tool runs shell commands and returns token-optimized output, saving 60-90% of tokens on verbose commands.</p>
 
     <p>Supported command families: <strong>git</strong> (status, log, diff, push, pull, commit, add, fetch, branch), <strong>GitHub CLI</strong> (gh pr list/view, gh issue list, gh run list), <strong>test runners</strong> (jest, vitest, pytest, cargo test, go test, rspec, minitest, playwright), <strong>linters/build</strong> (eslint, tsc, ruff, clippy, cargo build, prettier, biome, golangci-lint, rubocop, next build), <strong>file listings</strong> (ls, find, tree), <strong>search</strong> (grep, rg, grouped by file), <strong>diff</strong> (condensed context), <strong>docker/k8s</strong> (docker ps, images, logs, compose ps, kubectl pods, logs, services), <strong>package managers</strong> (npm, pip, bundle, prisma generate), <strong>AWS</strong> (sts, ec2, lambda, logs, cloudformation, dynamodb, iam, s3, ecs, sqs, sns), <strong>network</strong> (curl, wget, strips progress).</p>
