@@ -140,18 +140,12 @@ fi
 # ── Create GitHub release ────────────────────────────────────────────────────
 step "Creating GitHub release"
 
-# Get the title from changelog (first ## line for this version)
-TITLE=$(grep -m1 "^## \[$VERSION\]" CHANGELOG.md | sed 's/^## \[.*\] - //')
-if [ -z "$TITLE" ]; then
-  TITLE="v$VERSION"
-fi
-
 echo "$NOTES" | gh release create "$TAG" \
-  --title "$TITLE" \
+  --title "$TAG" \
   --notes-file - \
   --latest
 
-info "GitHub release created: $TITLE"
+info "GitHub release created: $TAG"
 
 # ── Publish to npm ───────────────────────────────────────────────────────────
 if [ "$NPM_SKIP" = true ]; then
