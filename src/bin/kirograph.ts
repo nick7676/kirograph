@@ -50,6 +50,7 @@ import { register as registerVulns } from './commands/vulns';
 import { register as registerReachability } from './commands/reachability';
 import { register as registerStaleness } from './commands/staleness';
 import { register as registerLicenses } from './commands/licenses';
+import { register as registerSecurityExport } from './commands/security-export';
 
 // ── Global error handler for WASM runtime crashes ─────────────────────────────
 //
@@ -138,13 +139,14 @@ registerCommunities(program);
 registerRefactor(program);
 registerRead(program);
 registerBudget(program);
-registerSecurity(program);
+const securityCmd = registerSecurity(program);
 registerSbom(program);
 registerVex(program);
 registerVulns(program);
 registerReachability(program);
 registerStaleness(program);
 registerLicenses(program);
+registerSecurityExport(securityCmd);
 
 // Register the help command for `kirograph help`
 program

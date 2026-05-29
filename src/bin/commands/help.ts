@@ -141,6 +141,12 @@ const GROUPS: Group[] = [
           '--format <fmt>   table | json',
         ],
       },
+      { name: 'security export', args: '[path]', desc: 'Generate HTML security dashboard',
+        opts: [
+          '--output <file>  Output path (default: .kirograph/security-export.html)',
+          '--open           Open in browser after generating',
+        ],
+      },
     ],
     examples: [
       ['kirograph security', 'Overview: dep count, vuln count, verdict breakdown'],
@@ -159,6 +165,7 @@ const GROUPS: Group[] = [
       ['kirograph licenses --deny "GPL-*,AGPL-*"', 'Block all GPL/AGPL licenses'],
       ['kirograph vex --output vex.json', 'Export CycloneDX VEX document'],
       ['kirograph sbom --output sbom.json', 'Export SPDX SBOM'],
+      ['kirograph security export --open', 'Generate and open HTML security dashboard'],
     ],
   },
   {

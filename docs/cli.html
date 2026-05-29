@@ -329,6 +329,13 @@ kirograph sbom --output sbom.json          # Export to file</code></pre>
 
     <pre><code>kirograph vex [path]                       # Export CycloneDX 1.5 VEX to stdout
 kirograph vex --output vex.json            # Export to file</code></pre>
+
+    <h3 id="cli-security-export">Security Dashboard</h3>
+    <p>Generate a self-contained HTML dashboard with all security data: vulnerability triage, SBOM and VEX download, license compliance, and dependency staleness.</p>
+    <pre><code>kirograph security export [path]                    # Generate .kirograph/security-export.html
+kirograph security export --open                    # Generate and open immediately in browser
+kirograph security export --output report.html      # Custom output path</code></pre>
+    <p>The dashboard has 6 tabs: <strong>Overview</strong> (stat cards, verdict chart, top CVEs by EPSS×CVSS), <strong>Vulnerabilities</strong> (filterable table with EPSS badges and expandable call paths), <strong>SBOM</strong> (component list + one-click CycloneDX JSON download), <strong>VEX</strong> (analysis states + one-click download), <strong>Licenses</strong> (policy violations highlighted), <strong>Staleness</strong> (score bars, sortable table).</p>
     <p>Requires <code>enableSecurity: true</code> in <code>.kirograph/config.json</code>.</p>
 
   </main>
@@ -356,6 +363,7 @@ kirograph vex --output vex.json            # Export to file</code></pre>
       <a href="#cli-docs" class="sidebar-link">Documentation</a>
       <a href="#cli-data" class="sidebar-link">Data</a>
       <a href="#cli-security" class="sidebar-link">Security</a>
+      <a href="#cli-security-export" class="sidebar-link" style="padding-left:1.5rem;">↳ Security Dashboard</a>
     </div>
   </aside>
 

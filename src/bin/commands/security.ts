@@ -3,10 +3,11 @@ import * as path from 'path';
 import { loadConfig } from '../../config';
 import { dim, reset, violet, bold, green, section } from '../ui';
 
-export function register(program: Command): void {
-  program
-    .command('security [projectPath]')
-    .description('Show security overview: vulnerabilities, reachability verdicts, stale data warnings')
+export function register(program: Command): Command {
+  const secCmd = program
+    .command('security')
+    .description('Security analysis: overview, dashboard export, and vulnerability management')
+    .argument('[projectPath]', 'Project root path (optional)')
     .option('--refresh-staleness', 'Fetch latest version info from registries and show stale dependency count')
     .action(async (projectPath: string | undefined, opts: { refreshStaleness?: boolean }) => {
       const target = path.resolve(projectPath ?? process.cwd());
@@ -129,4 +130,6 @@ export function register(program: Command): void {
 
       cg.close();
     });
+
+  return secCmd;
 }
