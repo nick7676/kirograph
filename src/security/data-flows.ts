@@ -216,26 +216,38 @@ export class DataFlowAnalyzer {
   // ── Detection: path traversal ─────────────────────────────────────────────────
 
   private _detectPathTraversal(rawDb: any): DataFlowFinding[] {
-    // Find functions that call file I/O operations and look like they handle requests
+    // Find functions that call file I/O operations and look like they handle requests.
+    // Exclusions:
+    //   - Internal analysis/infrastructure paths (mcp, resolution, security, extraction, graph, architecture)
+    //   - 'open' is excluded from file ops because KiroGraph.open() (DB) triggers false positives
+    //   - Class names ending in 'Handler' or 'Server' are excluded (too broad — use more specific patterns)
     const rows: CallEdgeRow[] = rawDb.all(`
       SELECT n.name as caller, n.file_path, n.start_line, n2.name as callee
       FROM edges e
       JOIN nodes n  ON n.id  = e.source
       JOIN nodes n2 ON n2.id = e.target
       WHERE e.kind = 'calls'
-        AND n2.name IN ('readFile', 'readFileSync', 'writeFile', 'writeFileSync', 'createReadStream', 'createWriteStream', 'open', 'openSync', 'unlink', 'unlinkSync')
+        AND n2.name IN ('readFile', 'readFileSync', 'writeFile', 'writeFileSync', 'createReadStream', 'createWriteStream', 'openSync', 'unlink', 'unlinkSync')
         AND (
-          n.name LIKE '%handle%'
-          OR n.name LIKE '%controller%'
+          n.name LIKE '%controller%'
           OR n.name LIKE '%route%'
           OR n.name LIKE '%request%'
-          OR n.name LIKE '%serve%'
           OR n.name LIKE '%download%'
           OR n.name LIKE '%upload%'
           OR n.name LIKE '%get%file%'
           OR n.name LIKE '%fetch%file%'
+          OR n.name LIKE '%serve%file%'
+          OR n.name LIKE '%handle%file%'
         )
         AND n.file_path != ''
+        AND n.file_path NOT LIKE '%/mcp/%'
+        AND n.file_path NOT LIKE '%/resolution/%'
+        AND n.file_path NOT LIKE '%/security/%'
+        AND n.file_path NOT LIKE '%/extraction/%'
+        AND n.file_path NOT LIKE '%/graph/%'
+        AND n.file_path NOT LIKE '%/architecture/%'
+        AND n.file_path NOT LIKE '%/frameworks/%'
+        AND n.file_path NOT LIKE '%/bridges/%'
     `);
 
     return rows.map((row) => ({

@@ -233,7 +233,9 @@ kirograph install --target kiro   # install for a specific platform only</code><
       <tbody>
         <tr><td>Dependency vulnerability scanning</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>OSV vulnerability database</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Batch OSV queries (1000 deps/request)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Call-graph reachability analysis</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Combined risk score (CVSS + EPSS + reachability + staleness)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Architecture-layer impact (affected layers)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>CycloneDX 1.5 SBOM export</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>CycloneDX 1.5 VEX export</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -242,6 +244,7 @@ kirograph install --target kiro   # install for a specific platform only</code><
         <tr><td>License compliance (SPDX + policy)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Dependency staleness score</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Dashboard security overlay</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>CVE suppression list</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Manual CVE registration</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Queryable via MCP by AI agents</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Call-graph attack surface mapping</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -1197,11 +1200,19 @@ kirograph docs reembed                      # re-embed with current model</code>
       <table>
         <thead><tr><th>Ecosystem</th><th>Manifest</th><th>Lock File</th><th>Purl Prefix</th></tr></thead>
         <tbody>
-          <tr><td>npm</td><td><code>package.json</code></td><td><code>package-lock.json</code>, <code>yarn.lock</code></td><td><code>pkg:npm/</code></td></tr>
+          <tr><td>npm / pnpm</td><td><code>package.json</code></td><td><code>package-lock.json</code>, <code>pnpm-lock.yaml</code>, <code>yarn.lock</code></td><td><code>pkg:npm/</code></td></tr>
           <tr><td>Maven</td><td><code>pom.xml</code></td><td>—</td><td><code>pkg:maven/</code></td></tr>
+          <tr><td>Gradle</td><td><code>build.gradle</code>, <code>build.gradle.kts</code></td><td><code>gradle.lockfile</code></td><td><code>pkg:maven/</code></td></tr>
           <tr><td>Go</td><td><code>go.mod</code></td><td><code>go.sum</code></td><td><code>pkg:golang/</code></td></tr>
           <tr><td>pip</td><td><code>requirements.txt</code></td><td>—</td><td><code>pkg:pypi/</code></td></tr>
+          <tr><td>Python (modern)</td><td><code>pyproject.toml</code></td><td><code>poetry.lock</code>, <code>pdm.lock</code>, <code>uv.lock</code></td><td><code>pkg:pypi/</code></td></tr>
           <tr><td>Cargo</td><td><code>Cargo.toml</code></td><td><code>Cargo.lock</code></td><td><code>pkg:cargo/</code></td></tr>
+          <tr><td>NuGet</td><td><code>*.csproj</code>, <code>packages.config</code></td><td><code>packages.lock.json</code></td><td><code>pkg:nuget/</code></td></tr>
+          <tr><td>RubyGems</td><td><code>Gemfile</code></td><td><code>Gemfile.lock</code></td><td><code>pkg:gem/</code></td></tr>
+          <tr><td>Composer</td><td><code>composer.json</code></td><td><code>composer.lock</code></td><td><code>pkg:composer/</code></td></tr>
+          <tr><td>Swift PM</td><td><code>Package.swift</code></td><td><code>Package.resolved</code></td><td><code>pkg:swift/</code></td></tr>
+          <tr><td>Dart/Flutter</td><td><code>pubspec.yaml</code></td><td><code>pubspec.lock</code></td><td><code>pkg:pub/</code></td></tr>
+          <tr><td>Elixir/Hex</td><td><code>mix.exs</code></td><td><code>mix.lock</code></td><td><code>pkg:hex/</code></td></tr>
         </tbody>
       </table>
     </div>

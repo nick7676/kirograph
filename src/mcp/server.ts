@@ -3,6 +3,7 @@
  * Implements the Model Context Protocol over stdio.
  */
 
+import * as path from 'path';
 import KiroGraph, { findNearestKiroGraphRoot } from '../index';
 import { StdioTransport, ErrorCodes } from './transport';
 import { tools, ToolHandler } from './tools';
@@ -18,7 +19,8 @@ export class MCPServer {
   private projectPath: string | null;
 
   constructor(projectPath?: string) {
-    this.projectPath = projectPath ?? null;
+    // Normalize to absolute path immediately to prevent any path traversal
+    this.projectPath = projectPath ? path.resolve(projectPath) : null;
     this.toolHandler = new ToolHandler(null);
   }
 

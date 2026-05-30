@@ -1312,7 +1312,7 @@ export function register(secCmd: import('commander').Command): void {
       const rawDb = db.getRawDb();
 
       // Query all vulnerability + dep data in one JOIN
-      const vulns: VulnRow[] = rawDb.all(`
+      const rawVulns: VulnRow[] = rawDb.all(`
         SELECT v.cve_id, v.severity_score, v.risk_score, v.epss_score, v.epss_percentile,
                v.fixed_version, v.summary, v.affected_ranges,
                d.package_name, d.ecosystem, d.resolved_version, d.declared_constraint,
@@ -1324,6 +1324,18 @@ export function register(secCmd: import('commander').Command): void {
         LEFT JOIN sec_reachability r ON r.vulnerability_node_id = v.node_id
         ORDER BY v.epss_score DESC NULLS LAST, v.severity_score DESC NULLS LAST
       `);
+
+      // Deduplicate by (cve_id, package_name, ecosystem) — same CVE can appear multiple
+      // times when a package is declared in multiple manifests (monorepo).
+      const _vRank = (v: string | null) =>
+        v === 'affected' ? 3 : v === 'under_investigation' ? 2 : v === 'not_affected' ? 1 : 0;
+      const _dedupMap = new Map<string, VulnRow>();
+      for (const row of rawVulns) {
+        const key = `${row.cve_id}::${row.package_name ?? ''}::${row.ecosystem ?? ''}`;
+        const ex = _dedupMap.get(key);
+        if (!ex || _vRank(row.verdict) > _vRank(ex.verdict)) _dedupMap.set(key, row);
+      }
+      const vulns: VulnRow[] = [..._dedupMap.values()];
 
       // Determine which deps are direct (have a declared_in edge)
       const directNodeIds = new Set<string>(

@@ -22,7 +22,7 @@ The result is fewer tool calls, less context used, and faster responses on compl
 
 | Feature | Description |
 |---------|-------------|
-| <h4>Graph & Analysis</h4> | |
+| <h4>Graph & Analysis (Kirograph-Core)</h4> | |
 | 🕸️ **Semantic Graph** | tree-sitter AST parsing across 33+ languages — functions, classes, call edges, type hierarchies, all in SQLite |
 | 🎯 **Context Building** | One tool call returns entry points, related symbols, and code snippets for any task description |
 | 💥 **Impact Analysis** | Blast-radius traversal before making changes — know what breaks at any depth |
@@ -31,24 +31,24 @@ The result is fewer tool calls, less context used, and faster responses on compl
 | 💀 **Dead Code Detection** | Find unexported symbols with zero incoming references |
 | 🔥 **Hotspots & Surprises** | Identify most-connected symbols and unexpected cross-module coupling |
 | 🧪 **Affected Tests** | Find test files impacted by source changes — useful in CI and pre-commit hooks |
-| <h4>Architecture</h4> | |
-| 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
-| 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
 | 🌐 **Graph Export** | Interactive browser dashboard with search, clustering, path finding, and analytics |
 | <h4>Semantic Search</h4> | |
 | ⚡ **7 Semantic Engines** | Cosine, sqlite-vec, Orama, PGlite, LanceDB, Qdrant, Typesense — pick the best fit for your project |
 | 🤖 **Custom Embedding Models** | Use any HuggingFace `feature-extraction` model — nomic, Gemma, MiniLM, BGE, or bring your own |
+| <h4>Architecture (Kirograph-Arch opt-in  module)</h4> | |
+| 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
+| 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
 | <h4>Security</h4> | |
-| 🔒 **Vulnerability Detection** | Dependency scanning across 14 ecosystems, OSV integration with batch queries, reachability-aware impact analysis, EPSS exploitation probability, license compliance, dependency staleness, CycloneDX 1.5 SBOM/VEX export, dashboard security overlay |
+| 🔒 **Security (KiroGraph-Sec opt-in  module)** | Goes beyond "this dependency has a CVE" — uses the call graph to determine if vulnerable code is **actually reachable** from your entry points. Maps your **attack surface** (which HTTP routes reach vulnerable deps). Detects **hardcoded secrets** and shows how many entry points expose them. **SAST-lite** finds SQL injection, path traversal, and dangerous eval in your code. **Supply chain health** checks OpenSSF Scorecard scores and detects dependency confusion attacks. Covers 14 ecosystems, outputs CycloneDX SBOM/VEX and CI-ready SARIF reports. |
 | <h4>Knowledge & Data</h4> | |
-| 🧠 **Persistent Memory** | Cross-session observations — decisions, errors, patterns — auto-linked to code symbols |
-| 📖 **Documentation Indexing** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
-| 📊 **Data Navigation** | Query CSV/JSON/Excel/Parquet with filters, aggregations, joins — all server-side in SQLite |
+| 🧠 **Persistent Memor (KiroGraph-Mem opt-in module)** | Cross-session observations — decisions, errors, patterns — auto-linked to code symbols |
+| 📖 **Documentation Indexing (KiroGraph-Doc opt-in  module)** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
+| 📊 **Data Navigation (KiroGraph-Data opt-in  module)** | Query CSV/JSON/Excel/Parquet with filters, aggregations, joins — all server-side in SQLite |
 | <h4>Token Optimization</h4> | |
-| 🗜️ **Shell Compression** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
-| 🪨 **Caveman Mode** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
-| 📈 **Token Analytics** | Track cumulative savings from graph tools and shell compression over time |
-| <h4>Integration</h4> | |
+| 🗜️ **Shell Compression (Kirograph-RTK opt-in  module)** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
+| 🪨 **Caveman Mode (Kirograph-Caveman opt-in module)** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
+| 📈 **Token Analytics (Kirograph-Gain core module)** | Track cumulative savings from graph tools and shell compression over time |
+| <h4>Integration (Kirograph-Integration core module)</h4> | |
 | 🔌 **Multi-tool Support** | Native Kiro + 32 experimental targets (Cursor, Copilot, Claude Code, Codex, Windsurf, Cline, and more) |
 
 
@@ -88,7 +88,7 @@ All Kiro integration files are written to `.kiro/`. Restart Kiro IDE, or switch 
 | [MCP Tools](docs/guide/mcp-tools.md) | Full reference for all MCP tools |
 | [CLI Reference](docs/guide/cli.md) | All CLI commands with examples |
 | [Configuration](docs/guide/configuration.md) | Config fields, semantic engines, architecture analysis |
-| [Security](docs/guide/security.md) | 14 ecosystems, OSV batch queries, EPSS, license compliance, dependency staleness, SBOM/VEX export |
+| [Security](docs/guide/security.md) | Full SCA+: 14 ecosystems, EPSS, reachability, attack surface, secrets, SAST-lite, supply chain, SBOM/VEX/SARIF |
 | [Languages & Frameworks](docs/guide/languages.md) | Supported languages, frameworks, and detection |
 | [Changelog](CHANGELOG.md) | Release history |
 | [Contributing](CONTRIBUTING.md) | How to contribute |

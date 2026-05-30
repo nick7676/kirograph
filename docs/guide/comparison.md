@@ -68,12 +68,23 @@ A comparison of KiroGraph with the open-source projects that inspired it or oper
 |---------|:---------:|:---------:|:-----------------:|:----------:|:---------:|:----------:|:-------:|:-------:|:---:|:--------:|
 | Dependency vulnerability scanning | ✅ | — | — | — | — | — | — | — | — | — |
 | OSV vulnerability database | ✅ | — | — | — | — | — | — | — | — | — |
+| Batch OSV queries (1000 deps/request) | ✅ | — | — | — | — | — | — | — | — | — |
 | Call-graph reachability analysis | ✅ | — | — | — | — | — | — | — | — | — |
+| Combined risk score (CVSS + EPSS + reachability + staleness) | ✅ | — | — | — | — | — | — | — | — | — |
 | Architecture-layer impact (affected layers) | ✅ | — | — | — | — | — | — | — | — | — |
 | CycloneDX 1.5 SBOM export | ✅ | — | — | — | — | — | — | — | — | — |
 | CycloneDX 1.5 VEX export | ✅ | — | — | — | — | — | — | — | — | — |
+| EPSS exploitation probability | ✅ | — | — | — | — | — | — | — | — | — |
+| Attack surface mapping (routes → vulnerable deps) | ✅ | — | — | — | — | — | — | — | — | — |
+| Secrets detection with call-graph blast radius | ✅ | — | — | — | — | — | — | — | — | — |
+| SAST-lite (SQL injection, eval, path traversal, weak crypto) | ✅ | — | — | — | — | — | — | — | — | — |
+| OWASP Top 10 mapping | ✅ | — | — | — | — | — | — | — | — | — |
+| Supply chain health (OpenSSF Scorecard) | ✅ | — | — | — | — | — | — | — | — | — |
+| Dependency confusion detection | ✅ | — | — | — | — | — | — | — | — | — |
+| Remediation SLA tracking | ✅ | — | — | — | — | — | — | — | — | — |
+| CI/CD SARIF export (GitHub Security tab) | ✅ | — | — | — | — | — | — | — | — | — |
+| CVE suppression list | ✅ | — | — | — | — | — | — | — | — | — |
 | Fix suggestions per ecosystem | ✅ | — | — | — | — | — | — | — | — | — |
-| EPSS exploitation probability score | ✅ | — | — | — | — | — | — | — | — | — |
 | License compliance (SPDX + policy) | ✅ | — | — | — | — | — | — | — | — | — |
 | Dependency staleness score | ✅ | — | — | — | — | — | — | — | — | — |
 | Dashboard security overlay | ✅ | — | — | — | — | — | — | — | — | — |

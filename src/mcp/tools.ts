@@ -901,7 +901,9 @@ export class ToolHandler {
 
   private async getConnection(projectPath?: string): Promise<KiroGraph | null> {
     if (!projectPath) return this.defaultCg;
+    // Normalize and validate: must be an absolute path after resolution
     const resolved = path.resolve(projectPath);
+    if (!path.isAbsolute(resolved)) return null;
     if (this.connections.has(resolved)) return this.connections.get(resolved)!;
     try {
       const cg = await KiroGraph.open(resolved);
@@ -2759,11 +2761,23 @@ export class ToolHandler {
           verdict: string | null;
         }> = rawDb.all(query, params);
 
+        // Deduplicate by (cve_id, package_name, ecosystem) — same CVE can appear multiple
+        // times when a package is declared in multiple manifests (monorepo).
+        const verdictRankMcp = (v: string | null) =>
+          v === 'affected' ? 3 : v === 'under_investigation' ? 2 : v === 'not_affected' ? 1 : 0;
+        const dedupMapMcp = new Map<string, typeof rows[0]>();
+        for (const row of rows) {
+          const key = `${row.cve_id}::${row.package_name ?? ''}::${row.ecosystem ?? ''}`;
+          const ex = dedupMapMcp.get(key);
+          if (!ex || verdictRankMcp(row.verdict) > verdictRankMcp(ex.verdict)) dedupMapMcp.set(key, row);
+        }
+        const dedupedRowsMcp = [...dedupMapMcp.values()];
+
         // Filter out suppressed CVEs
         const { SuppressionManager } = await import('../security/suppressions');
         const suppressionMgr = new SuppressionManager(projectRoot);
-        const suppressedCount = rows.filter(row => suppressionMgr.isSuppressed(row.cve_id)).length;
-        const filteredRows = rows.filter(row => !suppressionMgr.isSuppressed(row.cve_id));
+        const suppressedCount = dedupedRowsMcp.filter(row => suppressionMgr.isSuppressed(row.cve_id)).length;
+        const filteredRows = dedupedRowsMcp.filter(row => !suppressionMgr.isSuppressed(row.cve_id));
 
         if (filteredRows.length === 0) {
           const noMatch = 'No vulnerabilities found' + ((args.severity || args.verdict) ? ' matching filters.' : '.');

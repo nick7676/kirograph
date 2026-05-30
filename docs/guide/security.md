@@ -99,6 +99,9 @@ kirograph vulns --add CVE-2024-1234 --package lodash --version 4.17.20
 | `--verdict <verdict>` | Filter by verdict: `affected`, `not_affected`, `under_investigation` |
 | `--epss <threshold>` | Filter by EPSS exploitation probability (0.0–1.0, e.g. `--epss 0.5`) |
 | `--stale` | Show staleness score of the affected dependency alongside each CVE |
+| `--sort <key>` | Sort results by: `risk` (default), `cvss`, `epss`, `name` |
+| `--group-by workspace` | Group output by source manifest directory (monorepo support) |
+| `--fail-on <condition>` | Exit 1 if condition met: `affected`, `any`, `critical`, `high`, `epss=N` |
 | `--refresh` | Trigger fresh enrichment from configured databases before listing |
 | `--add <cveId>` | Manually register a CVE (requires `--package` and `--version`) |
 | `--package <name>` | Package name for manual CVE registration |
@@ -115,6 +118,21 @@ kirograph reachability lodash
 ```
 
 Accepts either a CVE ID or a package name. Shows: verdict, reaching entry point count, call paths (up to 5), unresolved symbols if any, and full impact summary (affected layers, entry points, distinct paths) when verdict is `affected`.
+
+### `kirograph security export`
+
+Generate a self-contained HTML security dashboard with 10 tabs: Overview, Vulnerabilities, SBOM, VEX, Licenses, Staleness, Attack Surface, Secrets, Flows, and Remediation.
+
+```bash
+kirograph security export [path]
+kirograph security export --output security-report.html
+kirograph security export --open           # open in browser immediately
+```
+
+| Flag | Description |
+|------|-------------|
+| `--output <file>` | Write dashboard to file (default: stdout) |
+| `--open` | Open in default browser immediately after generation |
 
 ### `kirograph attack-surface`
 
@@ -215,6 +233,35 @@ kirograph staleness --format json
 
 Staleness score 0.0–1.0: accounts for major versions behind (up to 0.6) and months since latest release (up to 0.4).
 
+### CVE Suppression
+
+Mark false positives or accepted risks to exclude them from all output.
+
+```bash
+kirograph vuln suppress CVE-2024-1234 --reason "not in code path"
+kirograph vuln suppress CVE-2024-1234 --expires 2026-12-31
+kirograph vuln unsuppress CVE-2024-1234
+kirograph vuln suppressions
+kirograph vuln suppressions --format json
+```
+
+Suppressions are stored in `.kirograph/security-suppressions.json`. Expired suppressions are auto-pruned on each run.
+
+### Risk Score
+
+Each vulnerability receives a combined risk score on a 0–10 scale:
+
+```
+risk_score = reachability_factor × (0.4 × CVSS + 0.6 × EPSS) × staleness_bonus
+```
+
+- **reachability_factor**: 1.0 if `affected`, 0.5 if `under_investigation`, 0.1 if `not_affected`
+- **CVSS**: normalized CVSS v3.1 base score (0–10)
+- **EPSS**: exploitation probability weight (0.0–1.0)
+- **staleness_bonus**: up to 1.2× multiplier for stale dependencies
+
+The score is shown as a badge `[Risk: 8.5]` in `kirograph vulns` output and used as the default sort order (`--sort risk`).
+
 ## MCP Tools
 
 All security tools require `enableSecurity: true` and `enableArchitecture: true`.
@@ -274,6 +321,17 @@ Manually register a CVE against a dependency. Useful for private/internal adviso
 | `severity` | number | - | CVSS v3.1 base score (0.0–10.0) |
 | `summary` | string | - | Human-readable description (truncated to 500 chars) |
 | `fixedVersion` | string | - | Version that fixes the vulnerability |
+| `projectPath` | string | cwd | Project root path |
+
+### `kirograph_vuln_suppress`
+
+Suppress a CVE (mark as false positive or accepted risk). Suppressed CVEs are excluded from all output until the expiry date or until unsuppressed.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `cveId` | string | required | CVE identifier to suppress (e.g. `CVE-2024-1234`) |
+| `reason` | string | - | Human-readable reason for suppression |
+| `expires` | string | - | ISO 8601 expiry date (e.g. `2026-12-31`); suppression is auto-pruned after this date |
 | `projectPath` | string | cwd | Project root path |
 
 ### `kirograph_attack_surface`

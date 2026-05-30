@@ -260,10 +260,25 @@ export function register(program: Command): void {
         source_manifests?: string | null;
       }> = rawDb.all(query, params);
 
+      // Deduplicate by (cve_id, package_name, ecosystem) — same CVE can appear multiple
+      // times if a package is declared in multiple manifests (monorepo) or has multiple
+      // dep nodes. Keep the row with the worst verdict (affected > under_investigation > not_affected > null).
+      const verdictRank = (v: string | null) =>
+        v === 'affected' ? 3 : v === 'under_investigation' ? 2 : v === 'not_affected' ? 1 : 0;
+      const deduped = new Map<string, typeof rows[0]>();
+      for (const row of rows) {
+        const key = `${row.cve_id}::${row.package_name ?? ''}::${row.ecosystem ?? ''}`;
+        const existing = deduped.get(key);
+        if (!existing || verdictRank(row.verdict) > verdictRank(existing.verdict)) {
+          deduped.set(key, row);
+        }
+      }
+      const dedupedRows = [...deduped.values()];
+
       // Filter out suppressed CVEs
       const suppressions = new SuppressionManager(target);
-      const suppressedRows = rows.filter(row => suppressions.isSuppressed(row.cve_id));
-      const filteredRows = rows.filter(row => !suppressions.isSuppressed(row.cve_id));
+      const suppressedRows = dedupedRows.filter(row => suppressions.isSuppressed(row.cve_id));
+      const filteredRows = dedupedRows.filter(row => !suppressions.isSuppressed(row.cve_id));
 
       if (filteredRows.length === 0) {
         const filterNote = (opts.severity || opts.verdict)

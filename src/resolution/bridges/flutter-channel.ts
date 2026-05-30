@@ -10,6 +10,7 @@
  * the Dart side and each native platform side.
  */
 
+import * as path from 'path';
 import type { ResolutionContext } from '../../frameworks/types';
 import type { BridgeResolver, SynthesizedEdge } from './index';
 
@@ -275,7 +276,10 @@ function extractChannelNameNearOffset(
  */
 function findKotlinJavaHandlers(context: ResolutionContext): NativeChannelHandler[] {
   const handlers: NativeChannelHandler[] = [];
-  const files = context.getAllFiles();
+  const projectRoot = path.resolve(context.getProjectRoot());
+  // getAllFiles() returns already-indexed paths from the project — validate they
+  // are within the project root before reading to prevent path traversal.
+  const files = context.getAllFiles().filter(f => path.resolve(f).startsWith(projectRoot));
 
   for (const f of files) {
     if (!f.endsWith('.kt') && !f.endsWith('.java')) continue;
@@ -359,7 +363,9 @@ function findKotlinJavaHandlers(context: ResolutionContext): NativeChannelHandle
  */
 function findSwiftHandlers(context: ResolutionContext): NativeChannelHandler[] {
   const handlers: NativeChannelHandler[] = [];
-  const files = context.getAllFiles();
+  const projectRoot = path.resolve(context.getProjectRoot());
+  // Validate all paths are within the project root before reading.
+  const files = context.getAllFiles().filter(f => path.resolve(f).startsWith(projectRoot));
 
   for (const f of files) {
     if (!f.endsWith('.swift')) continue;
