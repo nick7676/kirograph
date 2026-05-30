@@ -22,7 +22,7 @@ The result is fewer tool calls, less context used, and faster responses on compl
 
 | Feature | Description |
 |---------|-------------|
-| <h4>Graph & Analysis (Kirograph-Core)</h4> | |
+| <h4>Graph & Analysis (KiroGraph-Core)</h4> | |
 | 🕸️ **Semantic Graph** | tree-sitter AST parsing across 33+ languages — functions, classes, call edges, type hierarchies, all in SQLite |
 | 🎯 **Context Building** | One tool call returns entry points, related symbols, and code snippets for any task description |
 | 💥 **Impact Analysis** | Blast-radius traversal before making changes — know what breaks at any depth |
@@ -35,7 +35,7 @@ The result is fewer tool calls, less context used, and faster responses on compl
 | <h4>Semantic Search</h4> | |
 | ⚡ **7 Semantic Engines** | Cosine, sqlite-vec, Orama, PGlite, LanceDB, Qdrant, Typesense — pick the best fit for your project |
 | 🤖 **Custom Embedding Models** | Use any HuggingFace `feature-extraction` model — nomic, Gemma, MiniLM, BGE, or bring your own |
-| <h4>Architecture (Kirograph-Arch opt-in  module)</h4> | |
+| <h4>Architecture (KiroGraph-Arch opt-in  module)</h4> | |
 | 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
 | 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
 | <h4>Security</h4> | |
@@ -45,10 +45,10 @@ The result is fewer tool calls, less context used, and faster responses on compl
 | 📖 **Documentation Indexing (KiroGraph-Doc opt-in  module)** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
 | 📊 **Data Navigation (KiroGraph-Data opt-in  module)** | Query CSV/JSON/Excel/Parquet with filters, aggregations, joins — all server-side in SQLite |
 | <h4>Token Optimization</h4> | |
-| 🗜️ **Shell Compression (Kirograph-RTK opt-in  module)** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
-| 🪨 **Caveman Mode (Kirograph-Caveman opt-in module)** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
-| 📈 **Token Analytics (Kirograph-Gain core module)** | Track cumulative savings from graph tools and shell compression over time |
-| <h4>Integration (Kirograph-Integration core module)</h4> | |
+| 🗜️ **Shell Compression (KiroGraph-RTK opt-in  module)** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
+| 🪨 **Caveman Mode (KiroGraph-Caveman opt-in module)** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
+| 📈 **Token Analytics (KiroGraph-Gain core module)** | Track cumulative savings from graph tools and shell compression over time |
+| <h4>Integration (KiroGraph-Integration core module)</h4> | |
 | 🔌 **Multi-tool Support** | Native Kiro + 32 experimental targets (Cursor, Copilot, Claude Code, Codex, Windsurf, Cline, and more) |
 
 
