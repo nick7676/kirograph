@@ -360,6 +360,8 @@ kirograph mem lint --fix                  # auto-repair issues
 
 ## Documentation *(requires `enableDocs: true`)*
 
+![KiroGraph Documentation](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/docs.png)
+
 ```bash
 # Table of contents
 kirograph docs toc                          # whole project
