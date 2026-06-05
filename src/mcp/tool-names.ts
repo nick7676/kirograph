@@ -56,5 +56,8 @@ export const KIROGRAPH_TOOL_NAMES = [
   'kirograph_supply_chain',
   'kirograph_dep_confusion',
   'kirograph_remediation',
+  'kirograph_pattern_coverage',
+  'kirograph_pattern_save_baseline',
+  'kirograph_pattern_diff',
 ];
 

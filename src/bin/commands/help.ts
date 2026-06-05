@@ -157,6 +157,14 @@ const GROUPS: Group[] = [
       { name: 'supply-chain',        args: '[path]', desc: 'Supply chain health: OpenSSF Scorecard, maintainer count, abandoned packages', opts: ['--threshold critical|high|medium', '--refresh', '--format json'] },
       { name: 'dep-confusion',       args: '[path]', desc: 'Detect dependency confusion: internal packages that exist in public registries', opts: ['--format json'] },
       { name: 'remediation',         args: '[path]', desc: 'Remediation SLA tracking: days open, fix available since, overdue alerts', opts: ['--overdue-only', '--format json'] },
+      { name: 'pattern', args: '[pattern]', desc: 'AST structural search: live pattern search or library rule runner',
+        opts: [
+          '--list             Show all bundled SAST rules',
+          '--library <id>    Run a specific library rule',
+          '--lang <l>        Language filter (js, ts, python, go, ...)',
+          '--format json     JSON output',
+        ],
+      },
     ],
     examples: [
       ['kirograph security', 'Overview: dep count, vuln count, verdict breakdown'],
@@ -186,6 +194,9 @@ const GROUPS: Group[] = [
       ['kirograph vuln suppress CVE-2024-1234 --reason "not in code path"', 'Suppress a false positive CVE'],
       ['kirograph vuln unsuppress CVE-2024-1234', 'Remove a suppression'],
       ['kirograph vuln suppressions', 'List all active suppressions'],
+      ['kirograph pattern "eval($X)"', 'Find all eval() calls'],
+      ['kirograph pattern --list', 'Show all bundled SAST rules'],
+      ['kirograph pattern --library dangerous-eval-js', 'Run the dangerous-eval library rule'],
     ],
   },
   {
@@ -453,6 +464,9 @@ export function printColoredHelp(): void {
         ['kirograph vuln suppress CVE-2024-1234 --expires 2026-12-31', 'Suppress with expiry date'],
         ['kirograph vuln unsuppress CVE-2024-1234',                  'Remove a suppression'],
         ['kirograph vuln suppressions',                              'List all active suppressions'],
+        ['kirograph pattern "eval($X)"',                             'Find all eval() calls (requires enablePatterns: true)'],
+        ['kirograph pattern --list',                                 'Show all bundled SAST pattern rules'],
+        ['kirograph pattern --library dangerous-eval-js',            'Run a specific library rule'],
       ],
     },
     {

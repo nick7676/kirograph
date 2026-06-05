@@ -1,0 +1,12 @@
+id: prototype-pollution-js
+language: [javascript, typescript]
+severity: high
+owaspCategory: A08
+description: Assignment to __proto__ enables prototype pollution
+fixHint: Validate object keys before merge. Use Object.create(null) for dictionaries. Avoid merging untrusted objects.
+fix: "/* REMOVE: prototype pollution — use Object.assign({}, ...) instead */"
+rule:
+  any:
+    - pattern: $OBJ["__proto__"] = $VAL
+    - pattern: $OBJ.__proto__ = $VAL
+    - pattern: $OBJ["constructor"]["prototype"] = $VAL

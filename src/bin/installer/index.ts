@@ -48,6 +48,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
     let enableDocs = false;
     let enableData = false;
     let enableSecurity = false;
+    let enablePatterns = false;
     let enableArchitecture = false;
     let shouldOfferIndex = false;
     let typesenseDashboard = false;
@@ -62,6 +63,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         enableDocs = config.enableDocs ?? false;
         enableData = (config as any).enableData ?? false;
         enableSecurity = (config as any).enableSecurity ?? false;
+        enablePatterns = (config as any).enablePatterns ?? false;
         enableArchitecture = config.enableArchitecture ?? false;
         console.log(`  ✓ Reusing existing KiroGraph data in ${cwd}/.kirograph/`);
         console.log(`  • semanticEngine: ${config.semanticEngine}`);
@@ -73,6 +75,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         console.log(`  • enableDocs: ${enableDocs}`);
         console.log(`  • enableData: ${enableData}`);
         console.log(`  • enableSecurity: ${enableSecurity}`);
+        console.log(`  • enablePatterns: ${enablePatterns}`);
       } else {
         shouldOfferIndex = true;
         const patch = await promptConfigOptions(rl);
@@ -83,6 +86,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         enableDocs = patch.enableDocs ?? false;
         enableData = patch.enableData ?? false;
         enableSecurity = patch.enableSecurity ?? false;
+        enablePatterns = patch.enablePatterns ?? false;
         enableArchitecture = patch.enableArchitecture ?? false;
         typesenseDashboard = patch.typesenseDashboard;
         qdrantDashboard = patch.qdrantDashboard;
@@ -160,6 +164,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         console.log(`  • enableDocs: ${enableDocs}`);
         console.log(`  • enableData: ${enableData}`);
         console.log(`  • enableSecurity: ${enableSecurity}`);
+        console.log(`  • enablePatterns: ${enablePatterns}`);
 
         // Install optional data format deps if enableData is on
         if (enableData) {
@@ -182,9 +187,23 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
             }
           }
         }
+
+        if (enablePatterns) {
+          console.log(`\n  Installing @ast-grep/napi...`);
+          const astGrepResult = spawnSync('npm', ['install', '@ast-grep/napi', '--save-optional'], {
+            stdio: 'inherit',
+            shell: true,
+          });
+          if (astGrepResult.status === 0) {
+            console.log(`  ✓ @ast-grep/napi installed`);
+          } else {
+            console.warn(`  ✗ @ast-grep/napi install failed. Run manually: npm install @ast-grep/napi`);
+            console.warn(`  KiroGraph will continue but kirograph pattern and kirograph_live_search will be unavailable.`);
+          }
+        }
       }
 
-      installer.installLate(cwd, cavemanMode, shellCompressionLevel, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture);
+      installer.installLate(cwd, cavemanMode, shellCompressionLevel, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns);
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
       console.error(`\n  ✗ Failed to write configuration: ${reason}`);

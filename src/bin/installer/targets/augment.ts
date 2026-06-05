@@ -24,14 +24,14 @@ export function installAugmentEarly(projectRoot: string): void {
   console.log(`  ✓ Augment Code MCP server registered in ${mcpPath}`);
 }
 
-export function installAugmentLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean): void {
+export function installAugmentLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean, enablePatterns?: boolean): void {
   const instructionsPath = path.join(projectRoot, '.kirograph', 'augment.md');
   ensureDir(path.dirname(instructionsPath));
-  fs.writeFileSync(instructionsPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture)));
+  fs.writeFileSync(instructionsPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns)));
   console.log(`  ✓ Augment instructions written to ${instructionsPath}`);
 
   const guidelinesPath = path.join(projectRoot, 'augment-guidelines.md');
-  const changed = upsertGeneratedBlock(guidelinesPath, AUGMENT_BLOCK_ID, '## KiroGraph', buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture)));
+  const changed = upsertGeneratedBlock(guidelinesPath, AUGMENT_BLOCK_ID, '## KiroGraph', buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns)));
   console.log(changed
     ? `  ✓ augment-guidelines.md updated with KiroGraph instructions`
     : `  ✓ augment-guidelines.md already up to date`);

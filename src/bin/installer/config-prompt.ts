@@ -6,7 +6,7 @@ import * as readline from 'readline';
 import { KiroGraphConfig } from '../../config';
 type CavemanMode = 'lite' | 'full' | 'ultra';
 import { ask, askToggle, arrowSelect, printSection, printSeparator, dim, reset, violet } from './prompts';
-export type ConfigPatch = Pick<KiroGraphConfig, 'enableEmbeddings' | 'useVecIndex' | 'semanticEngine' | 'typesenseDashboard' | 'qdrantDashboard' | 'extractDocstrings' | 'trackCallSites' | 'enableArchitecture' | 'cavemanMode' | 'shellCompressionLevel' | 'enableMemory' | 'enableDocs' | 'docsContextLimit' | 'enableData' | 'dataContextLimit' | 'enableSecurity'> & { embeddingModel?: string; embeddingDim?: number };
+export type ConfigPatch = Pick<KiroGraphConfig, 'enableEmbeddings' | 'useVecIndex' | 'semanticEngine' | 'typesenseDashboard' | 'qdrantDashboard' | 'extractDocstrings' | 'trackCallSites' | 'enableArchitecture' | 'cavemanMode' | 'shellCompressionLevel' | 'enableMemory' | 'enableDocs' | 'docsContextLimit' | 'enableData' | 'dataContextLimit' | 'enableSecurity' | 'enablePatterns'> & { embeddingModel?: string; embeddingDim?: number };
 export type SemanticEngine = KiroGraphConfig['semanticEngine'];
 
 export const DEFAULT_EMBEDDING_MODEL = 'nomic-ai/nomic-embed-text-v1.5';
@@ -55,7 +55,7 @@ export async function promptConfigOptions(rl: readline.Interface): Promise<Confi
     'Enables natural-language code search via vector embeddings. A local model (~130MB) is downloaded on first use.',
   );
 
-  const patch: ConfigPatch = { enableEmbeddings, useVecIndex: false, semanticEngine: 'cosine', typesenseDashboard: false, qdrantDashboard: false, extractDocstrings: true, trackCallSites: true, enableArchitecture: false, cavemanMode: 'off', shellCompressionLevel: 'normal', enableMemory: false, enableDocs: false, docsContextLimit: 0, enableData: false, dataContextLimit: 0, enableSecurity: false };
+  const patch: ConfigPatch = { enableEmbeddings, useVecIndex: false, semanticEngine: 'cosine', typesenseDashboard: false, qdrantDashboard: false, extractDocstrings: true, trackCallSites: true, enableArchitecture: false, cavemanMode: 'off', shellCompressionLevel: 'normal', enableMemory: false, enableDocs: false, docsContextLimit: 0, enableData: false, dataContextLimit: 0, enableSecurity: false, enablePatterns: false };
 
   if (enableEmbeddings) {
     // ── Model selection ────────────────────────────────────────────────────────
@@ -153,6 +153,15 @@ export async function promptConfigOptions(rl: readline.Interface): Promise<Confi
     patch.enableArchitecture = true;
     console.log('  ℹ  Architecture analysis auto-enabled (required by Security module)');
   }
+
+  // ── Pattern Matching ─────────────────────────────────────────────────────────
+  printSection('🔍', 'Pattern Matching');
+
+  patch.enablePatterns = await askToggle(rl,
+    'Precise SAST with ast-grep?',
+    'Runs AST structural pattern matching during indexing using @ast-grep/napi (~15MB native binding). Unlike heuristic symbol-name analysis, matches real code structure — precise SQL injection, path traversal, eval detection. Requires @ast-grep/napi (will be installed automatically if you answer yes).',
+    false,
+  );
 
   // ── Documentation ───────────────────────────────────────────────────────────
   printSection('📖', 'Documentation');

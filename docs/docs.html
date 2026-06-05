@@ -250,6 +250,8 @@ kirograph install --target kiro   # install for a specific platform only</code><
         <tr><td>Call-graph attack surface mapping</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Secrets detection with blast radius</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>SAST-lite (SQL injection, eval, path traversal)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>AST-based SAST (ast-grep patterns)</td><td>✅ opt-in</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Live structural code search (kirograph_live_search)</td><td>✅ opt-in</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Supply chain health (OpenSSF Scorecard)</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Dependency confusion detection</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>Remediation SLA tracking</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -1256,6 +1258,7 @@ kirograph docs reembed                      # re-embed with current model</code>
           <tr><td><code>kirograph attack-surface [path]</code></td><td>Map HTTP routes to reachable vulnerable dependencies — exposure level (public/authenticated/internal), hop count, risk score. <code>--public-only</code>, <code>--limit</code>, <code>--format json</code>.</td></tr>
           <tr><td><code>kirograph security secrets [path]</code></td><td>Scan for 14 secret types (AWS keys, GitHub tokens, DB URLs, JWT, etc.) with call-graph blast radius. <code>--include-tests</code>, <code>--severity</code>, <code>--format json</code>.</td></tr>
           <tr><td><code>kirograph security flows [path]</code></td><td>SAST-lite: SQL injection, eval/exec, unsafe deserialization, path traversal, weak crypto. Each finding tagged with OWASP Top 10 (2021) category. <code>--type sql</code>, <code>--format json</code>.</td></tr>
+          <tr><td><code>kirograph pattern [--list] [--library &lt;id&gt;] [--lang] [--format]</code></td><td>AST structural search — live pattern, library browser, specific rule runner. Exit 1 on findings for CI.</td></tr>
           <tr><td><code>kirograph security ci-report [path]</code></td><td>Generate CI/CD security report in JSON, SARIF 2.1.0 (GitHub Security tab), or compact text. <code>--format sarif --output results.sarif</code>, <code>--fail-on critical</code>.</td></tr>
           <tr><td><code>kirograph supply-chain [path]</code></td><td>Supply chain health: OpenSSF Scorecard scores, maintainer count, abandoned package detection (&gt;365 days), new package risk (&lt;30 days). <code>--threshold high</code>, <code>--refresh</code>.</td></tr>
           <tr><td><code>kirograph dep-confusion [path]</code></td><td>Detect dependency confusion (internal package names in public registries) and typosquatting (Levenshtein ≤ 2 from popular packages). <code>--format json</code>.</td></tr>

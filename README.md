@@ -39,7 +39,7 @@ The result is fewer tool calls, less context used, and faster responses on compl
 | 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
 | 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
 | <h4>Security</h4> | |
-| 🔒 **Security (KiroGraph-Sec opt-in  module)** | Goes beyond "this dependency has a CVE" — uses the call graph to determine if vulnerable code is **actually reachable** from your entry points. Maps your **attack surface** (which HTTP routes reach vulnerable deps). Detects **hardcoded secrets** and shows how many entry points expose them. **SAST-lite** finds SQL injection, path traversal, and dangerous eval in your code. **Supply chain health** checks OpenSSF Scorecard scores and detects dependency confusion attacks. Covers 14 ecosystems, outputs CycloneDX SBOM/VEX and CI-ready SARIF reports. |
+| 🔒 **Security (KiroGraph-Sec opt-in  module)** | Goes beyond "this dependency has a CVE" — uses the call graph to determine if vulnerable code is **actually reachable** from your entry points. Maps your **attack surface** (which HTTP routes reach vulnerable deps). Detects **hardcoded secrets** and shows how many entry points expose them. **SAST-lite** finds SQL injection, path traversal, and dangerous eval in your code. **AST-based SAST (opt-in via `enablePatterns`)** runs 10 bundled structural pattern rules via `@ast-grep/napi` — matches actual code structure, not just symbol names. **Supply chain health** checks OpenSSF Scorecard scores and detects dependency confusion attacks. Covers 14 ecosystems, outputs CycloneDX SBOM/VEX and CI-ready SARIF reports. |
 | <h4>Knowledge & Data</h4> | |
 | 🧠 **Persistent Memor (KiroGraph-Mem opt-in module)** | Cross-session observations — decisions, errors, patterns — auto-linked to code symbols |
 | 📖 **Documentation Indexing (KiroGraph-Doc opt-in  module)** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
@@ -88,7 +88,7 @@ All Kiro integration files are written to `.kiro/`. Restart Kiro IDE, or switch 
 | [MCP Tools](docs/guide/mcp-tools.md) | Full reference for all MCP tools |
 | [CLI Reference](docs/guide/cli.md) | All CLI commands with examples |
 | [Configuration](docs/guide/configuration.md) | Config fields, semantic engines, architecture analysis |
-| [Security](docs/guide/security.md) | Full SCA+: 14 ecosystems, EPSS, reachability, attack surface, secrets, SAST-lite, supply chain, SBOM/VEX/SARIF |
+| [Security](docs/guide/security.md) | Full SCA+: 14 ecosystems, EPSS, reachability, attack surface, secrets, SAST-lite, AST pattern matching (opt-in), supply chain, SBOM/VEX/SARIF |
 | [Languages & Frameworks](docs/guide/languages.md) | Supported languages, frameworks, and detection |
 | [Changelog](CHANGELOG.md) | Release history |
 | [Contributing](CONTRIBUTING.md) | How to contribute |

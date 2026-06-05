@@ -59,6 +59,7 @@ import { register as registerSecurityCiReport } from './commands/security-ci-rep
 import { register as registerSupplyChain } from './commands/supply-chain';
 import { register as registerDepConfusion } from './commands/dep-confusion';
 import { register as registerRemediation } from './commands/remediation';
+import { register as registerPattern } from './commands/pattern';
 
 // ── Global error handler for WASM runtime crashes ─────────────────────────────
 //
@@ -163,6 +164,7 @@ registerAttackSurface(program);
 registerSupplyChain(program);
 registerDepConfusion(program);
 registerRemediation(program);
+registerPattern(program);
 
 // Register the help command for `kirograph help`
 program

@@ -51,6 +51,17 @@ function copyAssets(): void {
   fs.copyFileSync(path.join(src, 'db', 'docs-schema.sql'), path.join(dist, 'db', 'docs-schema.sql'));
   fs.copyFileSync(path.join(src, 'db', 'data-schema.sql'), path.join(dist, 'db', 'data-schema.sql'));
   fs.copyFileSync(path.join(src, 'db', 'security-schema.sql'), path.join(dist, 'db', 'security-schema.sql'));
+  fs.copyFileSync(path.join(src, 'db', 'patterns-schema.sql'), path.join(dist, 'db', 'patterns-schema.sql'));
+
+  // patterns library yaml files
+  const patternLibSrc = path.join(src, 'patterns', 'library');
+  const patternLibDst = path.join(dist, 'patterns', 'library');
+  fs.mkdirSync(patternLibDst, { recursive: true });
+  if (fs.existsSync(patternLibSrc)) {
+    for (const f of fs.readdirSync(patternLibSrc).filter(f => f.endsWith('.yaml') || f.endsWith('.yml'))) {
+      fs.copyFileSync(path.join(patternLibSrc, f), path.join(patternLibDst, f));
+    }
+  }
 
   // tree-sitter wasm files
   const wasmSrc = path.join(src, 'extraction', 'wasm');

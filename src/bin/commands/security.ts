@@ -167,6 +167,21 @@ export function register(program: Command): Command {
         }
       }
 
+      // Pattern SAST findings (if enablePatterns and data exists)
+      try {
+        if (config.enablePatterns) {
+          const tableExists = rawDb.get("SELECT name FROM sqlite_master WHERE type='table' AND name='pattern_matches'");
+          if (tableExists) {
+            const pm = rawDb.get('SELECT COUNT(*) as cnt FROM pattern_matches') as { cnt: number } | undefined;
+            if ((pm?.cnt ?? 0) > 0) {
+              const critPm = rawDb.get("SELECT COUNT(*) as cnt FROM pattern_matches WHERE severity='critical'") as { cnt: number } | undefined;
+              console.log(`  ${dim}SAST findings:${reset}         ${violet}${bold}${pm!.cnt}${reset} ${dim}pattern matches (${critPm?.cnt ?? 0} critical)${reset}`);
+              console.log(`  ${dim}Run${reset} ${violet}${bold}kirograph pattern --coverage${reset} ${dim}for details.${reset}\n`);
+            }
+          }
+        }
+      } catch { /* non-critical */ }
+
       // --fail-on: exit 1 if condition is met (after all output)
       if (opts.failOn === 'affected') {
         const affectedCount = verdicts['affected'] ?? 0;

@@ -1,0 +1,8 @@
+id: dangerous-reflection-java
+language: java
+severity: high
+owaspCategory: A03
+description: Class.forName() with user-controlled input enables arbitrary class loading
+fixHint: Validate the class name against an allowlist before using reflection. Never use user input directly.
+rule:
+  pattern: Class.forName($CLASS)

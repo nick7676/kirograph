@@ -1,0 +1,12 @@
+id: path-traversal-py
+language: python
+severity: high
+owaspCategory: A01
+description: File open with path from request or user input — path traversal vector
+fixHint: Use os.path.realpath() and verify the result is under an allowed base directory.
+fix: "open(os.path.join(allowed_base, os.path.basename(request.$PROP)))"
+rule:
+  any:
+    - pattern: open(request.$PROP)
+    - pattern: open(request.args[$KEY])
+    - pattern: open(request.form[$KEY])

@@ -122,6 +122,7 @@ export function buildInstructionOpts(
   enableData?: boolean,
   enableSecurity?: boolean,
   enableArchitecture?: boolean,
+  enablePatterns?: boolean,
 ): InstructionOptions {
   return {
     cavemanMode,
@@ -131,6 +132,7 @@ export function buildInstructionOpts(
     enableDocs: enableDocs ?? false,
     enableData: enableData ?? false,
     enableSecurity: enableSecurity ?? false,
+    enablePatterns: enablePatterns ?? false,
     hasHooks: hasHooks ?? false,
   };
 }

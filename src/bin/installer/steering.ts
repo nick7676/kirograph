@@ -49,6 +49,7 @@ KiroGraph builds a semantic knowledge graph of your codebase. Use its MCP tools 
 | Are dependencies outdated? | \`kirograph_staleness\` |
 | Generate SBOM/VEX | \`kirograph_sbom\` / \`kirograph_vex\` |
 | Add a private CVE | \`kirograph_vuln_add\` |
+| Find structural code patterns? | \`kirograph_live_search\` |
 
 ---
 
@@ -346,6 +347,7 @@ export interface SteeringOptions {
   enableDocs?: boolean;
   enableData?: boolean;
   enableSecurity?: boolean;
+  enablePatterns?: boolean;
 }
 
 function buildSteeringContent(opts?: SteeringOptions): string {
@@ -379,6 +381,11 @@ function buildSteeringContent(opts?: SteeringOptions): string {
     content = content.replace('| Are dependencies outdated? | `kirograph_staleness` |\n', '');
     content = content.replace('| Generate SBOM/VEX | `kirograph_sbom` / `kirograph_vex` |\n', '');
     content = content.replace('| Add a private CVE | `kirograph_vuln_add` |\n', '');
+  }
+
+  // Remove pattern tools from decision guide if disabled
+  if (!opts?.enablePatterns) {
+    content = content.replace('| Find structural code patterns? | `kirograph_live_search` |\n', '');
   }
 
   const caveman = cavemanMode && cavemanMode !== 'off' ? CAVEMAN_RULES[cavemanMode] : null;
@@ -459,6 +466,26 @@ kirograph_data_aggregate(dataset: "data-orders", groupBy: ["region"], metrics: [
 \`\`\`
 `;
     content = content.trimEnd() + '\n\n' + dataSection.trim() + '\n';
+  }
+
+  // Patterns section
+  if (opts?.enablePatterns) {
+    const patternsSection = `
+## Pattern Matching
+
+KiroGraph can search for structural code patterns using @ast-grep/napi.
+
+**Available tools (only when enablePatterns: true and @ast-grep/napi installed):**
+- \`kirograph_live_search\` — search for any AST pattern across the codebase at query time
+
+**CLI commands:**
+- \`kirograph pattern "<pattern>"\` — live structural search
+- \`kirograph pattern --list\` — browse bundled SAST rules
+- \`kirograph pattern --library <id>\` — run a specific library rule
+
+**When to use:** When you need to find code patterns that can't be expressed as symbol names or semantic queries — "all eval() calls", "all SQL string concatenation", "all readFile with request parameters".
+`;
+    content = content.trimEnd() + '\n\n' + patternsSection.trim() + '\n';
   }
 
   // Security section
@@ -853,8 +880,69 @@ kirograph_vex()    // Vulnerability Exploitability eXchange
     console.log(`  ✓ Security workflow steering file written`);
   }
 
+  // Patterns workflow — only when enablePatterns is true
+  if (opts?.enablePatterns) {
+    fs.writeFileSync(path.join(steeringDir, 'kirograph-patterns.md'), `---
+inclusion: manual
+---
+
+# KiroGraph: Pattern Search Workflow
+
+Use this workflow to find structural code patterns using AST matching.
+Activate with \`/kirograph-patterns\` in Kiro IDE or CLI.
+
+## Steps
+
+### 1. Browse available rules
+\`\`\`
+kirograph_live_search(pattern: "--list")
+\`\`\`
+Or use the CLI: \`kirograph pattern --list\`
+
+### 2. Search for a specific structural pattern
+\`\`\`
+kirograph_live_search(pattern: "eval($X)", language: "typescript")
+\`\`\`
+
+### 3. Run a bundled library rule
+\`\`\`
+kirograph pattern --library sql-injection-concat-js
+\`\`\`
+
+### 4. Add a custom rule
+Create a YAML file in your \`patternLibraryPath\` directory:
+\`\`\`yaml
+id: my-custom-rule
+language: [javascript, typescript]
+severity: high
+owaspCategory: A03
+description: Custom pattern description
+fixHint: How to fix this issue.
+rule:
+  pattern: dangerousFunction($ARG)
+\`\`\`
+
+## Pattern syntax examples
+
+| Pattern | Matches |
+|---------|---------|
+| \`eval($X)\` | Any eval() call |
+| \`$OBJ.query($A + $B)\` | String concat in any query method |
+| \`fs.$F(req.$P, $$$)\` | Any fs method with request param |
+| \`createHash('md5')\` | Hardcoded MD5 usage |
+
+## Interpretation
+
+- Findings mean the pattern was found in the AST — not a false positive from symbol name matching
+- Check the surrounding context: \`kirograph_node(symbol: "...", includeCode: true)\`
+- Use \`kirograph_callers\` to understand how the affected function is reached
+`);
+    console.log(`  ✓ Patterns workflow steering file written`);
+  }
+
   const written = ['review', 'debug', 'onboard', 'refactor'];
   if (opts?.enableArchitecture) written.push('architecture');
   if (opts?.enableSecurity) written.push('security');
+  if (opts?.enablePatterns) written.push('patterns');
   console.log(`  ✓ Workflow steering files written (${written.join(', ')})`);
 }

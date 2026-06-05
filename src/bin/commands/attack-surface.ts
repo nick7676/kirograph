@@ -151,4 +151,13 @@ function printRouteEntry(entry: AttackSurfaceEntry): void {
   console.log(
     `  ${routeColor}[${riskLabel}]${reset} ${bold}${entry.route.padEnd(30)}${reset}  ${exposureBadge}${vulnSuffix}`,
   );
+
+  // Pattern matches below the route line
+  for (const pm of entry.patternMatches) {
+    const sevUpper = pm.severity.toUpperCase();
+    const pmColor = pm.severity === 'critical' ? red : pm.severity === 'high' ? yellow : dim;
+    console.log(
+      `        ${pmColor}⚠ [${sevUpper}]${reset} ${dim}${pm.patternId}${reset} ${dim}at${reset} ${pm.symbolName}:${pm.line}`,
+    );
+  }
 }

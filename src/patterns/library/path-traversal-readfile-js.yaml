@@ -1,0 +1,14 @@
+id: path-traversal-readfile-js
+language: [javascript, typescript]
+severity: high
+owaspCategory: A01
+description: File operation with path from request parameter — path traversal vector
+fixHint: Use path.resolve() and verify the result starts with an allowed base directory. Reject paths containing '..'.
+fix: "/* validate path: use path.resolve() and check it starts with allowedBase */"
+rule:
+  any:
+    - pattern: fs.readFile(req.$PROP, $$$)
+    - pattern: fs.readFileSync(req.$PROP, $$$)
+    - pattern: fs.createReadStream(req.$PROP, $$$)
+    - pattern: fs.open(req.$PROP, $$$)
+    - pattern: fs.openSync(req.$PROP, $$$)

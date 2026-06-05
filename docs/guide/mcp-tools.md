@@ -571,3 +571,20 @@ Check dependency freshness — identifies packages significantly behind their la
 | `threshold` | number | 0.3 | Minimum staleness score (0.0–1.0) to include |
 | `refresh` | boolean | false | Re-query registries before listing |
 | `projectPath` | string | cwd | Project root path |
+
+---
+
+## Pattern Search Tools *(require `enablePatterns: true` and `@ast-grep/napi` installed)*
+
+These tools only appear in the MCP tool list when both conditions are met. When either is false, they are not registered and cannot be called.
+
+### `kirograph_live_search`
+
+Run a live AST structural pattern search across the indexed codebase. Finds code patterns that can't be expressed as symbol names or semantic queries.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `pattern` | string | required | ast-grep inline pattern (e.g. `"eval($X)"`) |
+| `language` | string | required | Language to search: `javascript`, `typescript`, `python`, `go`, `rust`, `java`, etc. |
+| `limit` | number | 20 | Max results (max 100) |
+| `projectPath` | string | cwd | Project root path |

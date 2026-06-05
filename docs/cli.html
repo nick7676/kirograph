@@ -374,6 +374,15 @@ kirograph security flows --type sql        # Filter to SQL injection only
 kirograph security flows --format json     # JSON output</code></pre>
     <p>Supported flow types: <code>sql</code>, <code>eval</code>, <code>deserialization</code>, <code>path-traversal</code>, <code>crypto</code>.</p>
 
+    <h3 id="cli-pattern">Pattern Search</h3>
+    <p>AST structural pattern search using <code>@ast-grep/napi</code>. Requires <code>enablePatterns: true</code> in <code>.kirograph/config.json</code> and <code>@ast-grep/napi</code> installed. Only available when both conditions are met.</p>
+    <pre><code>kirograph pattern 'eval($X)'                         # find all eval() calls
+kirograph pattern 'eval($X)' --lang typescript       # filter by language
+kirograph pattern --list                              # browse bundled SAST rules
+kirograph pattern --library sql-injection-concat-js  # run a specific rule
+kirograph pattern --format json                      # JSON output for CI</code></pre>
+    <p>Exit codes: <code>0</code> = no findings, <code>1</code> = findings found (suitable for CI gates), <code>2</code> = <code>@ast-grep/napi</code> not installed or <code>enablePatterns</code> is false.</p>
+
     <h3 id="cli-ci-report">CI/CD Security Report</h3>
     <p>Generate a structured security report for CI/CD pipelines. Supports JSON, SARIF 2.1.0 (uploadable to the GitHub Security tab), or compact text format.</p>
     <pre><code>kirograph security ci-report [path]                          # Compact text report
@@ -430,6 +439,7 @@ kirograph remediation --format json        # JSON output</code></pre>
       <a href="#cli-attack-surface" class="sidebar-link" style="padding-left:1.5rem;">↳ Attack Surface</a>
       <a href="#cli-secrets" class="sidebar-link" style="padding-left:1.5rem;">↳ Secrets Detection</a>
       <a href="#cli-security-flows" class="sidebar-link" style="padding-left:1.5rem;">↳ Security Flows</a>
+      <a href="#cli-pattern" class="sidebar-link" style="padding-left:1.5rem;">↳ Pattern Search</a>
       <a href="#cli-ci-report" class="sidebar-link" style="padding-left:1.5rem;">↳ CI/CD Report</a>
       <a href="#cli-supply-chain" class="sidebar-link" style="padding-left:1.5rem;">↳ Supply Chain</a>
       <a href="#cli-dep-confusion" class="sidebar-link" style="padding-left:1.5rem;">↳ Dep Confusion</a>

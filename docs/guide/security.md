@@ -262,6 +262,41 @@ risk_score = reachability_factor × (0.4 × CVSS + 0.6 × EPSS) × staleness_bon
 
 The score is shown as a badge `[Risk: 8.5]` in `kirograph vulns` output and used as the default sort order (`--sort risk`).
 
+## Pattern-based SAST *(requires `enablePatterns: true` and `@ast-grep/napi`)*
+
+When `enablePatterns: true` is set and `@ast-grep/napi` is installed, KiroGraph runs AST structural pattern rules during indexing. Unlike the heuristic SAST (which matches symbol names), AST patterns match the actual code structure — finding SQL injection in helper functions, not just handlers named "controller".
+
+**The existing SQL heuristic SAST always runs.** AST findings are merged on top (additive, deduplicating by file+line with AST entries preferred).
+
+### `kirograph pattern`
+
+```bash
+kirograph pattern 'eval($X)'                    # live structural search
+kirograph pattern 'eval($X)' --lang typescript  # filter by language
+kirograph pattern --list                         # show all bundled rules
+kirograph pattern --library sql-injection-concat-js  # run a specific rule
+kirograph pattern --format json                  # JSON output
+```
+
+Exit codes: `0` = no findings, `1` = findings (CI security gate), `2` = dependency missing.
+
+### Bundled SAST rules
+
+| ID | Severity | OWASP | Description |
+|----|----------|-------|-------------|
+| `sql-injection-concat-js` | critical | A03 | SQL query by string concatenation (JS/TS) |
+| `sql-injection-template-js` | critical | A03 | SQL query by template literal (JS/TS) |
+| `sql-injection-py` | critical | A03 | SQL query by string formatting (Python) |
+| `dangerous-eval-js` | critical | A03 | `eval()` with non-literal argument (JS/TS) |
+| `dangerous-exec-py` | critical | A03 | `os.system()` / `subprocess` with `shell=True` (Python) |
+| `path-traversal-readfile-js` | high | A01 | `fs.readFile` with request param path (JS/TS) |
+| `path-traversal-py` | high | A01 | `open()` with request param path (Python) |
+| `prototype-pollution-js` | high | A08 | `__proto__` assignment (JS/TS) |
+| `weak-crypto-md5-js` | medium | A02 | `createHash('md5'/'sha1')` (JS/TS) |
+| `weak-crypto-py` | medium | A02 | `hashlib.md5/sha1()` (Python) |
+
+Custom rules can be added via `patternLibraryPath` in `.kirograph/config.json`.
+
 ## MCP Tools
 
 All security tools require `enableSecurity: true` and `enableArchitecture: true`.

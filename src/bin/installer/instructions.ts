@@ -8,6 +8,7 @@ export interface InstructionOptions {
   enableDocs?: boolean;
   enableData?: boolean;
   enableSecurity?: boolean;
+  enablePatterns?: boolean;
   hasHooks?: boolean;
 }
 
@@ -52,6 +53,7 @@ export function buildAgentInstructions(cavemanModeOrOpts?: CavemanMode | 'off' |
   const enableDocs = opts.enableDocs ?? false;
   const enableData = opts.enableData ?? false;
   const enableSecurity = opts.enableSecurity ?? false;
+  const enablePatterns = opts.enablePatterns ?? false;
 
   let content = `# KiroGraph
 
@@ -77,7 +79,7 @@ KiroGraph builds a local semantic knowledge graph of this codebase. When the \`k
 | Any unexpected cross-module coupling? | \`kirograph_surprising\` |
 | What changed since the last snapshot? | \`kirograph_diff\` |
 ${enableArchitecture ? '| What packages/layers exist? | `kirograph_architecture` |\n| How coupled is package X? | `kirograph_coupling` |\n| What does package X depend on? | `kirograph_package` |\n' : ''}
-${enableCompression ? '| Run a command with token savings | `kirograph_exec` |\n| Check token savings stats | `kirograph_gain` |\n' : ''}${enableMemory ? '| Search past decisions/patterns | `kirograph_mem_search` |\n| Store an observation | `kirograph_mem_store` |\n' : ''}${enableDocs ? '| Find a doc section | `kirograph_docs_search` |\n| Get doc table of contents | `kirograph_docs_toc` |\n' : ''}${enableData ? '| What datasets are indexed? | `kirograph_data_list` |\n| Query rows with filters | `kirograph_data_query` |\n| Aggregate data server-side | `kirograph_data_aggregate` |\n' : ''}${enableSecurity ? '| Are there vulnerable dependencies? | `kirograph_security` |\n| Which CVEs affect my project? | `kirograph_vulns` |\n| Is this vulnerability reachable? | `kirograph_reachability` |\n| What licenses do my deps use? | `kirograph_licenses` |\n| Are dependencies outdated? | `kirograph_staleness` |\n' : ''}
+${enableCompression ? '| Run a command with token savings | `kirograph_exec` |\n| Check token savings stats | `kirograph_gain` |\n' : ''}${enableMemory ? '| Search past decisions/patterns | `kirograph_mem_search` |\n| Store an observation | `kirograph_mem_store` |\n' : ''}${enableDocs ? '| Find a doc section | `kirograph_docs_search` |\n| Get doc table of contents | `kirograph_docs_toc` |\n' : ''}${enableData ? '| What datasets are indexed? | `kirograph_data_list` |\n| Query rows with filters | `kirograph_data_query` |\n| Aggregate data server-side | `kirograph_data_aggregate` |\n' : ''}${enableSecurity ? '| Are there vulnerable dependencies? | `kirograph_security` |\n| Which CVEs affect my project? | `kirograph_vulns` |\n| Is this vulnerability reachable? | `kirograph_reachability` |\n| What licenses do my deps use? | `kirograph_licenses` |\n| Are dependencies outdated? | `kirograph_staleness` |\n' : ''}${enablePatterns ? '| Find structural code patterns? | `kirograph_live_search` |\n| Browse SAST rules | `kirograph pattern --list` |\n' : ''}
 ## Tool selection
 
 - Start code tasks with \`kirograph_context\`.
@@ -235,6 +237,21 @@ production deploy, or when the user asks about security/compliance.
 **EPSS scores:** >= 0.5 = patch immediately; 0.1–0.5 = elevated risk; < 0.1 = low probability.
 
 **Workflow:** \`kirograph_security\` → \`kirograph_vulns --verdict affected\` → \`kirograph_reachability <cve>\` → fix → \`kirograph_vulns --refresh\`
+`;
+  }
+
+  // Pattern matching section
+  if (enablePatterns) {
+    content += `
+## Pattern Search
+
+KiroGraph supports AST structural pattern search via \`kirograph_live_search\` (only available when \`enablePatterns: true\` and \`@ast-grep/napi\` is installed).
+
+- \`kirograph_live_search\` — find any structural code pattern across the indexed file list
+- \`kirograph pattern --list\` — browse 10 bundled SAST rules (SQL injection, eval, path traversal, etc.)
+- \`kirograph pattern --library <id>\` — run a specific library rule
+
+Use \`kirograph_live_search\` when you need to find patterns that can't be expressed as symbol names: anonymous functions, specific code structures, or security anti-patterns.
 `;
   }
 

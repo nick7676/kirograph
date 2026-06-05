@@ -1,0 +1,12 @@
+id: sql-injection-concat-js
+language: [javascript, typescript]
+severity: critical
+owaspCategory: A03
+description: SQL query built by string concatenation — classic injection vector
+fixHint: Use parameterized queries. Never concatenate user-controlled values into SQL strings.
+fix: "/* TODO: use parameterized query */ $DB.query('?', [$B])"
+rule:
+  any:
+    - pattern: $DB.query($A + $B)
+    - pattern: $DB.execute($A + $B)
+    - pattern: $DB.run($A + $B)

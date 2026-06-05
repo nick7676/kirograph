@@ -1,0 +1,13 @@
+id: dangerous-exec-py
+language: python
+severity: critical
+owaspCategory: A03
+description: os.system() or subprocess with shell=True enables command injection
+fixHint: Use subprocess.run() with a list of arguments and shell=False. Validate all inputs.
+fix: "subprocess.run([$CMD], shell=False, check=True)"
+rule:
+  any:
+    - pattern: os.system($CMD)
+    - pattern: subprocess.call($CMD, shell=True)
+    - pattern: subprocess.run($CMD, shell=True)
+    - pattern: subprocess.Popen($CMD, shell=True)

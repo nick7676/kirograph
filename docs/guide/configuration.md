@@ -31,6 +31,9 @@ KiroGraph stores its config in `.kirograph/config.json`. You can edit it directl
 | `enableSecurity` | boolean | `false` | Enable dependency vulnerability detection and reachability analysis. Requires `enableArchitecture` (auto-enabled if missing). |
 | `securityDatabases` | string[] | `["OSV"]` | Vulnerability databases to query. Supported: `OSV`. |
 | `securityAutoEnrich` | boolean | `true` | Auto-run vulnerability enrichment after manifest parsing. Set to `false` for on-demand only (via `kirograph vulns --refresh` or `kirograph_vulns` with `refresh: true`). |
+| `enablePatterns` | boolean | `false` | Enable AST pattern matching SAST via `@ast-grep/napi`. Requires `npm install @ast-grep/napi`. |
+| `patternLibraryPath` | string | — | Path to custom YAML pattern rules directory (merged with bundled rules) |
+| `patternSeverityThreshold` | string | `low` | Minimum severity to store: `critical`, `high`, `medium`, `low` |
 | **Memory** | | | |
 | `enableMemory` | boolean | `false` | Enable persistent cross-session memory |
 | `memorySearchAlpha` | number | `0.5` | Blend weight for hybrid search (0 = FTS only, 1 = vector only) |

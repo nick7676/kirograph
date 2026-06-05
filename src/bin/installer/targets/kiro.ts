@@ -11,12 +11,12 @@ export function installKiroEarly(projectRoot: string): void {
   writeHooks(kiroDir);
 }
 
-export function installKiroLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean): void {
+export function installKiroLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean, enablePatterns?: boolean): void {
   const kiroDir = path.join(projectRoot, '.kiro');
   const enableCompression = shellCompressionLevel !== 'off';
   writeHooks(kiroDir, { enableCompression, enableMemory });
-  writeSteering(kiroDir, { cavemanMode, enableCompression, shellCompressionLevel: shellCompressionLevel as any, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture });
-  writeCliAgent(kiroDir, { enableSecurity, enableArchitecture });
+  writeSteering(kiroDir, { cavemanMode, enableCompression, shellCompressionLevel: shellCompressionLevel as any, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns });
+  writeCliAgent(kiroDir, { enableSecurity, enableArchitecture, enablePatterns });
 }
 
 export function printKiroNextSteps(): void {

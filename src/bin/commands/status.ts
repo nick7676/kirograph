@@ -89,6 +89,34 @@ export function register(program: Command): void {
         console.log(`  ${label('Status')}     ${dim}disabled${reset}`);
       }
 
+      // Pattern SAST section
+      try {
+        const patConfig = await loadConfig(target);
+        if (patConfig.enablePatterns) {
+          const db2 = cg.getDatabase();
+          (db2 as any).applyPatternsSchema?.();
+          const rawDb2 = db2.getRawDb();
+          const tableExists = rawDb2.get("SELECT name FROM sqlite_master WHERE type='table' AND name='pattern_matches'");
+          if (tableExists) {
+            const matchCount = (rawDb2.get('SELECT COUNT(*) as cnt FROM pattern_matches') as any)?.cnt ?? 0;
+            const fileCount = (rawDb2.get('SELECT COUNT(DISTINCT file_path) as cnt FROM pattern_matches') as any)?.cnt ?? 0;
+            const ruleCount = (rawDb2.get('SELECT COUNT(DISTINCT pattern_id) as cnt FROM pattern_matches') as any)?.cnt ?? 0;
+            console.log();
+            console.log(section('  Patterns'));
+            console.log(`  ${label('Status')}     ${green}${bold}enabled${reset}`);
+            if (matchCount > 0) {
+              console.log(`  ${label('Matches')}    ${value(String(matchCount))}  ${dim}across ${fileCount} files, ${ruleCount} rules triggered${reset}`);
+            } else {
+              console.log(`  ${label('Matches')}    ${dim}none yet — run kirograph index${reset}`);
+            }
+          } else {
+            console.log();
+            console.log(section('  Patterns'));
+            console.log(`  ${label('Status')}     ${green}${bold}enabled${reset}  ${dim}(not yet indexed — run kirograph index)${reset}`);
+          }
+        }
+      } catch { /* non-critical */ }
+
       // Security stats (conditional on enableSecurity)
       try {
         const config = await loadConfig(target);

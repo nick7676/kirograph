@@ -20,15 +20,15 @@ export function installTabnineEarly(projectRoot: string): void {
   console.log(`  ✓ Tabnine MCP server registered in ${mcpPath}`);
 }
 
-export function installTabnineLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean): void {
+export function installTabnineLate(projectRoot: string, cavemanMode?: CavemanMode | 'off', shellCompressionLevel?: string, enableMemory?: boolean, enableDocs?: boolean, enableData?: boolean, enableSecurity?: boolean, enableArchitecture?: boolean, enablePatterns?: boolean): void {
   const instructionsPath = path.join(projectRoot, '.kirograph', 'tabnine.md');
   ensureDir(path.dirname(instructionsPath));
-  fs.writeFileSync(instructionsPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture)));
+  fs.writeFileSync(instructionsPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns)));
   console.log(`  ✓ Tabnine instructions written to ${instructionsPath}`);
 
   const rulesPath = path.join(projectRoot, '.tabnine', 'instructions.md');
   ensureDir(path.dirname(rulesPath));
-  fs.writeFileSync(rulesPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture)));
+  fs.writeFileSync(rulesPath, buildAgentInstructions(buildInstructionOpts(cavemanMode, shellCompressionLevel, enableMemory, undefined, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns)));
   console.log(`  ✓ Tabnine instructions written to ${rulesPath}`);
 }
 

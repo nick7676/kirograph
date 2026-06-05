@@ -1,0 +1,13 @@
+id: weak-crypto-py
+language: python
+severity: medium
+owaspCategory: A02
+description: MD5 or SHA-1 are cryptographically broken
+fixHint: Use hashlib.sha256() or hashlib.sha3_256() for hashing. Use bcrypt for passwords.
+fix: "hashlib.sha256($$$)"
+rule:
+  any:
+    - pattern: hashlib.md5($$$)
+    - pattern: hashlib.sha1($$$)
+    - pattern: hashlib.new('md5', $$$)
+    - pattern: hashlib.new('sha1', $$$)

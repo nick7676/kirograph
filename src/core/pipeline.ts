@@ -281,6 +281,23 @@ export class IndexPipeline {
         } catch { /* data indexing is non-critical */ }
       }
 
+      // Index pattern matches (if enabled)
+      if ((this.config as any).enablePatterns) {
+        try {
+          this.db.applyPatternsSchema();
+          const { PatternIndexer } = await import('../patterns/indexer');
+          const indexer = new PatternIndexer(this.db.getRawDb(), this.config, this.projectRoot);
+          await indexer.indexAll((phase, current, total) => {
+            opts?.onProgress?.({ phase: 'patterns' as any, current, total });
+          });
+        } catch (err) {
+          // Patterns are non-critical — log and continue
+          const { logWarn } = await import('../errors');
+          const msg = err instanceof Error ? err.message : String(err);
+          logWarn(`[patterns] Pattern indexing failed (non-critical): ${msg}`);
+        }
+      }
+
       this.lock.clearDirty();
       return { success: errors.length === 0, filesIndexed, nodesCreated, edgesCreated, errors, duration: Date.now() - start };
     } finally {
@@ -314,6 +331,8 @@ export class IndexPipeline {
         await this.vectors.deleteEmbeddings(oldNodes.map(n => n.id));
         this.db.deleteFile(rel);
         this.db.deleteUnresolvedRefsByFile(rel);
+        // Clean up pattern matches for removed files
+        this.db.getRawDb().run('DELETE FROM pattern_matches WHERE file_path = ?', [rel]);
         result.removed.push(rel);
       };
 
@@ -523,6 +542,34 @@ export class IndexPipeline {
             } catch { /* non-critical */ }
           }
         } catch { /* data indexing is non-critical */ }
+      }
+
+      // Re-index pattern matches for changed files (if enabled)
+      if ((this.config as any).enablePatterns) {
+        try {
+          const tableExists = this.db.getRawDb().get(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='pattern_matches'"
+          );
+          if (tableExists) {
+            const { PatternIndexer } = await import('../patterns/indexer');
+            const { PatternLibraryLoader } = await import('../patterns/loader');
+            const { PatternRunner } = await import('../patterns/runner');
+            const runner = new PatternRunner();
+            if (runner.isAvailable()) {
+              const loader = new PatternLibraryLoader();
+              const builtinPath = require('path').join(__dirname, '../patterns/library');
+              const rules = loader.load(builtinPath, (this.config as any).patternLibraryPath);
+              const threshold = (this.config as any).patternSeverityThreshold ?? 'low';
+              const indexer = new PatternIndexer(this.db.getRawDb(), this.config, this.projectRoot);
+              const changedPaths = [...result.added, ...result.modified];
+              for (const filePath of changedPaths) {
+                const fileRecord = this.db.getFile(filePath);
+                const language = fileRecord?.language ?? 'unknown';
+                await indexer.indexFile(filePath, language, rules, runner, threshold, Date.now());
+              }
+            }
+          }
+        } catch { /* non-critical */ }
       }
 
       this.lock.clearDirty();

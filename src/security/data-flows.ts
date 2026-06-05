@@ -30,22 +30,104 @@ interface CallEdgeRow {
   callee: string;
 }
 
+// ── hasPatternsData helper ────────────────────────────────────────────────────
+
+function hasPatternsData(rawDb: any): boolean {
+  try {
+    const result = rawDb.get("SELECT COUNT(*) as cnt FROM pattern_matches") as { cnt: number } | undefined;
+    return (result?.cnt ?? 0) > 0;
+  } catch {
+    // Table doesn't exist (enablePatterns never ran)
+    return false;
+  }
+}
+
 // ── DataFlowAnalyzer ──────────────────────────────────────────────────────────
 
 export class DataFlowAnalyzer {
   constructor(private readonly db: GraphDatabase) {}
 
   async analyze(): Promise<DataFlowFinding[]> {
-    const rawDb = this.db.getRawDb();
-    const findings: DataFlowFinding[] = [];
+    const rawDb = (this.db as any).getRawDb();
 
-    findings.push(...this._detectDangerousEval(rawDb));
-    findings.push(...this._detectUnsafeDeserialize(rawDb));
-    findings.push(...this._detectHardcodedCrypto(rawDb));
-    findings.push(...this._detectSqlInjection(rawDb));
-    findings.push(...this._detectPathTraversal(rawDb));
+    // Always run existing SQL heuristics (unchanged behavior)
+    const sqlFindings = [
+      ...this._detectDangerousEval(rawDb),
+      ...this._detectUnsafeDeserialize(rawDb),
+      ...this._detectHardcodedCrypto(rawDb),
+      ...this._detectSqlInjection(rawDb),
+      ...this._detectPathTraversal(rawDb),
+    ];
 
-    return findings;
+    // When pattern_matches has data, merge AST findings (more precise)
+    if (hasPatternsData(rawDb)) {
+      const astFindings = this.analyzeFromPatternMatches(rawDb);
+      // Deduplicate: AST entry wins over SQL entry at same (filePath, line)
+      const astKeys = new Set(astFindings.map(f => `${f.filePath}:${f.line}`));
+      const filteredSql = sqlFindings.filter(f => !astKeys.has(`${f.filePath}:${f.line}`));
+      return [...astFindings, ...filteredSql];
+    }
+
+    return sqlFindings;
+  }
+
+  private analyzeFromPatternMatches(rawDb: any): DataFlowFinding[] {
+    const rows: Array<{
+      file_path: string;
+      pattern_id: string;
+      line: number;
+      col: number;
+      match_text: string;
+      severity: string;
+      owasp_category: string;
+      language: string;
+    }> = rawDb.all('SELECT file_path, pattern_id, line, col, match_text, severity, owasp_category, language FROM pattern_matches');
+
+    return rows.map(row => {
+      // Map pattern_id prefix to DataFlowFinding type
+      const type = this._patternIdToType(row.pattern_id);
+      // Look up nearest enclosing symbol
+      const symbol = this._findEnclosingSymbol(rawDb, row.file_path, row.line);
+      return {
+        type,
+        severity: row.severity as DataFlowFinding['severity'],
+        owaspCategory: row.owasp_category as DataFlowFinding['owaspCategory'],
+        filePath: row.file_path,
+        line: row.line,
+        symbol: symbol ?? row.pattern_id,
+        description: `[AST pattern: ${row.pattern_id}] ${row.match_text.slice(0, 100)}`,
+        recommendation: this._getRecommendation(type),
+      };
+    });
+  }
+
+  private _patternIdToType(patternId: string): DataFlowFinding['type'] {
+    if (patternId.startsWith('sql-injection')) return 'sql-injection';
+    if (patternId.startsWith('dangerous-eval') || patternId.startsWith('dangerous-exec')) return 'dangerous-eval';
+    if (patternId.startsWith('path-traversal')) return 'path-traversal';
+    if (patternId.startsWith('prototype-pollution')) return 'unsafe-deserialize';
+    if (patternId.startsWith('weak-crypto')) return 'hardcoded-crypto';
+    return 'dangerous-eval'; // fallback
+  }
+
+  private _findEnclosingSymbol(rawDb: any, filePath: string, line: number): string | null {
+    const row = rawDb.get(
+      `SELECT name FROM nodes WHERE file_path = ? AND start_line <= ? AND end_line >= ? AND kind IN ('function', 'method', 'class') ORDER BY (end_line - start_line) ASC LIMIT 1`,
+      [filePath, line, line]
+    ) as { name: string } | undefined;
+    return row?.name ?? null;
+  }
+
+  private _getRecommendation(type: DataFlowFinding['type']): string {
+    const recs: Record<DataFlowFinding['type'], string> = {
+      'sql-injection': 'Use parameterized queries. Never concatenate user input into SQL strings.',
+      'dangerous-eval': 'Remove eval()/exec(). Use structured alternatives.',
+      'path-traversal': 'Use path.resolve() and verify result is within an allowed base directory.',
+      'unsafe-deserialize': 'Validate object keys before merge. Avoid untrusted deserialization.',
+      'hardcoded-crypto': 'Use SHA-256+ for hashing. Use bcrypt/argon2 for passwords.',
+      'xss': 'Sanitize output. Use a trusted template engine with auto-escaping.',
+    };
+    return recs[type] ?? 'Review and fix this security issue.';
   }
 
   // ── Detection: dangerous eval / exec ────────────────────────────────────────

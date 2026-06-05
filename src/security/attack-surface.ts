@@ -42,6 +42,14 @@ export interface AttackSurfaceEntry {
     verdict: string | null;
     hopCount: number;
   }>;
+  patternMatches: Array<{
+    patternId: string;
+    severity: string;
+    line: number;
+    symbolNodeId: string;
+    symbolName: string;
+  }>;
+  patternRiskLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
   riskScore: number;
 }
 
@@ -135,6 +143,52 @@ export class AttackSurfaceAnalyzer {
         }
       }
 
+      // Step 3b: Find pattern matches on the call path (table may not exist)
+      const routeNodeId = route.id;
+      let patternRows: Array<{
+        symbol_node_id: string;
+        symbol_name: string;
+        pattern_id: string;
+        severity: string;
+        line: number;
+      }> = [];
+      try {
+        patternRows = rawDb.all(
+          `WITH RECURSIVE reachable(node_id, depth) AS (
+             SELECT target, 1 FROM edges WHERE source = ? AND kind IN ('calls', 'imports', 'references')
+             UNION
+             SELECT e.target, r.depth + 1
+             FROM edges e
+             JOIN reachable r ON e.source = r.node_id
+             WHERE r.depth < 5 AND e.kind IN ('calls', 'imports', 'references')
+           )
+           SELECT DISTINCT pm.symbol_node_id, n.name as symbol_name, pm.pattern_id, pm.severity, pm.line
+           FROM reachable r
+           JOIN pattern_matches pm ON pm.symbol_node_id = r.node_id
+           JOIN nodes n ON n.id = pm.symbol_node_id
+           WHERE pm.symbol_node_id IS NOT NULL
+           ORDER BY CASE pm.severity WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'medium' THEN 2 ELSE 1 END DESC
+           LIMIT 10`,
+          [routeNodeId],
+        );
+      } catch {
+        // pattern_matches table does not exist yet — degrade silently
+        patternRows = [];
+      }
+
+      const patternMatches: AttackSurfaceEntry['patternMatches'] = patternRows.map(r => ({
+        patternId: r.pattern_id,
+        severity: r.severity,
+        line: r.line,
+        symbolNodeId: r.symbol_node_id,
+        symbolName: r.symbol_name,
+      }));
+
+      const patternRiskLevel: AttackSurfaceEntry['patternRiskLevel'] =
+        patternMatches.length === 0
+          ? 'none'
+          : (patternMatches[0].severity as AttackSurfaceEntry['patternRiskLevel']);
+
       // Step 4: Heuristic — isAuthenticated via path node names
       const pathNodeNames: Array<{ name: string }> = rawDb.all(
         `WITH RECURSIVE reachable(node_id, depth) AS (
@@ -171,12 +225,17 @@ export class AttackSurfaceAnalyzer {
         exposureLevel = 'unknown';
       }
 
-      // Step 6: riskScore = max risk_score of reachable affected vulns
+      // Step 6: riskScore = max risk_score of reachable affected vulns, plus pattern bonus
       const affectedVulns = vulnerableDeps.filter(v => v.verdict === 'affected' || v.verdict === 'under_investigation');
-      const riskScore = affectedVulns.reduce((max, v) => {
+      const baseRiskScore = affectedVulns.reduce((max, v) => {
         if (v.riskScore != null && v.riskScore > max) return v.riskScore;
         return max;
       }, 0);
+
+      const patternBonus: Record<AttackSurfaceEntry['patternRiskLevel'], number> = {
+        none: 0, low: 0.3, medium: 0.6, high: 0.8, critical: 1.0,
+      };
+      const riskScore = Math.min(10, baseRiskScore + (patternBonus[patternRiskLevel] ?? 0));
 
       entries.push({
         route: route.name ?? route.id,
@@ -185,6 +244,8 @@ export class AttackSurfaceAnalyzer {
         isAuthenticated,
         exposureLevel,
         vulnerableDeps,
+        patternMatches,
+        patternRiskLevel,
         riskScore,
       });
     }

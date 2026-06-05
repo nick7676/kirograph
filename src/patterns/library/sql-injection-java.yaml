@@ -1,0 +1,13 @@
+id: sql-injection-java
+language: java
+severity: critical
+owaspCategory: A03
+description: JDBC query built by string concatenation — SQL injection vector
+fixHint: Use PreparedStatement with ? placeholders. Never concatenate user input into SQL.
+fix: "stmt.executeQuery(\"SELECT ... WHERE id = ?\")"
+rule:
+  any:
+    - pattern: $CONN.createStatement().executeQuery($A + $B)
+    - pattern: $STMT.executeQuery($A + $B)
+    - pattern: $STMT.execute($A + $B)
+    - pattern: $STMT.executeUpdate($A + $B)

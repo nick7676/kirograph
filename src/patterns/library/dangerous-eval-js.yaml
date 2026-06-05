@@ -1,0 +1,14 @@
+id: dangerous-eval-js
+language: [javascript, typescript]
+severity: critical
+owaspCategory: A03
+description: eval() with a non-literal argument enables arbitrary code execution
+fixHint: Remove eval(). Use JSON.parse() for data, structured dispatch for dynamic behavior.
+# Only safe if $ARG is JSON data; for dynamic dispatch use a lookup table instead
+fix: "JSON.parse($ARG)"
+rule:
+  pattern: eval($ARG)
+  not:
+    has:
+      kind: string
+      nthChild: 1

@@ -93,6 +93,22 @@ export class GraphDatabase {
   }
 
   /**
+   * Apply patterns schema tables. Called when enablePatterns is true.
+   * Safe to call multiple times (CREATE IF NOT EXISTS).
+   */
+  applyPatternsSchema(): void {
+    const schemaPath = path.join(__dirname, '../db/patterns-schema.sql');
+    if (fs.existsSync(schemaPath)) {
+      const sql = fs.readFileSync(schemaPath, 'utf8');
+      this.db.exec(sql);
+    }
+    // Migrate existing DBs: add new columns introduced after initial release.
+    const tryAlter = (stmt: string) => { try { this.db.run(stmt); } catch { /* already exists */ } };
+    tryAlter('ALTER TABLE pattern_matches ADD COLUMN symbol_node_id TEXT');
+    tryAlter('CREATE INDEX IF NOT EXISTS idx_pm_symbol ON pattern_matches(symbol_node_id)');
+  }
+
+  /**
    * Apply security schema tables. Called when enableSecurity is true.
    * Safe to call multiple times (CREATE IF NOT EXISTS).
    */

@@ -1,0 +1,12 @@
+id: sql-injection-py
+language: python
+severity: critical
+owaspCategory: A03
+description: SQL query built with Python string formatting — injection vector
+fixHint: Use parameterized queries with %s placeholders and pass values as a tuple. Never use % or .format() with SQL.
+fix: "cursor.execute('SELECT ... WHERE col = %s', ($ARGS,))"
+rule:
+  any:
+    - pattern: cursor.execute($Q % $ARGS)
+    - pattern: cursor.execute($Q.format($$$ARGS))
+    - pattern: cursor.execute(f"$$$SQL")

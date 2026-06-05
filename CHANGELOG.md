@@ -1,9 +1,48 @@
 # Changelog
 
-## [0.19.0] - 2026-05-29: Security Module
+## [0.19.1] - 2026-06-01: KiroGraph-Patterns (ast-grep integration)
 
 ### Added
 
+- **KiroGraph-Patterns** (`enablePatterns: true`, opt-in): AST structural pattern matching via `@ast-grep/napi`. Adds a fourth search mode alongside FTS, graph traversal, and semantic vector search — finding code patterns that can't be expressed as symbol names.
+  - **Index-time SAST upgrade**: during `kirograph index`, 10 bundled YAML rules run against every source file and store matches in `pattern_matches` SQLite table. `kirograph security flows` merges AST findings with existing SQL heuristics (additive, SQL heuristics always preserved).
+  - **`kirograph_live_search` MCP tool**: dynamically registered in the MCP tool list *only* when `enablePatterns: true` AND `@ast-grep/napi` is installed — absent otherwise. Lets the AI agent search any ast-grep structural pattern across the indexed file list at query time without re-indexing.
+  - **`kirograph pattern` CLI**: `kirograph pattern '<pattern>'` (live search), `--list` (browse library), `--library <id>` (run specific rule), `--lang`, `--format json`. Exit code 1 on findings for CI gates.
+  - **10 bundled YAML rules**: SQL injection (JS/TS/Python ×3), dangerous eval/exec (JS/Python ×2), path traversal (JS/Python ×2), prototype pollution (JS), weak crypto MD5/SHA-1 (JS/Python ×2). All tagged with OWASP Top 10 (2021) category and fix hint.
+  - **3 new config fields**: `enablePatterns` (default `false`), `patternLibraryPath` (custom rules directory, merged with bundled), `patternSeverityThreshold` (default `low`).
+  - **Installer prompt**: "Precise SAST with ast-grep?" after the Security section — auto-installs `@ast-grep/napi` on yes, warns and continues on failure.
+  - **`kirograph-patterns.md` workflow steering file** (`inclusion: manual`): step-by-step guide — browse rules, live search, run library rules, pattern syntax reference. Written only when `enablePatterns: true`. Activatable via `/kirograph-patterns` in Kiro IDE/CLI.
+  - **Agent integration**: `kirograph_live_search` and `kirograph pattern` in steering decision guide (conditional on `enablePatterns`), CLI agent resources include `kirograph-patterns.md` when enabled, all 34 non-Kiro target agent instructions include a Pattern Search section when `enablePatterns: true`.
+
+- **MCP tool parity**: `kirograph_pattern_coverage`, `kirograph_pattern_save_baseline`, `kirograph_pattern_diff` — full MCP equivalents of the CLI commands, usable by AI agents in sessions.
+- **`kirograph_status` pattern section**: when `enablePatterns: true`, shows match count, files affected, rules triggered.
+- **`kirograph_security` SAST findings**: overview now includes pattern match count + critical count from `pattern_matches`.
+- **`kirograph_impact` pattern warning**: when analyzing blast radius, surfaces pattern matches on the target symbol ("this symbol has 2 SQL injection pattern matches at line N").
+- **`kirograph attack-surface` pattern awareness**: routes now show pattern matches found along call paths (up to 5 hops), with pattern-adjusted risk score.
+- **`kirograph hotspots --security`**: new mode that scores symbols by severity × caller count, showing only symbols with pattern matches.
+- **`symbol_node_id` in pattern_matches**: each match records the enclosing function/method node ID, enabling graph-level queries like "who calls code with SQL injection?"
+- **Pattern-aware `kirograph_context`**: context MCP tool surfaces up to 5 pattern findings from relevant files inline.
+- **OWASP coverage report** (`kirograph pattern --coverage`): bar chart of rule coverage per category, with match counts and uncovered gap list.
+- **Pattern diff** (`kirograph pattern --save-baseline / --diff`): snapshot and diff pattern match counts over time.
+- **`fix:` field in pattern rules**: all 10 bundled rules now carry a `fix:` template using ast-grep metavariables. `kirograph pattern --library <id> --fix` applies transformations in-process via `@ast-grep/napi` (no spawned processes). Falls back to range-based text substitution if `commitEdits()` is unavailable.
+- **4 new rules for Java and Go**: `sql-injection-java`, `dangerous-reflection-java` (critical/high), `command-injection-go`, `path-traversal-go` (critical/high). Total bundled rules: 14.
+- **`symbol_node_id` in `pattern_matches`**: each match now records the enclosing function/method/class node ID. Enables queries like "who calls code containing a SQL injection pattern?" via `findCallersOfPatternMatches()` in `src/patterns/graph.ts`.
+- **Pattern-aware `kirograph_context`**: when `enablePatterns: true`, the context MCP tool surfaces up to 5 pattern findings from the relevant files as a `## ⚠ Pattern Findings` section — same inline warning pattern as CVE surfacing.
+- **`kirograph pattern --coverage`**: OWASP Top 10 coverage report — bar chart of rules-per-category, match counts, affected files, and "no coverage" gaps. `--format json` for CI.
+- **`kirograph pattern --save-baseline [label]` / `--diff [label]`**: save a JSON snapshot of current pattern match counts to `.kirograph/pattern-baseline-<label>.json`, then diff future state against it. Shows NEW/RESOLVED/UNCHANGED buckets with net delta.
+
+### Changed
+
+- `DataFlowAnalyzer.analyze()` now merges `pattern_matches` results with SQL heuristic results when `enablePatterns: true` and data is present — deduplicating by `(filePath, line)` with AST entries preferred. SQL heuristics run unchanged regardless.
+- `IndexPipeline` gains a `patterns` phase (after embeddings, before architecture). Non-critical: wrapped in try/catch.
+- Incremental sync re-runs patterns for changed files only; file removal deletes corresponding `pattern_matches` rows.
+- `InstructionOptions`, `buildInstructionOpts`, and all 27 non-Kiro `installLate` implementations extended with `enablePatterns` parameter.
+- `PatternRule` extended with `fix?: string`; `PatternMatch` extended with `fixSuggestion?: string`.
+- `pattern_matches` schema extended with `symbol_node_id TEXT` (nullable, indexed) — backward-compatible migration via `tryAlter`.
+
+---
+
+## [0.19.0] - 2026-05-29: Security Module
 - **Security module** (`enableSecurity: true`): dependency vulnerability detection with reachability-aware impact analysis. Leverages the existing call graph and architecture layers to classify vulnerabilities as `affected`, `not_affected`, or `under_investigation`.
   - **`enableSecurity` config flag**: Guards the security pipeline. Requires `enableArchitecture: true` (auto-enabled if missing).
   - **CLI commands**:

@@ -1,0 +1,13 @@
+id: sql-injection-template-js
+language: [javascript, typescript]
+severity: critical
+owaspCategory: A03
+description: SQL query built with template literal containing substitution — injection vector
+fixHint: Use parameterized queries with ? placeholders. Template literals with user data are injectable.
+fix: "/* TODO: replace with parameterized query */"
+rule:
+  any:
+    - pattern: $DB.query(`$$$`)
+    - pattern: $DB.execute(`$$$`)
+    - pattern: $DB.run(`$$$`)
+    - pattern: $DB.exec(`$$$`)

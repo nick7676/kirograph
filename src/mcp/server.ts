@@ -6,7 +6,8 @@
 import * as path from 'path';
 import KiroGraph, { findNearestKiroGraphRoot } from '../index';
 import { StdioTransport, ErrorCodes } from './transport';
-import { tools, ToolHandler } from './tools';
+import { tools, ToolHandler, LIVE_SEARCH_TOOL_DEFINITION } from './tools';
+import { PatternRunner } from '../patterns/runner';
 import type { JsonRpcMessage } from './transport';
 
 const SERVER_INFO = { name: 'kirograph', version: '0.1.0' };
@@ -17,6 +18,8 @@ export class MCPServer {
   private cg: KiroGraph | null = null;
   private toolHandler: ToolHandler;
   private projectPath: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private config: any | null = null;
 
   constructor(projectPath?: string) {
     // Normalize to absolute path immediately to prevent any path traversal
@@ -42,6 +45,12 @@ export class MCPServer {
     } catch (err) {
       process.stderr.write(`[KiroGraph MCP] Failed to open ${root}: ${err}\n`);
     }
+    try {
+      const { loadConfig } = await import('../config');
+      this.config = await loadConfig(root);
+    } catch {
+      // config is optional — proceed without it
+    }
   }
 
   private async handleMessage(msg: JsonRpcMessage): Promise<unknown> {
@@ -63,8 +72,13 @@ export class MCPServer {
         };
       }
 
-      case 'tools/list':
-        return { tools };
+      case 'tools/list': {
+        const dynamicTools = [...tools];
+        if (this.config?.enablePatterns && new PatternRunner().isAvailable()) {
+          dynamicTools.push(LIVE_SEARCH_TOOL_DEFINITION);
+        }
+        return { tools: dynamicTools };
+      }
 
       case 'tools/call': {
         const { name, arguments: args = {} } = req.params ?? {};

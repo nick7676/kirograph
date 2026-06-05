@@ -1,0 +1,13 @@
+id: weak-crypto-md5-js
+language: [javascript, typescript]
+severity: medium
+owaspCategory: A02
+description: MD5 or SHA-1 are cryptographically broken — do not use for security purposes
+fixHint: Use SHA-256 or SHA-3 for hashing. Use bcrypt/argon2 for passwords. Use AES-GCM for encryption.
+fix: "createHash('sha256')"
+rule:
+  any:
+    - pattern: createHash('md5')
+    - pattern: createHash('sha1')
+    - pattern: createHash("md5")
+    - pattern: createHash("sha1")

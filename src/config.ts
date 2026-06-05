@@ -103,6 +103,12 @@ export interface KiroGraphConfig {
   enableSecurity: boolean;
   /** Vulnerability databases to query. Default: ['OSV']. */
   securityDatabases: string[];
+  /** Enable AST-level structural pattern matching (SAST) during indexing. Default: false. */
+  enablePatterns: boolean;
+  /** Path to a directory of user-supplied YAML rule files. Merged with bundled library (user rules win on id conflict). Default: undefined. */
+  patternLibraryPath: string | undefined;
+  /** Minimum severity level for storing pattern matches during index-time analysis. Default: 'low'. */
+  patternSeverityThreshold: 'critical' | 'high' | 'medium' | 'low';
   /** Auto-run vulnerability enrichment after manifest parsing. Default: true. */
   securityAutoEnrich: boolean;
   /** Max age in days for vulnerability data before showing a staleness warning. Default: 7. */
@@ -144,6 +150,7 @@ const KNOWN_FIELDS = new Set<string>([
   'enableData', 'dataInclude', 'dataExclude', 'dataLinkCode',
   'dataContextLimit', 'dataMaxFileSize', 'dataMaxRows', 'dataQueryLimit', 'dataMaxResponseTokens',
   'enableSecurity', 'securityDatabases', 'securityAutoEnrich', 'securityEnrichMaxAgeDays', 'securityLicensePolicy',
+  'enablePatterns', 'patternLibraryPath', 'patternSeverityThreshold',
   'contextBudget',
   // Legacy aliases (still accepted, mapped during validation)
   'enableCompression', 'compressionLevel',
@@ -221,6 +228,9 @@ export function createDefaultConfig(_projectRoot?: string): KiroGraphConfig {
     securityAutoEnrich: true,
     securityEnrichMaxAgeDays: 7,
     securityLicensePolicy: { deny: [], warn: [] },
+    enablePatterns: false,
+    patternLibraryPath: undefined,
+    patternSeverityThreshold: 'low',
   };
 }
 
@@ -457,6 +467,38 @@ export function validateConfig(config: unknown): KiroGraphConfig {
     securityLicensePolicy = defaults.securityLicensePolicy;
   }
 
+  // ── Patterns config ───────────────────────────────────────────────────────
+  let enablePatterns: boolean;
+  if (typeof raw.enablePatterns === 'boolean') {
+    enablePatterns = raw.enablePatterns;
+  } else {
+    if (raw.enablePatterns !== undefined) {
+      logWarn('Invalid config field enablePatterns: expected boolean, applying default (false)');
+    }
+    enablePatterns = defaults.enablePatterns;
+  }
+
+  let patternLibraryPath: string | undefined;
+  if (raw.patternLibraryPath === undefined || raw.patternLibraryPath === null) {
+    patternLibraryPath = undefined;
+  } else if (typeof raw.patternLibraryPath === 'string') {
+    patternLibraryPath = raw.patternLibraryPath;
+  } else {
+    logWarn('Invalid config field patternLibraryPath: expected string or undefined, applying default (undefined)');
+    patternLibraryPath = defaults.patternLibraryPath;
+  }
+
+  const PATTERN_SEVERITY_LEVELS = new Set(['critical', 'high', 'medium', 'low']);
+  let patternSeverityThreshold: KiroGraphConfig['patternSeverityThreshold'];
+  if (typeof raw.patternSeverityThreshold === 'string' && PATTERN_SEVERITY_LEVELS.has(raw.patternSeverityThreshold)) {
+    patternSeverityThreshold = raw.patternSeverityThreshold as KiroGraphConfig['patternSeverityThreshold'];
+  } else {
+    if (raw.patternSeverityThreshold !== undefined) {
+      logWarn('Invalid config field patternSeverityThreshold: expected critical|high|medium|low, applying default (low)');
+    }
+    patternSeverityThreshold = defaults.patternSeverityThreshold;
+  }
+
   // Dependency constraint: enableSecurity requires enableArchitecture
   let finalEnableArchitecture = enableArchitecture;
   if (enableSecurity && !enableArchitecture) {
@@ -534,6 +576,9 @@ export function validateConfig(config: unknown): KiroGraphConfig {
     securityAutoEnrich,
     securityEnrichMaxAgeDays,
     securityLicensePolicy,
+    enablePatterns,
+    patternLibraryPath,
+    patternSeverityThreshold,
     ...(architectureLayers !== undefined ? { architectureLayers } : {}),
     ...(contextBudget !== undefined ? { contextBudget } : {}),
   };

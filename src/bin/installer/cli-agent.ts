@@ -19,6 +19,7 @@ import { KIROGRAPH_SCOPED_TOOLS, KIROGRAPH_SYNC_CMD } from './common';
 export interface CliAgentOptions {
   enableArchitecture?: boolean;
   enableSecurity?: boolean;
+  enablePatterns?: boolean;
 }
 
 function buildAgentConfig(opts?: CliAgentOptions) {
@@ -34,6 +35,9 @@ function buildAgentConfig(opts?: CliAgentOptions) {
   if (opts?.enableSecurity) {
     workflowResources.push('file://.kiro/steering/kirograph-security.md');
   }
+  if (opts?.enablePatterns) {
+    workflowResources.push('file://.kiro/steering/kirograph-patterns.md');
+  }
 
   const slashCommands = [
     '/kirograph-review',
@@ -42,11 +46,12 @@ function buildAgentConfig(opts?: CliAgentOptions) {
     '/kirograph-onboard',
     '/kirograph-refactor',
     ...(opts?.enableSecurity ? ['/kirograph-security'] : []),
+    ...(opts?.enablePatterns ? ['/kirograph-patterns'] : []),
   ].join(', ');
 
   return {
     name: 'kirograph',
-    description: `KiroGraph-aware agent — semantic code graph for symbol lookup, call graphs, impact analysis${opts?.enableArchitecture ? ', architecture metrics' : ''}${opts?.enableSecurity ? ', and security auditing' : ''}. Workflow steering files are registered as resources — activate one with ${slashCommands}.`,
+    description: `KiroGraph-aware agent — semantic code graph for symbol lookup, call graphs, impact analysis${opts?.enableArchitecture ? ', architecture metrics' : ''}${opts?.enableSecurity ? ', security auditing' : ''}${opts?.enablePatterns ? ', AST pattern search' : ''}. Workflow steering files are registered as resources — activate one with ${slashCommands}.`,
     resources: [
       'file://.kiro/steering/kirograph.md',
       ...workflowResources,
