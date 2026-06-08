@@ -1,15 +1,36 @@
 # Changelog
 
-## [0.20.0] - 2026-06-05: KiroGraph-Watchmen
+## [0.20.0] - 2026-06-08: KiroGraph-Watchmen *(experimental)*
+
+> ⚠️ **Experimental feature.** Output quality in local synthesis mode depends heavily on the model used and the hardware it runs on. Smaller or quantized models may produce incomplete briefs and lower-quality skill files. Use `watchmenSynthesisMode: 'agent'` for best results on Kiro.
 
 ### Added
-- **KiroGraph-Watchmen** (`enableWatchmen: true`): opt-in module that auto-synthesizes accumulated memory observations into workspace brief files. When the observation count since the last synthesis reaches `watchmenThreshold` (default: 5), `kirograph_mem_store` returns a `watchmenReady` signal with a `targetFiles` list and synthesis instructions. The active AI agent writes the brief to the appropriate file for its tool — `.kiro/steering/kirograph-watchmen.md` for Kiro, `CLAUDE.md` for Claude Code, `AGENTS.md` for Codex/Copilot/Devin/Goose/Warp/Roo/OpenHands/Replit/Junie, and dedicated files for Gemini CLI, Aider, and Augment. Falls back to `AGENTS.md` for tools with no dedicated project memory file. No external API calls, no background daemon — synthesis is done by the active agent using the existing `kirograph_mem_search` tool.
-- `kirograph-watchmen.kiro.hook` — `askAgent` hook at `agentStop` that probes the threshold and instructs Kiro to synthesize when ready. Installed automatically when `enableWatchmen: true`.
-- `kirograph mem watchmen status` CLI — shows pending observation count, threshold, ready state, and which files would be written on next synthesis.
-- `kirograph mem watchmen reset` CLI — stores a `kind='summary'` observation to manually reset the threshold counter without triggering synthesis.
-- `enableWatchmen` and `watchmenThreshold` config fields.
-- `WatchmenReadyResult` type exported from `kirograph/memory`.
-- Installer prompt: "Enable Watchmen?" shown when memory is enabled during `kirograph install`.
+- **KiroGraph-Watchmen** (`enableWatchmen: true`): opt-in **experimental** module that auto-synthesizes accumulated memory observations into workspace briefs and skill files. When the observation count since the last `kind: 'summary'` reaches `watchmenThreshold` (default: 5), `kirograph_mem_store` returns a `watchmenReady` signal with `targetFiles`, `skillTargetDir`, and synthesis instructions. Requires `enableMemory: true`. No background daemon.
+
+- **Local model synthesis** (`watchmenSynthesisMode: 'local'`, default): synthesis runs entirely on-device via `@huggingface/transformers` (ONNX Runtime). No external API calls, no API key required. Model downloaded once to `~/.kirograph/models/` alongside the embedding model. Default: `onnx-community/gemma-4-E4B-it-ONNX`.
+  - Download: ~3–4 GB one-time
+  - RAM during inference: ~3–5 GB
+  - Speed: 8–15 s on Apple Silicon (M1+, CoreML); 30–60 s on Intel CPU
+  - Fires only at `agentStop` when threshold is reached — not a persistent process
+
+- **Agent synthesis** (`watchmenSynthesisMode: 'agent'`): delegates synthesis to the active AI agent via `askAgent` hook (Kiro only). Consumes agent API tokens/credits. Higher quality output but requires Kiro.
+
+- **Skill file generation**: when Kiro is detected (`.kiro/` present), Watchmen writes individual `inclusion: manual` steering files at `.kiro/steering/watchmen-<slug>.md` for each recurring procedure identified in the observations. Files from previous runs are automatically pruned when patterns change. Non-Kiro targets get a `## Recurring Procedures` section embedded in their brief file.
+
+- **Per-tool output**: `.kiro/steering/kirograph-watchmen.md` (`inclusion: always`) for Kiro; `CLAUDE.md` for Claude Code; `AGENTS.md` for Codex/Copilot CLI/Devin/Goose/Warp/Roo/OpenHands/Replit/Junie; `GEMINI.md` for Gemini CLI; `CONVENTIONS.md` for Aider; `augment-guidelines.md` for Augment; `AGENTS.md` fallback for Cursor, Cline, Windsurf, and rules-based tools.
+
+- **Hook**: `kirograph-watchmen.kiro.hook` written to `.kiro/hooks/` when `enableWatchmen: true`. Uses `runCommand: kirograph mem watchmen synthesize --quiet` in local mode (works for all tools); `askAgent` prompt in agent mode (Kiro only).
+
+- **CLI commands**:
+  - `kirograph mem watchmen status` — pending count, threshold, ready state, target files
+  - `kirograph mem watchmen synthesize [--force] [--quiet]` — run local model synthesis immediately; `--force` bypasses threshold check; `--quiet` suppresses output for hook use
+  - `kirograph mem watchmen reset` — store a `kind='summary'` observation to reset the counter
+
+- **New config fields**: `enableWatchmen` (bool), `watchmenThreshold` (number, default 5), `watchmenSynthesisMode` (`'local'` | `'agent'`, default `'local'`), `watchmenLocalModel` (string, default `'onnx-community/gemma-4-E4B-it-ONNX'`).
+- **`WatchmenReadyResult`** type exported from `kirograph/memory`: `{ id, watchmenReady, pendingCount, message, targetFiles, skillTargetDir? }`.
+- **Installer**: after enabling memory, prompts for synthesis mode (local model with model picker, or active agent with token cost warning). `kirograph install --yes` skips all prompts using existing config.
+- **`--yes` flag** on `kirograph install`: non-interactive mode — skips confirmation and index prompts, uses config on disk. Useful in scripts and CI.
+- **`test-watchmen.sh`**: end-to-end test script in `test-watchmen/`. Covers install (`--yes`), index, threshold counter, `watchmenReady` signal, synthesis (brief + skill files), pruning, timeline, search, and manual reset. Flags: `--skip-llm`, `--no-build`.
 
 ## [0.19.1] - 2026-06-01: KiroGraph-Patterns (ast-grep integration)
 

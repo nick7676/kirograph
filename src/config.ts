@@ -69,6 +69,15 @@ export interface KiroGraphConfig {
   enableWatchmen: boolean;
   /** Minimum new observations since last synthesis before watchmenReady fires. Default: 5. */
   watchmenThreshold: number;
+  /**
+   * How synthesis is performed.
+   * 'local' — runs a local HuggingFace model via @huggingface/transformers (no API cost, works for all tools).
+   * 'agent' — delegates to the active AI agent via askAgent hook (Kiro only, consumes agent tokens).
+   * Default: 'local'.
+   */
+  watchmenSynthesisMode: 'local' | 'agent';
+  /** HuggingFace model ID for local synthesis. Only used when watchmenSynthesisMode is 'local'. Default: 'onnx-community/gemma-4-E4B-it-ONNX'. */
+  watchmenLocalModel: string;
   /** Enable documentation indexing and navigation. Default: false. */
   enableDocs: boolean;
   /** Glob patterns for documentation files to include. */
@@ -149,7 +158,7 @@ const KNOWN_FIELDS = new Set<string>([
   'enableArchitecture', 'architectureLayers', 'cavemanMode', 'shellCompressionLevel', 'syncWarningThreshold',
   'enableMemory', 'memorySearchAlpha', 'memoryKeepRaw', 'memoryMaxObservations',
   'memorySessionTimeout', 'memoryContextLimit', 'memoryContextThreshold', 'memoryExcludePatterns',
-  'enableWatchmen', 'watchmenThreshold',
+  'enableWatchmen', 'watchmenThreshold', 'watchmenSynthesisMode', 'watchmenLocalModel',
   'enableDocs', 'docsInclude', 'docsExclude', 'docsLinkCode',
   'docsContextLimit', 'docsContextThreshold', 'docsMaxFileSize', 'docsSummarization',
   'enableData', 'dataInclude', 'dataExclude', 'dataLinkCode',
@@ -213,6 +222,8 @@ export function createDefaultConfig(_projectRoot?: string): KiroGraphConfig {
     memoryExcludePatterns: [],
     enableWatchmen: false,
     watchmenThreshold: 5,
+    watchmenSynthesisMode: 'local',
+    watchmenLocalModel: 'onnx-community/gemma-4-E4B-it-ONNX',
     enableDocs: false,
     docsInclude: ['**/*.md', '**/*.mdx', '**/*.rst', '**/*.adoc', '**/*.asciidoc', '**/*.rdoc', '**/*.org', '**/*.cheatmd', 'docs/**/*.txt', 'docs/**/*.html'],
     docsExclude: ['node_modules/**', '**/CHANGELOG*', '**/LICENSE*', '**/CHANGES*', 'dist/**', 'build/**', 'coverage/**', '.git/**', '**/generated/**', '**/auto-generated/**', '**/vendor/**', '_build/**'],
@@ -367,6 +378,13 @@ export function validateConfig(config: unknown): KiroGraphConfig {
   const watchmenThreshold = typeof raw.watchmenThreshold === 'number' && raw.watchmenThreshold > 0
     ? Math.round(raw.watchmenThreshold)
     : defaults.watchmenThreshold;
+  const WATCHMEN_SYNTHESIS_MODES = new Set(['local', 'agent']);
+  const watchmenSynthesisMode = typeof raw.watchmenSynthesisMode === 'string' && WATCHMEN_SYNTHESIS_MODES.has(raw.watchmenSynthesisMode)
+    ? (raw.watchmenSynthesisMode as KiroGraphConfig['watchmenSynthesisMode'])
+    : defaults.watchmenSynthesisMode;
+  const watchmenLocalModel = typeof raw.watchmenLocalModel === 'string' && raw.watchmenLocalModel.length > 0
+    ? raw.watchmenLocalModel
+    : defaults.watchmenLocalModel;
 
   // ── Docs config ───────────────────────────────────────────────────────────
   const enableDocs = typeof raw.enableDocs === 'boolean'
@@ -571,6 +589,8 @@ export function validateConfig(config: unknown): KiroGraphConfig {
     memoryExcludePatterns,
     enableWatchmen: enableWatchmen && enableMemory,
     watchmenThreshold,
+    watchmenSynthesisMode,
+    watchmenLocalModel,
     enableDocs,
     docsInclude,
     docsExclude,

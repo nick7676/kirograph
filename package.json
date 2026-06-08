@@ -17,6 +17,8 @@
     "dev": "tsx scripts/build.ts --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest --run",
+    "test:watchmen": "bash scripts/watchmen/test.sh",
+    "test:watchmen:skip-llm": "bash scripts/watchmen/test.sh --skip-llm",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "release": "./scripts/release.sh",
     "docs": "npx serve docs"
@@ -30,7 +32,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@huggingface/transformers": "^3.0.0",
+    "@huggingface/transformers": "^4.2.0",
     "commander": "^14.0.2",
     "figlet": "^1.11.0",
     "node-sqlite3-wasm": "^0.8.30",

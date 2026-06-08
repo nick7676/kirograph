@@ -46,6 +46,8 @@ KiroGraph stores its config in `.kirograph/config.json`. You can edit it directl
 | **Watchmen** | | | |
 | `enableWatchmen` | boolean | `false` | Enable Watchmen — auto-synthesize workspace briefs from memory observations. Requires `enableMemory: true`. |
 | `watchmenThreshold` | number | `5` | Minimum new observations since last synthesis before `watchmenReady` fires. |
+| `watchmenSynthesisMode` | string | `'local'` | `'local'` — runs a local HuggingFace model on-device (no API key, no external calls); `'agent'` — delegates to the active AI agent via `askAgent` hook (Kiro only, consumes tokens). |
+| `watchmenLocalModel` | string | `'onnx-community/gemma-4-E4B-it-ONNX'` | HuggingFace model ID for local synthesis. Downloaded once to `~/.kirograph/models/`. ~3–4 GB, ~3–5 GB RAM at inference, 8–15 s on Apple Silicon. Only used when `watchmenSynthesisMode: 'local'`. |
 | **Documentation** | | | |
 | `enableDocs` | boolean | `false` | Enable documentation indexing (section-level retrieval) |
 | `docsInclude` | string[] | `["**/*.md", ...]` | Glob patterns for doc files to include |

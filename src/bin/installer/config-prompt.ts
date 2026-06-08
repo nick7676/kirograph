@@ -6,7 +6,7 @@ import * as readline from 'readline';
 import { KiroGraphConfig } from '../../config';
 type CavemanMode = 'lite' | 'full' | 'ultra';
 import { ask, askToggle, arrowSelect, printSection, printSeparator, dim, reset, violet } from './prompts';
-export type ConfigPatch = Pick<KiroGraphConfig, 'enableEmbeddings' | 'useVecIndex' | 'semanticEngine' | 'typesenseDashboard' | 'qdrantDashboard' | 'extractDocstrings' | 'trackCallSites' | 'enableArchitecture' | 'cavemanMode' | 'shellCompressionLevel' | 'enableMemory' | 'enableWatchmen' | 'watchmenThreshold' | 'enableDocs' | 'docsContextLimit' | 'enableData' | 'dataContextLimit' | 'enableSecurity' | 'enablePatterns'> & { embeddingModel?: string; embeddingDim?: number };
+export type ConfigPatch = Pick<KiroGraphConfig, 'enableEmbeddings' | 'useVecIndex' | 'semanticEngine' | 'typesenseDashboard' | 'qdrantDashboard' | 'extractDocstrings' | 'trackCallSites' | 'enableArchitecture' | 'cavemanMode' | 'shellCompressionLevel' | 'enableMemory' | 'enableWatchmen' | 'watchmenThreshold' | 'watchmenSynthesisMode' | 'watchmenLocalModel' | 'enableDocs' | 'docsContextLimit' | 'enableData' | 'dataContextLimit' | 'enableSecurity' | 'enablePatterns'> & { embeddingModel?: string; embeddingDim?: number };
 export type SemanticEngine = KiroGraphConfig['semanticEngine'];
 
 export const DEFAULT_EMBEDDING_MODEL = 'nomic-ai/nomic-embed-text-v1.5';
@@ -55,7 +55,7 @@ export async function promptConfigOptions(rl: readline.Interface): Promise<Confi
     'Enables natural-language code search via vector embeddings. A local model (~130MB) is downloaded on first use.',
   );
 
-  const patch: ConfigPatch = { enableEmbeddings, useVecIndex: false, semanticEngine: 'cosine', typesenseDashboard: false, qdrantDashboard: false, extractDocstrings: true, trackCallSites: true, enableArchitecture: false, cavemanMode: 'off', shellCompressionLevel: 'normal', enableMemory: false, enableWatchmen: false, watchmenThreshold: 5, enableDocs: false, docsContextLimit: 0, enableData: false, dataContextLimit: 0, enableSecurity: false, enablePatterns: false };
+  const patch: ConfigPatch = { enableEmbeddings, useVecIndex: false, semanticEngine: 'cosine', typesenseDashboard: false, qdrantDashboard: false, extractDocstrings: true, trackCallSites: true, enableArchitecture: false, cavemanMode: 'off', shellCompressionLevel: 'normal', enableMemory: false, enableWatchmen: false, watchmenThreshold: 5, watchmenSynthesisMode: 'local', watchmenLocalModel: 'onnx-community/gemma-4-E4B-it-ONNX', enableDocs: false, docsContextLimit: 0, enableData: false, dataContextLimit: 0, enableSecurity: false, enablePatterns: false };
 
   if (enableEmbeddings) {
     // ── Model selection ────────────────────────────────────────────────────────
@@ -243,9 +243,69 @@ export async function promptConfigOptions(rl: readline.Interface): Promise<Confi
   if (patch.enableMemory) {
     patch.enableWatchmen = await askToggle(rl,
       'Watchmen (auto-synthesize workspace briefs from memory):',
-      'When enough observations accumulate (default: 5), signals the active agent to synthesize them into .kiro/steering/kirograph-watchmen.md, CLAUDE.md, AGENTS.md, or the equivalent for your tool. Zero LLM tokens from KiroGraph — synthesis is done by the active agent.',
+      'When enough observations accumulate (default: 5), synthesizes them into .kiro/steering/kirograph-watchmen.md, CLAUDE.md, AGENTS.md, or the equivalent for your tool.',
       false,
     );
+
+    if (patch.enableWatchmen) {
+      // ── Synthesis mode ───────────────────────────────────────────────────
+      const synthesisMode = await arrowSelect<KiroGraphConfig['watchmenSynthesisMode']>(
+        rl,
+        'Watchmen synthesis mode:',
+        [
+          {
+            value: 'local',
+            label: 'Local model',
+            description: 'Runs a local HuggingFace model via @huggingface/transformers. Zero API cost, no data leaves your machine. Model downloaded once to ~/.kirograph/models/. Works for all tools via runCommand hook.',
+          },
+          {
+            value: 'agent',
+            label: 'Active agent',
+            description: '⚠ Uses the active AI agent (Kiro/Claude) to synthesize. Consumes API tokens/credits on every synthesis. Kiro only — other tools are not supported.',
+          },
+        ],
+      );
+      patch.watchmenSynthesisMode = synthesisMode;
+
+      if (synthesisMode === 'local') {
+        // ── Local model selection ──────────────────────────────────────────
+        const LOCAL_MODELS = [
+          {
+            value: 'onnx-community/gemma-4-E4B-it-ONNX',
+            label: 'Gemma 4 E4B (recommended)',
+            description: '~3–4 GB · Google DeepMind Gemma 4 · 4.5B params · 128K context · Best quality · Apache 2.0',
+          },
+          {
+            value: 'onnx-community/Qwen2.5-1.5B-Instruct',
+            label: 'Qwen2.5-1.5B',
+            description: '~1.5 GB · Lighter option if RAM is limited · Acceptable quality',
+          },
+          {
+            value: 'HuggingFaceTB/SmolLM2-1.7B-Instruct',
+            label: 'SmolLM2-1.7B',
+            description: '~1.7 GB · HuggingFace compact model · Good at following structured formats',
+          },
+          {
+            value: '__other__',
+            label: 'Other',
+            description: 'Enter a custom HuggingFace model ID (must have ONNX weights on onnx-community)',
+          },
+        ] as const;
+
+        const modelChoice = await arrowSelect<string>(rl, 'Local synthesis model:', LOCAL_MODELS.map(m => ({ value: m.value, label: m.label, description: m.description })));
+
+        if (modelChoice === '__other__') {
+          console.log(`\n  ${dim}Enter a HuggingFace model ID (e.g. onnx-community/gemma-4-E4B-it-ONNX).${reset}`);
+          while (true) {
+            const raw = (await ask(rl, `  ${violet}Model identifier:${reset} `)).trim();
+            if (raw.includes('/')) { patch.watchmenLocalModel = raw; break; }
+            console.log(`  Expected a HuggingFace model ID in the format org/model-name.`);
+          }
+        } else {
+          patch.watchmenLocalModel = modelChoice;
+        }
+      }
+    }
   }
 
   return patch;

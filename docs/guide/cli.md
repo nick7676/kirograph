@@ -358,6 +358,23 @@ kirograph mem lint                        # find stale links, model mismatch
 kirograph mem lint --fix                  # auto-repair issues
 ```
 
+### Watchmen *(requires `enableWatchmen: true`)*
+
+![KiroGraph Watchmen](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/watchmen.png)
+
+```bash
+# Status — pending observations, threshold, target files
+kirograph mem watchmen status
+
+# Synthesize — run local model synthesis immediately
+kirograph mem watchmen synthesize           # runs if threshold is reached
+kirograph mem watchmen synthesize --force   # run regardless of threshold
+kirograph mem watchmen synthesize --quiet   # no output (used by hooks)
+
+# Reset — store a summary observation to reset the counter without synthesis
+kirograph mem watchmen reset
+```
+
 ## Documentation *(requires `enableDocs: true`)*
 
 ![KiroGraph Documentation](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/docs.png)

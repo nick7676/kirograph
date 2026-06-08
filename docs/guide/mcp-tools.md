@@ -261,9 +261,10 @@ When enough observations have accumulated since the last `kind: 'summary'`, the 
 | `watchmenReady` | `true` | Present only when synthesis should run |
 | `pendingCount` | number | Observations since last `kind: 'summary'` |
 | `message` | string | Synthesis instructions for the agent |
-| `targetFiles` | string[] | Project-relative paths to write the brief to, based on installed targets |
+| `targetFiles` | string[] | Project-relative paths to write the workspace brief to, based on installed targets |
+| `skillTargetDir` | string? | Present only when Kiro is detected (`.kiro/` exists). Path to the steering directory for individual `inclusion: manual` skill files (`watchmen-<slug>.md`). Absent for non-Kiro targets — embed procedures in the brief instead. |
 
-On receiving `watchmenReady: true`, the agent should call `kirograph_mem_search` for each kind, synthesize the brief, write to each file in `targetFiles`, then store a `kind: 'summary'` observation to reset the counter.
+On receiving `watchmenReady: true`, the agent should: (1) call `kirograph_mem_search` for each kind, (2) write the workspace brief to each file in `targetFiles`, (3) if `skillTargetDir` is present write separate `watchmen-<slug>.md` skill files for recurring procedures, otherwise embed a `## Recurring Procedures` section in the brief, (4) store a `kind: 'summary'` observation to reset the counter.
 
 ### `kirograph_mem_timeline`
 

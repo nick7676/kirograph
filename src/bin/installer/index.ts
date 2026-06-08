@@ -24,7 +24,7 @@ import type { InstallTarget } from './common';
 import { getTargetInstaller } from './targets';
 import type { CavemanMode } from './caveman';
 
-export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void> {
+export async function runInstaller(target: InstallTarget = 'kiro', opts: { yes?: boolean } = {}): Promise<void> {
   printBanner();
 
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -35,8 +35,12 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
 
     console.log(`  Workspace: ${cwd}\n`);
 
-    const proceed = await askToggle(rl, `Install KiroGraph for ${installer.label}?`, 'Registers the MCP server and writes integration files for this workspace.');
-    if (!proceed) { console.log('  Cancelled.'); rl.close(); return; }
+    if (!opts.yes) {
+      const proceed = await askToggle(rl, `Install KiroGraph for ${installer.label}?`, 'Registers the MCP server and writes integration files for this workspace.');
+      if (!proceed) { console.log('  Cancelled.'); rl.close(); return; }
+    } else {
+      console.log(`  Installing KiroGraph for ${installer.label} (--yes)`);
+    }
     console.log();
 
     installer.installEarly(cwd);
@@ -50,6 +54,8 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
     let enableSecurity = false;
     let enablePatterns = false;
     let enableArchitecture = false;
+    let enableWatchmen = false;
+    let watchmenSynthesisMode: 'local' | 'agent' = 'local';
     let shouldOfferIndex = false;
     let typesenseDashboard = false;
     let qdrantDashboard = false;
@@ -63,6 +69,8 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         enableDocs = config.enableDocs ?? false;
         enableData = (config as any).enableData ?? false;
         enableSecurity = (config as any).enableSecurity ?? false;
+        enableWatchmen = config.enableWatchmen ?? false;
+        watchmenSynthesisMode = config.watchmenSynthesisMode ?? 'local';
         enablePatterns = (config as any).enablePatterns ?? false;
         enableArchitecture = config.enableArchitecture ?? false;
         console.log(`  ✓ Reusing existing KiroGraph data in ${cwd}/.kirograph/`);
@@ -88,6 +96,8 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         enableSecurity = patch.enableSecurity ?? false;
         enablePatterns = patch.enablePatterns ?? false;
         enableArchitecture = patch.enableArchitecture ?? false;
+        enableWatchmen = patch.enableWatchmen ?? false;
+        watchmenSynthesisMode = patch.watchmenSynthesisMode ?? 'local';
         typesenseDashboard = patch.typesenseDashboard;
         qdrantDashboard = patch.qdrantDashboard;
 
@@ -203,7 +213,7 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
         }
       }
 
-      installer.installLate(cwd, cavemanMode, shellCompressionLevel, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns);
+      installer.installLate(cwd, cavemanMode, shellCompressionLevel, enableMemory, enableDocs, enableData, enableSecurity, enableArchitecture, enablePatterns, enableWatchmen, watchmenSynthesisMode);
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
       console.error(`\n  ✗ Failed to write configuration: ${reason}`);
@@ -216,7 +226,8 @@ export async function runInstaller(target: InstallTarget = 'kiro'): Promise<void
     }
 
     // 6. Optionally init + index
-    if (shouldOfferIndex && await askToggle(rl, 'Initialize and index this project now?', 'Creates .kirograph/ and indexes all source files. Takes a few seconds for small projects, longer for large ones.')) {
+    const doIndex = shouldOfferIndex && (opts.yes || await askToggle(rl, 'Initialize and index this project now?', 'Creates .kirograph/ and indexes all source files. Takes a few seconds for small projects, longer for large ones.'));
+    if (doIndex) {
       const KiroGraph = (await import('../../index')).default;
 
       const fileBytes = new Map<string, { loaded: number; total: number }>();

@@ -70,36 +70,56 @@ Zero LLM tokens on write. ~150-350 tokens per search (vs ~2000-5000 tokens to re
 }
 ```
 
-### Watchmen (opt-in)
+### Watchmen (opt-in, experimental)
 
-When `enableWatchmen: true` is set (requires `enableMemory: true`), KiroGraph automatically signals the active AI agent to synthesize accumulated memory observations into workspace brief files. Inspired by [watchmen](https://github.com/firstbatchxyz/watchmen) by [firstbatch](https://github.com/firstbatchxyz).
+> ⚠️ **Experimental.** Output quality in local synthesis mode (`watchmenSynthesisMode: 'local'`) varies significantly depending on the model chosen and the hardware it runs on. Smaller or heavily quantized models may produce incomplete briefs or lower-quality skill files. Inference time also depends on your machine — expect 8–15 s on Apple Silicon M1+ and 30–60 s on Intel CPU with the default model. Use `watchmenSynthesisMode: 'agent'` on Kiro for best results, or choose a larger model if local quality matters.
 
-After each `kirograph_mem_store` call, KiroGraph counts non-summary observations created since the last `kind: 'summary'`. When the count reaches `watchmenThreshold` (default: 5), the response includes a `watchmenReady` flag with synthesis instructions and a `targetFiles` list. The active AI agent then:
+When `enableWatchmen: true` is set (requires `enableMemory: true`), KiroGraph automatically synthesizes accumulated memory observations into workspace briefs and skill files. Inspired by [watchmen](https://github.com/firstbatchxyz/watchmen) by [firstbatch](https://github.com/firstbatchxyz).
 
-1. Calls `kirograph_mem_search` for each observation kind
-2. Synthesizes patterns into a structured workspace brief
-3. Writes or updates the brief in each file listed in `targetFiles`
-4. Stores a `kind: 'summary'` observation to reset the counter
+After each `kirograph_mem_store` call, KiroGraph counts non-summary observations since the last `kind: 'summary'`. When the count reaches `watchmenThreshold` (default: 5), the response includes a `watchmenReady` flag with `targetFiles`, `skillTargetDir`, and instructions. Synthesis then runs according to `watchmenSynthesisMode`.
 
-Target file per installed tool:
+#### Synthesis modes
 
-| Tool | File written |
-|------|-------------|
+**`watchmenSynthesisMode: 'local'` (default)** — runs a local HuggingFace model via `@huggingface/transformers` (ONNX Runtime). No API key, no external calls, no background daemon.
+
+| | |
+|---|---|
+| Default model | `onnx-community/gemma-4-E4B-it-ONNX` |
+| Download | ~3–4 GB one-time, cached in `~/.kirograph/models/` alongside the embedding model |
+| RAM during inference | ~3–5 GB |
+| Speed on Apple Silicon (M1+) | 8–15 seconds (CoreML acceleration via ONNX Runtime) |
+| Speed on Intel CPU | 30–60 seconds |
+| When it runs | Only at `agentStop` when threshold is reached — not a persistent process |
+
+The hook installed is `runCommand: kirograph mem watchmen synthesize --quiet`, which works for all tools (Kiro, Claude Code, Cursor, Cline, etc.).
+
+**`watchmenSynthesisMode: 'agent'`** — delegates synthesis to the active AI agent via `askAgent` hook (Kiro only). The agent calls `kirograph_mem_search`, writes the brief and skill files using its own intelligence, then stores a summary observation. Higher quality output but consumes API tokens/credits and requires Kiro.
+
+#### What gets written
+
+1. **Workspace brief** — written to the tool's project memory file:
+
+| Tool | File |
+|------|------|
 | Kiro | `.kiro/steering/kirograph-watchmen.md` (`inclusion: always`) |
-| Claude Code | `CLAUDE.md` (`## KiroGraph Watchmen` section) |
+| Claude Code | `CLAUDE.md` (`## KiroGraph Watchmen` section, upserted) |
 | Codex, Copilot CLI, Devin, Goose, Warp, Roo, OpenHands, Replit, Junie | `AGENTS.md` |
 | Gemini CLI / AntiGravity | `GEMINI.md` |
 | Aider | `CONVENTIONS.md` |
 | Augment | `augment-guidelines.md` |
-| Rules-based tools (Cursor, Cline, Windsurf…) | `AGENTS.md` fallback |
+| Cursor, Cline, Windsurf, and other rules-based tools | `AGENTS.md` fallback |
 
-Zero LLM tokens spent by KiroGraph — synthesis is done entirely by the active AI agent using its own intelligence and the existing `kirograph_mem_search` tool.
+2. **Skill files** (Kiro only) — when recurring procedures are detected, individual `inclusion: manual` steering files are written to `.kiro/steering/watchmen-<slug>.md`. Each file has trigger phrases and numbered steps and can be loaded on demand by the agent. Files from previous synthesis runs are automatically pruned when patterns change.
+
+3. **Summary observation** — a `kind: 'summary'` observation is stored to mark the synthesis and reset the counter. The watermark is the timestamp of the last summary — no separate state file needed.
 
 ```json
 {
   "enableMemory": true,
   "enableWatchmen": true,
-  "watchmenThreshold": 5
+  "watchmenThreshold": 5,
+  "watchmenSynthesisMode": "local",
+  "watchmenLocalModel": "onnx-community/gemma-4-E4B-it-ONNX"
 }
 ```
 

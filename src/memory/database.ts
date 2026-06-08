@@ -95,6 +95,31 @@ export class MemoryDatabase {
     return row?.count ?? 0;
   }
 
+  getObservationsSinceLastSummary(limit = 50): MemObservation[] {
+    const lastSummary = this.db.get(
+      `SELECT created_at FROM mem_observations WHERE kind = 'summary' ORDER BY created_at DESC LIMIT 1`
+    ) as { created_at: number } | undefined;
+
+    const since = lastSummary?.created_at ?? 0;
+    const rows = this.db.all(
+      `SELECT * FROM mem_observations WHERE kind != 'summary' AND created_at > ?
+       ORDER BY created_at DESC LIMIT ?`,
+      [since, limit]
+    ) as any[];
+
+    return rows.map(row => ({
+      id: row.id,
+      sessionId: row.session_id ?? undefined,
+      content: row.content,
+      contentRaw: row.content_raw ?? undefined,
+      contentHash: row.content_hash,
+      kind: row.kind,
+      source: row.source,
+      tags: row.tags ? JSON.parse(row.tags) : undefined,
+      createdAt: row.created_at,
+    }));
+  }
+
   // ── Sessions ─────────────────────────────────────────────────────────────
 
   /**

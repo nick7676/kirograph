@@ -128,12 +128,23 @@ export function register(program: Command): void {
       const mem = new MemoryManager(config, db.getRawDb());
       mem.initialize();
 
-      const id = await mem.store({ content: text, kind: opts.kind as any, source: 'manual' });
+      const result = await mem.store({ content: text, kind: opts.kind as any, source: 'manual' });
 
-      if (id) {
-        console.log(`  ✓ Stored observation ${dim}${id}${reset} [${violet}${opts.kind}${reset}]`);
-      } else {
+      if (!result) {
         console.log(`  ${dim}Duplicate observation — already stored.${reset}`);
+      } else if (typeof result === 'object' && result.watchmenReady) {
+        console.log(`  ✓ Stored observation ${dim}${result.id}${reset} [${violet}${opts.kind}${reset}]`);
+        console.log(`\n  ${violet}⚡ Watchmen ready${reset} — ${result.pendingCount} observations since last synthesis`);
+        console.log(`  Target files:`);
+        for (const f of result.targetFiles) {
+          console.log(`    ${dim}·${reset} ${f}`);
+        }
+        if (result.skillTargetDir) {
+          console.log(`  Skill dir:    ${dim}${result.skillTargetDir}/watchmen-<slug>.md${reset} (inclusion: manual)`);
+        }
+        console.log(`\n  ${dim}Run synthesis manually or let the agentStop hook handle it.${reset}`);
+      } else {
+        console.log(`  ✓ Stored observation ${dim}${result}${reset} [${violet}${opts.kind}${reset}]`);
       }
 
       cg.close();
@@ -545,6 +556,83 @@ export function register(program: Command): void {
     });
 
   watchmen
+    .command('synthesize')
+    .description('Run local model synthesis immediately (requires watchmenSynthesisMode: local)')
+    .option('--force', 'Run even if below threshold')
+    .option('--quiet', 'Suppress output (used by runCommand hook)')
+    .action(async (opts: { force?: boolean; quiet?: boolean }) => {
+      const { MemoryManager } = await import('../../memory/index');
+      const { WatchmenChecker } = await import('../../watchmen/index');
+      const { MemoryDatabase } = await import('../../memory/database');
+      const { runLocalSynthesis } = await import('../../watchmen/synthesize');
+      const { loadConfig } = await import('../../config');
+      const KiroGraph = (await import('../../index')).default;
+
+      const cwd = process.cwd();
+      if (!KiroGraph.isInitialized(cwd)) {
+        if (!opts.quiet) console.error('  ✖ KiroGraph is not initialized.');
+        process.exit(1);
+      }
+      const config = await loadConfig(cwd);
+      if (!config.enableMemory || !config.enableWatchmen) {
+        if (!opts.quiet) console.error('  ✖ Watchmen is not enabled (enableMemory + enableWatchmen required).');
+        process.exit(1);
+      }
+      if (config.watchmenSynthesisMode !== 'local') {
+        if (!opts.quiet) console.error('  ✖ watchmenSynthesisMode is not "local" — use the agent hook instead.');
+        process.exit(1);
+      }
+
+      const cg = await KiroGraph.open(cwd);
+      const db = cg.getDatabase();
+      db.applyMemorySchema();
+      const memDb = new MemoryDatabase(db.getRawDb());
+      memDb.initialize();
+
+      const checker = new WatchmenChecker(config.watchmenThreshold);
+      const { ready, pendingCount } = checker.shouldSynthesize(memDb);
+
+      if (!ready && !opts.force) {
+        if (!opts.quiet) console.log(`  ${dim}Watchmen: ${pendingCount}/${config.watchmenThreshold} observations — threshold not reached.${reset}`);
+        cg.close();
+        return;
+      }
+
+      const observations = memDb.getObservationsSinceLastSummary(50);
+      if (observations.length === 0) {
+        if (!opts.quiet) console.log(`  ${dim}No observations to synthesize.${reset}`);
+        cg.close();
+        return;
+      }
+
+      if (!opts.quiet) {
+        console.log(`\n  ${section('Watchmen Synthesis')}\n`);
+        console.log(`  Synthesizing ${observations.length} observations with ${dim}${config.watchmenLocalModel}${reset}`);
+        const cacheDir = require('path').join(require('os').homedir(), '.kirograph', 'models');
+        const cached = require('fs').existsSync(require('path').join(cacheDir, config.watchmenLocalModel));
+        if (!cached) console.log(`  ${dim}Downloading model — first run only (cached in ~/.kirograph/models/)${reset}`);
+        console.log('');
+      }
+
+      const readyResult = checker.buildReadyResponse('', pendingCount, cwd);
+      const result = await runLocalSynthesis(observations, readyResult, config.watchmenLocalModel, cwd, !!opts.quiet);
+
+      // Store summary observation to reset counter
+      const mgr = new MemoryManager(config, db.getRawDb(), cwd);
+      mgr.initialize();
+      await mgr.store({ content: result.summaryObservation, kind: 'summary', source: 'agent' });
+
+      if (!opts.quiet) {
+        if (result.filesWritten.length) console.log(`  ✓ Brief written to: ${result.filesWritten.map(f => violet + f + reset).join(', ')}`);
+        if (result.skillsWritten.length) console.log(`  ✓ Skills written:   ${result.skillsWritten.map(f => violet + f + reset).join(', ')}`);
+        if (result.skillsPruned.length)  console.log(`  ${dim}✗ Pruned stale:     ${result.skillsPruned.join(', ')}${reset}`);
+        console.log('');
+      }
+
+      cg.close();
+    });
+
+  watchmen
     .command('reset')
     .description('Store a summary observation to reset the synthesis counter without running synthesis')
     .action(async () => {
@@ -574,7 +662,7 @@ export function register(program: Command): void {
       mgr.initialize();
 
       // Bypass watchmen check by storing directly as summary
-      const id = await mgr.store({ content: 'Watchmen counter reset manually via CLI.', kind: 'summary', source: 'manual' });
+      const id = await mgr.store({ content: `Watchmen counter reset manually via CLI at ${new Date().toISOString()}.`, kind: 'summary', source: 'manual' });
       if (id) {
         console.log(`  ✓ Counter reset — pending observations set back to 0`);
       } else {

@@ -99,6 +99,13 @@ export interface WatchmenReadyResult {
   message: string;
   /** Project-relative paths to write the workspace brief to. */
   targetFiles: string[];
+  /**
+   * Present when Kiro is detected (.kiro/ exists). Path to the steering
+   * directory where individual skill files should be written as separate
+   * `inclusion: manual` files (e.g. `.kiro/steering/watchmen-<slug>.md`).
+   * Absent for all other tools — embed procedures in the brief instead.
+   */
+  skillTargetDir?: string;
 }
 
 // ── Compress ─────────────────────────────────────────────────────────────────

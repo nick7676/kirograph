@@ -71,6 +71,7 @@
     <div class="sidebar-section">
       <div class="sidebar-heading">Advanced</div>
       <a href="#memory" class="sidebar-link">Memory</a>
+      <a href="#watchmen" class="sidebar-link" style="padding-left:1.5rem;">↳ Watchmen</a>
       <a href="#documentation" class="sidebar-link">Documentation</a>
       <a href="#data" class="sidebar-link">Data</a>
       <a href="#security" class="sidebar-link">Security</a>
@@ -979,6 +980,65 @@ kirograph mem export --format jsonl</code></pre>
 
     <h3>Privacy</h3>
     <p>Wrap sensitive content in <code>&lt;private&gt;...&lt;/private&gt;</code> blocks — they are stripped before storage. All data stays in the local <code>.kirograph/kirograph.db</code> file, same as the rest of the graph.</p>
+
+    <!-- ── Watchmen ── -->
+    <h2 id="watchmen">Watchmen (opt-in) <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.4);padding:0.15rem 0.5rem;border-radius:4px;vertical-align:middle;">experimental</span></h2>
+
+    <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/watchmen.png" alt="KiroGraph Watchmen" style="border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1.5rem; max-width: 100%;">
+
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.35);border-radius:var(--radius);padding:0.9rem 1.1rem;margin-bottom:1.25rem;font-size:0.9rem;">
+      <strong>⚠ Experimental feature.</strong> Output quality in local synthesis mode varies significantly depending on the model chosen and the hardware it runs on. Smaller or heavily quantized models may produce incomplete briefs or lower-quality skill files. Inference time also depends on your machine — expect 8–15 s on Apple Silicon M1+ and 30–60 s on Intel CPU with the default model. Use <code>watchmenSynthesisMode: 'agent'</code> on Kiro for best results, or choose a larger model if local quality matters.
+    </div>
+
+    <p>When <code>enableWatchmen: true</code> is set (requires <code>enableMemory: true</code>), KiroGraph automatically synthesizes accumulated memory observations into workspace brief files. When the observation count since the last synthesis reaches <code>watchmenThreshold</code> (default: 5), <code>kirograph_mem_store</code> returns a <code>watchmenReady</code> signal. Inspired by <a href="https://github.com/firstbatchxyz/watchmen" target="_blank" rel="noopener">watchmen</a> by <a href="https://github.com/firstbatchxyz" target="_blank" rel="noopener">firstbatch</a>.</p>
+
+    <p>Synthesis is performed by a local HuggingFace model (<code>watchmenSynthesisMode: 'local'</code>, default) or delegated to the active AI agent (<code>'agent'</code>, Kiro only, consumes tokens).</p>
+
+    <h3>Local model</h3>
+    <p>The default mode uses <code>onnx-community/gemma-4-E4B-it-ONNX</code> via <code>@huggingface/transformers</code> (ONNX Runtime). The model is downloaded once to <code>~/.kirograph/models/</code> alongside the embedding model — the same cache directory, no extra setup.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Download</td><td>~3–4 GB one-time</td></tr>
+          <tr><td>RAM during inference</td><td>~3–5 GB</td></tr>
+          <tr><td>Speed on Apple Silicon (M1+)</td><td>8–15 seconds (CoreML acceleration via ONNX Runtime)</td></tr>
+          <tr><td>Speed on Intel CPU</td><td>30–60 seconds</td></tr>
+          <tr><td>When it runs</td><td>Only at <code>agentStop</code> when threshold is reached — not a persistent process</td></tr>
+          <tr><td>API key required</td><td>No</td></tr>
+          <tr><td>Data leaves machine</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Output per tool</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>File written</th></tr></thead>
+        <tbody>
+          <tr><td>Kiro</td><td><code>.kiro/steering/kirograph-watchmen.md</code> (<code>inclusion: always</code>) + individual <code>watchmen-&lt;slug&gt;.md</code> skill files (<code>inclusion: manual</code>)</td></tr>
+          <tr><td>Claude Code</td><td><code>CLAUDE.md</code> (upserts <code>## KiroGraph Watchmen</code> block)</td></tr>
+          <tr><td>Codex, Copilot CLI, Devin, Goose, Warp, Roo, OpenHands, Replit, Junie</td><td><code>AGENTS.md</code></td></tr>
+          <tr><td>Gemini CLI / AntiGravity</td><td><code>GEMINI.md</code></td></tr>
+          <tr><td>Aider</td><td><code>CONVENTIONS.md</code></td></tr>
+          <tr><td>Augment</td><td><code>augment-guidelines.md</code></td></tr>
+          <tr><td>Rules-based tools (Cursor, Cline, Windsurf…)</td><td><code>AGENTS.md</code> fallback</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Configuration</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>enableWatchmen</code></td><td>boolean</td><td><code>false</code></td><td>Enable Watchmen. Requires <code>enableMemory: true</code>.</td></tr>
+          <tr><td><code>watchmenThreshold</code></td><td>number</td><td><code>5</code></td><td>Minimum new observations before <code>watchmenReady</code> fires.</td></tr>
+          <tr><td><code>watchmenSynthesisMode</code></td><td>string</td><td><code>'local'</code></td><td><code>'local'</code> — runs a local HuggingFace model on-device (no API key, no external calls); <code>'agent'</code> — delegates to the active AI agent via <code>askAgent</code> hook (Kiro only, consumes tokens).</td></tr>
+          <tr><td><code>watchmenLocalModel</code></td><td>string</td><td><code>'onnx-community/gemma-4-E4B-it-ONNX'</code></td><td>HuggingFace model ID for local synthesis. Downloaded once to <code>~/.kirograph/models/</code>. ~3–4 GB, ~3–5 GB RAM at inference, 8–15 s on Apple Silicon. Only used when <code>watchmenSynthesisMode: 'local'</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- ── Documentation ── -->
     <h2 id="documentation">Documentation (opt-in)</h2>

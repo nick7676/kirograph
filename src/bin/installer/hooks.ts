@@ -10,6 +10,36 @@ import { logWarn } from '../../errors';
 
 const HOOK_EXT = '.kiro.hook';
 
+// ── Hook builders ─────────────────────────────────────────────────────────────
+
+function buildWatchmenHook(synthesisMode: 'local' | 'agent'): object {
+  if (synthesisMode === 'local') {
+    return {
+      name: 'KiroGraph Watchmen',
+      version: '1.0.0',
+      description: 'After memory capture, run local model synthesis if enough observations have accumulated.',
+      when: { type: 'agentStop' },
+      then: { type: 'runCommand', command: 'kirograph mem watchmen synthesize --quiet 2>&1 || true' },
+    };
+  }
+  return {
+    name: 'KiroGraph Watchmen',
+    version: '1.0.0',
+    description: 'After memory capture, check if enough observations have accumulated. If so, synthesize them into workspace brief files.',
+    when: { type: 'agentStop' },
+    then: {
+      type: 'askAgent',
+      prompt: `Check if KiroGraph Watchmen synthesis should run: call kirograph_mem_store with kind='note' and content='watchmen check'. If the response does not include watchmenReady: true, do nothing and stop.
+
+If watchmenReady: true:
+1. Call kirograph_mem_search for each kind (decision, error, pattern, architecture, note) with limit 20.
+2. Write or update the workspace brief: upsert the ## KiroGraph Watchmen section in each file listed in targetFiles. For .kiro/steering/kirograph-watchmen.md use inclusion: always frontmatter with sections for Decisions, Known Errors & Fixes, Recurring Patterns, and Architecture Notes. For all other files write a compact ## KiroGraph Watchmen block.
+3. Generate skill files: if skillTargetDir is present in the response, identify recurring procedures (any procedure appearing in 3+ observations). For each, write a .kiro/steering/watchmen-<slug>.md file with inclusion: manual frontmatter, a short title, a "When to use" line with trigger phrases, and numbered steps. Prefix all generated files with watchmen- so they are distinguishable from hand-written steering files. Remove any .kiro/steering/watchmen-*.md files from previous runs that no longer match current patterns. If skillTargetDir is absent, embed a ## Recurring Procedures section in each targetFile instead, listing each procedure with trigger context and steps.
+4. Store a kind='summary' observation briefly describing what was synthesized (e.g. "Synthesized 8 observations: updated kirograph-watchmen.md, wrote watchmen-auth-flow.md and watchmen-test-pattern.md").`,
+    },
+  };
+}
+
 const HOOKS: Array<{ filename: string; hook: object }> = [
   {
     filename: `kirograph-sync-if-dirty${HOOK_EXT}`,
@@ -44,19 +74,6 @@ const HOOKS: Array<{ filename: string; hook: object }> = [
       then: {
         type: 'askAgent',
         prompt: 'Before ending, review what happened in this session. If there were any important decisions, bug root causes, architecture insights, error patterns, or lessons learned, store them using kirograph_mem_store with the appropriate kind (decision, error, pattern, architecture, note). Keep observations concise — one fact per observation. Skip if nothing noteworthy happened.',
-      },
-    },
-  },
-  {
-    filename: `kirograph-watchmen${HOOK_EXT}`,
-    hook: {
-      name: 'KiroGraph Watchmen',
-      version: '1.0.0',
-      description: 'After memory capture, check if enough observations have accumulated. If so, synthesize them into workspace brief files.',
-      when: { type: 'agentStop' },
-      then: {
-        type: 'askAgent',
-        prompt: 'Check if KiroGraph Watchmen synthesis should run: call kirograph_mem_store with kind=\'note\' and content=\'watchmen check\'. If the response includes watchmenReady: true, proceed with synthesis: call kirograph_mem_search for each kind (decision, error, pattern, architecture, note) with limit 20, identify recurring patterns and important context, then write or update the ## KiroGraph Watchmen section in each file listed in the targetFiles array of the response. For .kiro/steering/kirograph-watchmen.md use inclusion: always frontmatter and a full structured brief. For all other files upsert the ## KiroGraph Watchmen block. Finally store a kind=\'summary\' observation describing what was synthesized. If watchmenReady is not in the response, do nothing.',
       },
     },
   },
@@ -123,7 +140,7 @@ function migrateOnIdleHooks(hooksDir: string): void {
 
 // ── Public ────────────────────────────────────────────────────────────────────
 
-export function writeHooks(kiroDir: string, opts?: { enableCompression?: boolean; enableMemory?: boolean; enableWatchmen?: boolean }): void {
+export function writeHooks(kiroDir: string, opts?: { enableCompression?: boolean; enableMemory?: boolean; enableWatchmen?: boolean; watchmenSynthesisMode?: 'local' | 'agent' }): void {
   const hooksDir = path.join(kiroDir, 'hooks');
   ensureDir(hooksDir);
 
@@ -158,13 +175,16 @@ export function writeHooks(kiroDir: string, opts?: { enableCompression?: boolean
       if (fs.existsSync(p)) fs.unlinkSync(p);
       continue;
     }
-    // Skip watchmen hook if watchmen is disabled
-    if (filename === `kirograph-watchmen${HOOK_EXT}` && !opts?.enableWatchmen) {
-      const p = path.join(hooksDir, filename);
-      if (fs.existsSync(p)) fs.unlinkSync(p);
-      continue;
-    }
     writeJson(path.join(hooksDir, filename), hook);
+  }
+
+  // Watchmen hook — built dynamically based on synthesis mode
+  const watchmenHookPath = path.join(hooksDir, `kirograph-watchmen${HOOK_EXT}`);
+  if (opts?.enableWatchmen) {
+    const mode = opts.watchmenSynthesisMode ?? 'local';
+    writeJson(watchmenHookPath, buildWatchmenHook(mode));
+  } else {
+    if (fs.existsSync(watchmenHookPath)) fs.unlinkSync(watchmenHookPath);
   }
 
   console.log(`  ✓ Auto-sync hooks written to ${hooksDir}`);

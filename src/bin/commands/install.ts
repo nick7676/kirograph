@@ -14,8 +14,9 @@ export function register(program: Command): void {
     .description('Configure KiroGraph for an agent workspace')
     .option('--target <target>', `Integration target: ${INSTALL_TARGETS.join(', ')}`)
     .option('--all', 'Install for all auto-detected platforms without prompting')
+    .option('--yes', 'Skip confirmation prompts and use existing config (non-interactive mode)')
     .option('--dry-run', 'Show what would be written without making changes')
-    .action(async (opts: { target?: string; all?: boolean; dryRun?: boolean }) => {
+    .action(async (opts: { target?: string; all?: boolean; yes?: boolean; dryRun?: boolean }) => {
       if (opts.target) {
         // Explicit target: validate and install
         const target = opts.target.toLowerCase();
@@ -30,7 +31,7 @@ export function register(program: Command): void {
           await runAutoDetectInstaller({ skipPrompt: true, dryRun: opts.dryRun });
         } else {
           const { runInstaller } = await import('../installer/index');
-          await runInstaller(target as any);
+          await runInstaller(target as any, { yes: opts.yes });
         }
       } else if (opts.all) {
         // --all flag: auto-detect and install all without prompting
@@ -61,7 +62,7 @@ export function register(program: Command): void {
         } else {
           // Default to Kiro (choice === '1' or Enter)
           const { runInstaller } = await import('../installer/index');
-          await runInstaller('kiro');
+          await runInstaller('kiro', { yes: opts.yes });
         }
       }
     });

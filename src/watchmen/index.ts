@@ -33,18 +33,33 @@ export class WatchmenChecker {
 
   buildReadyResponse(id: string, pendingCount: number, projectRoot: string): WatchmenReadyResult {
     const targetFiles = this.resolveTargetFiles(projectRoot);
+    const hasKiro = fs.existsSync(path.join(projectRoot, '.kiro'));
+    const skillTargetDir = hasKiro ? '.kiro/steering' : undefined;
+
+    const skillInstructions = skillTargetDir
+      ? `For each recurring procedure (appearing in 3+ observations): write a separate ` +
+        `\`.kiro/steering/watchmen-<slug>.md\` file with \`inclusion: manual\` frontmatter, ` +
+        `a short title, trigger phrases (when to load this skill), and numbered steps. ` +
+        `Use \`watchmen-\` prefix so auto-generated skills are distinguishable. ` +
+        `Delete any \`.kiro/steering/watchmen-*.md\` files from previous runs that no ` +
+        `longer reflect current patterns.`
+      : `Embed a ## Recurring Procedures section in each file in targetFiles listing ` +
+        `each identified recurring procedure with trigger context and numbered steps.`;
+
     return {
       id,
       watchmenReady: true,
       pendingCount,
       message:
         `${pendingCount} new observations since last synthesis. ` +
-        `Synthesize now: call kirograph_mem_search for each kind ` +
-        `(decision, error, pattern, architecture, note), identify recurring ` +
-        `patterns and procedures, write or update the ## KiroGraph Watchmen ` +
-        `section in each file listed in targetFiles, then store a ` +
-        `kind='summary' observation to mark completion.`,
+        `Synthesize now: (1) call kirograph_mem_search for each kind ` +
+        `(decision, error, pattern, architecture, note) with limit 20, ` +
+        `(2) write or update the workspace brief (## KiroGraph Watchmen section) ` +
+        `in each file in targetFiles covering decisions, errors, patterns, and ` +
+        `architecture notes, (3) identify recurring procedures: ${skillInstructions} ` +
+        `(4) store a kind='summary' observation to mark completion.`,
       targetFiles,
+      ...(skillTargetDir !== undefined ? { skillTargetDir } : {}),
     };
   }
 
