@@ -20,8 +20,10 @@ KiroGraph stores its config in `.kirograph/config.json`. You can edit it directl
 | `enableEmbeddings` | boolean | `false` | Generate semantic embeddings (opt-in) |
 | `embeddingModel` | string | `nomic-ai/nomic-embed-text-v1.5` | HuggingFace `feature-extraction` model ID |
 | `embeddingDim` | number | `768` | Output dimension of the chosen embedding model |
-| `semanticEngine` | string | `cosine` | Engine: `cosine`, `sqlite-vec`, `orama`, `pglite`, `lancedb`, `qdrant`, `typesense` |
+| `semanticEngine` | string | `cosine` | Engine: `cosine`, `turboquant`, `sqlite-vec`, `orama`, `pglite`, `lancedb`, `qdrant`, `typesense` |
 | `useVecIndex` | boolean | `false` | Deprecated alias for `semanticEngine: "sqlite-vec"` |
+| `turboquantMemDocs` | boolean | `false` | Use TurboQuant ANN index for memory observation and doc section search (requires `turboquant-js`) |
+| `turboquantBits` | number | `3` | TurboQuant bits per coordinate (1–8). Controls compression/quality tradeoff. Changing this requires `kirograph index --force`. |
 | `typesenseDashboard` | boolean | `false` | Open Typesense dashboard after indexing |
 | `qdrantDashboard` | boolean | `false` | Open Qdrant dashboard after indexing |
 | **Architecture** | | | |
@@ -103,6 +105,20 @@ This generates vector embeddings for all functions, methods, classes, interfaces
 Switching models requires a full re-index (`kirograph index --force`).
 
 ### Semantic Engines
+
+#### turboquant
+
+ANN index powered by [turboquant-js](https://github.com/danilodevhub/turboquant-js), a TypeScript implementation of [Google's TurboQuant algorithm](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/). **Zero native dependencies.** Compresses each embedding at index time via Walsh-Hadamard rotation + Lloyd-Max scalar quantization.
+
+```json
+{ "enableEmbeddings": true, "semanticEngine": "turboquant" }
+```
+
+```bash
+npm install turboquant-js
+```
+
+A 768-dim `Float32Array` (3,072 bytes) is stored as ~120 bytes at 3 bits — roughly **25× smaller**. Falls back silently to `cosine` if `turboquant-js` is not installed.
 
 #### cosine (default)
 
@@ -189,6 +205,7 @@ npm install typesense
 | Engine | Search type | Extra deps | Native? | Best for |
 |--------|-------------|------------|---------|----------|
 | `cosine` | Exact cosine, linear scan | none | - | Small/medium projects, zero setup |
+| `turboquant` | ANN, sub-linear | `turboquant-js` | no (pure JS) | ANN without native deps, CI/ARM, large codebases with 20–30× RAM savings |
 | `sqlite-vec` | ANN, sub-linear | `better-sqlite3`, `sqlite-vec` | yes | Large codebases, fast ANN |
 | `orama` | Hybrid (FTS + vector) | `@orama/orama`, `@orama/plugin-data-persistence` | no (JS) | Best result quality, no native deps |
 | `pglite` | Hybrid (FTS + vector), exact | `@electric-sql/pglite` | no (WASM) | Exact results, PostgreSQL semantics |
@@ -203,12 +220,115 @@ All non-cosine engines fall back silently to `cosine` if their optional dependen
 | Engine | Graph store | Vector store |
 |--------|-------------|--------------|
 | `cosine` | `kirograph.db` (SQLite) | `kirograph.db` (`vectors` table) |
+| `turboquant` | `kirograph.db` (SQLite) | `.kirograph/turboquant.bin` (+ `turboquant-mem.bin`, `turboquant-doc.bin` if `turboquantMemDocs: true`) |
 | `sqlite-vec` | `kirograph.db` (SQLite) | `.kirograph/vec.db` |
 | `orama` | `kirograph.db` (SQLite) | `.kirograph/orama.json` |
 | `pglite` | `kirograph.db` (SQLite) | `.kirograph/pglite/` |
 | `lancedb` | `kirograph.db` (SQLite) | `.kirograph/lancedb/` |
 | `qdrant` | `kirograph.db` (SQLite) | `.kirograph/qdrant/` |
 | `typesense` | `kirograph.db` (SQLite) | `.kirograph/typesense/` |
+
+---
+
+## TurboQuant
+
+TurboQuant is an optional upgrade that **compresses your vector embeddings at storage time** and replaces the default linear scan with an approximate nearest-neighbour (ANN) index — with **zero native dependencies**.
+
+Built on [turboquant-js](https://github.com/danilodevhub/turboquant-js) by Danilo Dev, a TypeScript implementation of [Google's TurboQuant algorithm](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/). Embeddings are compressed immediately when they are generated:
+
+![KiroGraph TurboQuant](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/turboquant.png)
+
+1. **Random rotation** via Walsh-Hadamard transform with random sign flips in O(d log d). Distributes energy uniformly across all coordinates before quantization.
+2. **Lloyd-Max scalar quantization** per rotated coordinate. Each value is encoded in `turboquantBits` bits (default: 3) using optimal codebooks derived from Beta/Gaussian approximations.
+
+### What gets compressed
+
+A 768-dim `Float32Array` produced by the embedding model is 3,072 bytes (768 × 4). TurboQuant stores it as ~120 bytes at 3 bits — roughly **25× smaller**:
+
+| Vectors | Raw Float32 in RAM | TurboQuant (3 bit) | Reduction |
+|---------|-------------------|-------------------|-----------|
+| 1,000   | ~3 MB             | ~120 KB            | 25×       |
+| 10,000  | ~30 MB            | ~1.2 MB            | 25×       |
+| 100,000 | ~300 MB           | ~12 MB             | 25×       |
+
+The compressed index is the only thing stored on disk (`.kirograph/turboquant.bin`). Raw `Float32` values are **never written to disk or held in RAM** when TurboQuant is active as the code-node engine.
+
+For memory observations and doc sections, the raw Float32 stays in SQLite (needed for re-embedding with a different model), but TurboQuant replaces the bulk RAM load that happens on every search query.
+
+### When to use TurboQuant
+
+| Situation | Recommendation |
+|-----------|---------------|
+| Small project, < 5,000 symbols | `cosine` is fine |
+| Large project, native modules OK | `sqlite-vec` or `lancedb` |
+| Large project, **no native modules** (CI, ARM, restricted env) | **`turboquant`** |
+| Memory or docs search getting slow | `turboquantMemDocs: true` |
+
+### Code node search
+
+```json
+{
+  "enableEmbeddings": true,
+  "semanticEngine": "turboquant"
+}
+```
+
+```bash
+npm install turboquant-js
+```
+
+Each embedding is compressed immediately on `kirograph index`. The index is serialized to `.kirograph/turboquant.bin` at the end of indexing and reloaded in milliseconds on startup. Falls back silently to `cosine` if `turboquant-js` is not installed.
+
+### Memory and doc section search
+
+`MemoryVectorManager` and `DocsVectorManager` always use an implicit linear cosine scan regardless of `semanticEngine`. Enable TurboQuant independently for them:
+
+```json
+{
+  "turboquantMemDocs": true
+}
+```
+
+This replaces the O(n) bulk RAM load on every query:
+- **Memory** (`kirograph_mem_search`, `kirograph_mem_context`) → `.kirograph/turboquant-mem.bin`
+- **Docs** (`kirograph_docs_search`) → `.kirograph/turboquant-doc.bin`
+
+Can be combined with any code-node engine:
+
+```json
+{
+  "enableEmbeddings": true,
+  "semanticEngine": "cosine",
+  "turboquantMemDocs": true
+}
+```
+
+### Compression tuning
+
+The `turboquantBits` field (default: `3`, range: `1–8`) controls the quality/compression tradeoff:
+
+| Bits | Compression | Recall quality | Best for |
+|------|-------------|----------------|----------|
+| `1`  | ~100×       | low            | extreme memory constraints |
+| `3`  | ~25×        | good (default) | balanced |
+| `4`  | ~20×        | better         | more recall needed |
+| `8`  | ~8×         | high           | near-exact results |
+
+```json
+{ "turboquantBits": 4 }
+```
+
+Changing `turboquantBits` invalidates the existing `.bin` files — run `kirograph index --force` to rebuild.
+
+### Storage
+
+| Context | File | Estimated size (10K vectors, 768 dim, 3 bit) |
+|---------|------|----------------------------------------------|
+| Code nodes | `.kirograph/turboquant.bin` | ~1.2 MB |
+| Memory | `.kirograph/turboquant-mem.bin` | ~1.2 MB |
+| Docs | `.kirograph/turboquant-doc.bin` | ~1.2 MB |
+
+Delete any `.bin` file to force a full rebuild on the next index run.
 
 ---
 

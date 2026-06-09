@@ -66,7 +66,8 @@ export class DocsIndexer {
     if (this.config.enableEmbeddings) {
       try {
         opts?.onProgress?.('docs: embedding sections');
-        const vectorMgr = new DocsVectorManager(this.config, this.db);
+        const kirographDir = path.join(this.projectRoot, '.kirograph');
+        const vectorMgr = new DocsVectorManager(this.config, this.db, kirographDir);
         const allSections = this.db.all('SELECT * FROM doc_sections ORDER BY file_path, position') as any[];
         const sections: DocSection[] = allSections.map((row: any) => ({
           id: row.id,

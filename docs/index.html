@@ -128,7 +128,7 @@
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Persistent memory</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td></tr>
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Documentation indexing</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Shell + prose compression</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">7 semantic engines</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">8 semantic engines</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
           <tr><td style="padding: 0.5rem 0.6rem;">Multi-platform (34 targets)</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;">7</td><td style="padding:0.5rem;text-align:center;">13</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;">any</td><td style="padding:0.5rem;text-align:center;">28+</td></tr>
         </tbody>
       </table>
@@ -219,7 +219,16 @@
       <div class="card">
         <span class="card-icon"><i data-lucide="search"></i></span>
         <h3>Semantic Search</h3>
-        <p>Opt-in embedding-based search with configurable models and seven pluggable engines: cosine, sqlite-vec, orama, pglite, lancedb, qdrant, typesense.</p>
+        <p>Opt-in embedding-based search with configurable models and eight pluggable engines: cosine, turboquant, sqlite-vec, orama, pglite, lancedb, qdrant, typesense.</p>
+      </div>
+
+      <div class="card">
+        <span class="card-icon">🗜️</span>
+        <h3>TurboQuant Compression</h3>
+        <p>Compresses embeddings <strong>20–30×</strong> at index time using <a href="https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/" target="_blank" rel="noopener">Google's TurboQuant algorithm</a> (Walsh-Hadamard rotation + Lloyd-Max quantization). A 768-dim <code>Float32</code> vector (3,072 bytes) becomes ~120 bytes — 300 MB of raw embeddings shrinks to ~12 MB in RAM. ANN search with <strong>zero native dependencies</strong>, pure TypeScript. Powered by <a href="https://github.com/danilodevhub/turboquant-js" target="_blank" rel="noopener">turboquant-js</a> by Danilo Dev.</p>
+        <div class="card-media">
+          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/turboquant.png" alt="KiroGraph TurboQuant compression stats">
+        </div>
       </div>
 
       <div class="card">
@@ -404,7 +413,7 @@
   <div class="container">
     <div class="section-header">
       <span class="label">Semantic Search</span>
-      <h2>Seven pluggable vector engines</h2>
+      <h2>Eight pluggable vector engines</h2>
       <p>Enable embeddings for natural-language search. Choose the engine that fits your project size and constraints; all fall back gracefully if deps are missing.</p>
     </div>
 
@@ -413,6 +422,7 @@
         <thead><tr><th>Engine</th><th>Search type</th><th>Native deps?</th><th>Best for</th></tr></thead>
         <tbody>
           <tr><td><code>cosine</code> <em>(default)</em></td><td>Exact cosine, linear scan</td><td>None</td><td>Small/medium projects, zero setup</td></tr>
+          <tr><td><code>turboquant</code></td><td>ANN, sub-linear</td><td>No (pure JS)</td><td>Large codebases, 20–30× RAM savings, no native deps</td></tr>
           <tr><td><code>sqlite-vec</code></td><td>ANN, sub-linear</td><td>Yes</td><td>Large codebases, fast ANN</td></tr>
           <tr><td><code>orama</code></td><td>Hybrid (full-text + vector)</td><td>No (pure JS)</td><td>Best result quality, no native deps</td></tr>
           <tr><td><code>pglite</code></td><td>Hybrid, exact (WASM pgvector)</td><td>No (WASM)</td><td>Exact results, PostgreSQL semantics</td></tr>

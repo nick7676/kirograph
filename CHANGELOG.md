@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.21.0] - 2026-06-09: TurboQuant embedding compression
+
+### Added
+
+- **TurboQuant semantic engine** (`"semanticEngine": "turboquant"`): 8th vector search engine powered by [turboquant-js](https://github.com/danilodevhub/turboquant-js) by Danilo Dev — a TypeScript implementation of [Google's TurboQuant algorithm](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/). **Zero native dependencies** (pure TypeScript, works in CI, ARM, and restricted environments). **Compresses embeddings at index time**: each 768-dim `Float32Array` (3,072 bytes) is reduced to ~120 bytes via Walsh-Hadamard rotation + Lloyd-Max scalar quantization (~25× at the default 3 bits). 100K symbols: ~300 MB raw → ~12 MB compressed. No raw `Float32` values are written to disk or held in RAM when turboquant is active — the compressed ANN index (`.kirograph/turboquant.bin`) is the only artifact. Loaded from binary in milliseconds on startup. Falls back silently to `cosine` if `turboquant-js` is not installed. Optional dep: `npm install turboquant-js`.
+
+- **`turboquantMemDocs` config field** (boolean, default `false`): applies TurboQuant compression and ANN indexing to memory observations and doc section search. Replaces the O(n) linear cosine scan that loads all raw Float32 vectors from SQLite into RAM on every query. Serializes to `.kirograph/turboquant-mem.bin` and `.kirograph/turboquant-doc.bin`. Works independently of `semanticEngine`.
+
+- **`turboquantBits` config field** (number, default `3`, range `1–8`): controls the compression/quality tradeoff. Changing this field requires `kirograph index --force`.
+
+- **`kirograph status` compression stats**: when TurboQuant is active, shows compression ratio, bits per vector, raw → compressed size, and total RAM saved across code nodes, memory, and docs.
+
+- **`kirograph gain` TurboQuant row**: shows total embeddings compressed and MB saved in the "By source" breakdown. Reads from `.kirograph/turboquant-stats.json` without loading the index.
+
+- **Installer**: `turboquant` appears as the 2nd engine choice in `kirograph install` (after `cosine`, before `sqlite-vec`), with a clear note on zero native deps and compression. When `cosine` or `turboquant` is chosen, a follow-up prompt offers TurboQuant for memory and doc search (`turboquantMemDocs`).
+
 ## [0.20.0] - 2026-06-08: KiroGraph-Watchmen *(experimental)*
 
 > ⚠️ **Experimental feature.** Output quality in local synthesis mode depends heavily on the model used and the hardware it runs on. Smaller or quantized models may produce incomplete briefs and lower-quality skill files. Use `watchmenSynthesisMode: 'agent'` for best results on Kiro.

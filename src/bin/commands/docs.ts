@@ -377,7 +377,8 @@ export function register(program: Command): void {
 
       console.log(`  ${dim}Re-embedding ${sections.length} doc sections...${reset}`);
       const { DocsVectorManager } = await import('../../docs/vectors');
-      const vectorMgr = new DocsVectorManager(config, rawDb);
+      const kirographDir = require('path').join(cwd, '.kirograph');
+      const vectorMgr = new DocsVectorManager(config, rawDb, kirographDir);
       const embedded = await vectorMgr.reembed();
       console.log(`  ${green}✓${reset} Embedded ${value(String(embedded))} doc sections with model ${dim}${config.embeddingModel}${reset}`);
       cg.close();

@@ -118,7 +118,8 @@ export class DocsQueries {
     // Vector search (if embeddings enabled)
     if (this.config?.enableEmbeddings) {
       try {
-        const vectorMgr = new DocsVectorManager(this.config, this.db);
+        const kirographDir = path.join(this.projectRoot, '.kirograph');
+        const vectorMgr = new DocsVectorManager(this.config, this.db, kirographDir);
         const vectorResults = await vectorMgr.search(query, limit);
 
         if (vectorResults.length > 0) {

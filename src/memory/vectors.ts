@@ -9,6 +9,7 @@ import type { KiroGraphConfig } from '../config';
 import type { MemObservation, ScoredObservation } from './types';
 import type { MemoryDatabase } from './database';
 import { logDebug, logWarn, logError } from '../errors';
+import { TurboQuantIndex, writeTurboQuantStats } from '../vectors/turboquant-index';
 
 const MAX_TOKEN_CHARS = 2000;
 
@@ -69,15 +70,33 @@ export class MemoryVectorManager {
   private memDb: MemoryDatabase;
   private modelName: string;
   private cacheDir: string;
+  private tqIndex: TurboQuantIndex | null = null;
+  private tqInitialized = false;
 
-  constructor(config: KiroGraphConfig, memDb: MemoryDatabase) {
+  constructor(config: KiroGraphConfig, memDb: MemoryDatabase, kirographDir?: string) {
     this.config = config;
     this.memDb = memDb;
     this.modelName = (config as any).embeddingModel ?? 'nomic-ai/nomic-embed-text-v1.5';
 
     const { homedir } = require('os');
-    const path = require('path');
-    this.cacheDir = path.join(homedir(), '.kirograph', 'models');
+    const pathMod = require('path');
+    this.cacheDir = pathMod.join(homedir(), '.kirograph', 'models');
+
+    if (kirographDir && (config as any).turboquantMemDocs) {
+      const bits = (config as any).turboquantBits ?? 3;
+      const dim = (config as any).embeddingDim ?? 768;
+      this.tqIndex = new TurboQuantIndex(kirographDir, 'turboquant-mem.bin', dim, bits);
+      this._kirographDir = kirographDir;
+    }
+  }
+
+  private _kirographDir: string | undefined;
+
+  /** Lazily initialize the TurboQuant index on first use. */
+  private async ensureTQReady(): Promise<void> {
+    if (this.tqInitialized) return;
+    this.tqInitialized = true;
+    if (this.tqIndex) await this.tqIndex.initialize();
   }
 
   /**
@@ -99,6 +118,10 @@ export class MemoryVectorManager {
       if (embedding) {
         const buffer = Buffer.from(embedding.buffer);
         this.memDb.insertVector(obs.id, buffer, this.modelName);
+        if (this.tqIndex) {
+          await this.ensureTQReady();
+          this.tqIndex.upsert(obs.id, embedding);
+        }
       }
     } catch (err) {
       logWarn(`Failed to embed observation ${obs.id}: ${err}`);
@@ -134,31 +157,38 @@ export class MemoryVectorManager {
       const queryEmbedding = await this.embed(query);
       if (!queryEmbedding) return [];
 
-      // Get all vectors with matching model
-      const allVectors = this.memDb.getAllVectors(this.modelName);
-      if (allVectors.length === 0) return [];
-
-      // Compute cosine similarity for each
-      const scored: Array<{ observationId: string; score: number }> = [];
-      for (const { observationId, embedding } of allVectors) {
-        const vec = new Float32Array(embedding.buffer, embedding.byteOffset, embedding.byteLength / 4);
-        const score = cosine(queryEmbedding, vec);
-        scored.push({ observationId, score });
-      }
-
-      // Sort by score descending, take top N
-      scored.sort((a, b) => b.score - a.score);
-      const topN = scored.slice(0, limit);
-
-      // Fetch full observations
-      const results: ScoredObservation[] = [];
-      for (const { observationId, score } of topN) {
-        const obs = this.memDb.getObservation(observationId);
-        if (obs) {
-          results.push({ observation: obs, score, scoreSource: 'vector' });
+      // ANN path: TurboQuant index replaces the O(n) linear scan
+      if (this.tqIndex) {
+        await this.ensureTQReady();
+        if (this.tqIndex.isAvailable()) {
+          const hits = this.tqIndex.searchWithScores(queryEmbedding, limit);
+          const results: ScoredObservation[] = [];
+          for (const { id, score } of hits) {
+            const obs = this.memDb.getObservation(id);
+            if (obs) results.push({ observation: obs, score, scoreSource: 'vector' });
+          }
+          return results;
         }
       }
 
+      // Fallback: linear cosine scan over all stored embeddings
+      const allVectors = this.memDb.getAllVectors(this.modelName);
+      if (allVectors.length === 0) return [];
+
+      const scored: Array<{ observationId: string; score: number }> = [];
+      for (const { observationId, embedding } of allVectors) {
+        const vec = new Float32Array(embedding.buffer, embedding.byteOffset, embedding.byteLength / 4);
+        scored.push({ observationId, score: cosine(queryEmbedding, vec) });
+      }
+
+      scored.sort((a, b) => b.score - a.score);
+      const topN = scored.slice(0, limit);
+
+      const results: ScoredObservation[] = [];
+      for (const { observationId, score } of topN) {
+        const obs = this.memDb.getObservation(observationId);
+        if (obs) results.push({ observation: obs, score, scoreSource: 'vector' });
+      }
       return results;
     } catch (err) {
       logError('Memory vector search failed', { error: err });
@@ -180,6 +210,12 @@ export class MemoryVectorManager {
     // Delete all existing vectors
     this.memDb.deleteVectors();
 
+    // Reset TurboQuant index so it rebuilds from scratch
+    if (this.tqIndex) {
+      this.tqIndex.close();
+      this.tqInitialized = false;
+    }
+
     // Get all observations
     const db = (this.memDb as any).db;
     const rows = db.all('SELECT * FROM mem_observations ORDER BY created_at');
@@ -199,6 +235,19 @@ export class MemoryVectorManager {
     for (let i = 0; i < observations.length; i += batchSize) {
       const batch = observations.slice(i, i + batchSize);
       embedded += await this.embedBatch(batch);
+    }
+
+    if (this.tqIndex?.isAvailable() && this._kirographDir) {
+      await this.tqIndex.save();
+      const stats = this.tqIndex.memoryStats();
+      const dim = (this.config as any).embeddingDim ?? 768;
+      const rawBytes = embedded * dim * 4;
+      writeTurboQuantStats(this._kirographDir, {
+        memEnabled: true,
+        memCount: embedded,
+        memActualBytes: stats.actualBytes,
+        memRawBytes: rawBytes,
+      });
     }
 
     return embedded;

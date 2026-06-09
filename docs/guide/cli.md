@@ -26,6 +26,8 @@ kirograph mark-dirty [path]       # Write a dirty marker for deferred sync
 
 ## Status & Maintenance
 
+![KiroGraph TurboQuant](https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/turboquant.png)
+
 ```bash
 kirograph status [path]           # Show index stats (files, symbols, edges, frameworks)
 kirograph unlock [path]           # Force-release a stale lock file
