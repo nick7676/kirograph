@@ -20,38 +20,38 @@ The result is fewer tool calls, less context used, and faster responses on compl
 
 ## Features
 
-| | Feature | Description |
-|--|---------|-------------|
-| | <h4>Graph & Analysis (KiroGraph-Core)</h4> | |
-| | 🕸️ **Semantic Graph** | tree-sitter AST parsing across 33+ languages — functions, classes, call edges, type hierarchies, all in SQLite |
-| | 🎯 **Context Building** | One tool call returns entry points, related symbols, and code snippets for any task description |
-| | 💥 **Impact Analysis** | Blast-radius traversal before making changes — know what breaks at any depth |
-| | 🧬 **Type Hierarchy** | Traverse inheritance chains — base types, derived types, implementations |
-| | 🔄 **Circular Dependency Detection** | Find import cycles using Tarjan's SCC algorithm |
-| | 💀 **Dead Code Detection** | Find unexported symbols with zero incoming references |
-| | 🔥 **Hotspots & Surprises** | Identify most-connected symbols and unexpected cross-module coupling |
-| | 🧪 **Affected Tests** | Find test files impacted by source changes — useful in CI and pre-commit hooks |
-| | 🌐 **Graph Export** | Interactive browser dashboard with search, clustering, path finding, and analytics |
-| | <h4>Semantic Search</h4> | |
-| | ⚡ **8 Semantic Engines** | Cosine, TurboQuant, sqlite-vec, Orama, PGlite, LanceDB, Qdrant, Typesense — pick the best fit for your project |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/turboquadrant.png" width="150" height="150"> | 🗜️ **TurboQuant Embedding Compression** | Compresses embeddings 20–30× at index time using [Google's TurboQuant algorithm](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/) (Walsh-Hadamard rotation + Lloyd-Max quantization). A 768-dim `Float32` vector (3,072 bytes) becomes ~120 bytes — 300 MB of raw embeddings shrinks to ~12 MB in RAM. ANN search with **zero native dependencies**, pure TypeScript. Configurable via `turboquantBits`. Powered by [turboquant-js](https://github.com/danilodevhub/turboquant-js) by Danilo Dev. |
-| | 🤖 **Custom Embedding Models** | Use any HuggingFace `feature-extraction` model — nomic, Gemma, MiniLM, BGE, or bring your own |
-| | <h4>Architecture (KiroGraph-Arch opt-in  module)</h4> | |
-| | 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
-| | 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
-| | <h4>Security</h4> | |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/sec.png" width="150" height="150"> | 🔒 **Security (KiroGraph-Sec opt-in  module)** | Goes beyond "this dependency has a CVE" — uses the call graph to determine if vulnerable code is **actually reachable** from your entry points. Maps your **attack surface** (which HTTP routes reach vulnerable deps). Detects **hardcoded secrets** and shows how many entry points expose them. **SAST-lite** finds SQL injection, path traversal, and dangerous eval in your code. **AST-based SAST (opt-in via `enablePatterns`)** runs 10 bundled structural pattern rules via `@ast-grep/napi` — matches actual code structure, not just symbol names. **Supply chain health** checks OpenSSF Scorecard scores and detects dependency confusion attacks. Covers 14 ecosystems, outputs CycloneDX SBOM/VEX and CI-ready SARIF reports. |
-| | <h4>Knowledge & Data</h4> | |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/mem.png" width="150" height="150"> | 🧠 **Persistent Memor (KiroGraph-Mem opt-in module)** | Cross-session observations — decisions, errors, patterns — auto-linked to code symbols |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/watchman.png" width="150" height="150"> | 👁️ **Watchmen (KiroGraph-Watchmen opt-in module)** ⚠️ *experimental* | Auto-synthesizes accumulated memory observations into workspace briefs and `inclusion: manual` skill files. Fires via the `watchmenReady` signal in `kirograph_mem_store` when threshold is reached. **Local model** (default, `watchmenSynthesisMode: 'local'`): runs `gemma-4-E4B-it-ONNX` on-device via `@huggingface/transformers` — ~3–4 GB one-time download, ~3–5 GB RAM, 8–15 s on Apple Silicon M1+. No API key, no background daemon, no external calls. **Agent mode** also available for Kiro (`watchmenSynthesisMode: 'agent'`, uses active session). ⚠️ **Experimental:** output quality in local mode depends heavily on the model chosen and your hardware. Smaller models or slower machines may produce incomplete briefs and lower-quality skill files. Use `agent` mode for best results. |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/docs.png" width="150" height="150"> | 📖 **Documentation Indexing (KiroGraph-Doc opt-in  module)** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/data.png" width="150" height="150"> | 📊 **Data Navigation (KiroGraph-Data opt-in  module)** | Query CSV/JSON/Excel/Parquet with filters, aggregations, joins — all server-side in SQLite |
-| | <h4>Token Optimization</h4> | |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/rtk.png" width="150" height="150"> | 🗜️ **Shell Compression (KiroGraph-RTK opt-in  module)** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
-| <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/caveman.png" width="150" height="150"> | 🪨 **Caveman Mode (KiroGraph-Caveman opt-in module)** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
-| | 📈 **Token Analytics (KiroGraph-Gain core module)** | Track cumulative savings from graph tools and shell compression over time |
-| | <h4>Integration (KiroGraph-Integration core module)</h4> | |
-| | 🔌 **Multi-tool Support** | Native Kiro + 32 experimental targets (Cursor, Copilot, Claude Code, Codex, Windsurf, Cline, and more) |
+| Feature | Description |
+|---------|-------------|
+| <h4>Graph & Analysis (KiroGraph-Core)</h4> | |
+| 🕸️ **Semantic Graph** | tree-sitter AST parsing across 33+ languages — functions, classes, call edges, type hierarchies, all in SQLite |
+| 🎯 **Context Building** | One tool call returns entry points, related symbols, and code snippets for any task description |
+| 💥 **Impact Analysis** | Blast-radius traversal before making changes — know what breaks at any depth |
+| 🧬 **Type Hierarchy** | Traverse inheritance chains — base types, derived types, implementations |
+| 🔄 **Circular Dependency Detection** | Find import cycles using Tarjan's SCC algorithm |
+| 💀 **Dead Code Detection** | Find unexported symbols with zero incoming references |
+| 🔥 **Hotspots & Surprises** | Identify most-connected symbols and unexpected cross-module coupling |
+| 🧪 **Affected Tests** | Find test files impacted by source changes — useful in CI and pre-commit hooks |
+| 🌐 **Graph Export** | Interactive browser dashboard with search, clustering, path finding, and analytics |
+| <h4>Semantic Search</h4> | |
+| ⚡ **8 Semantic Engines** | Cosine, TurboQuant, sqlite-vec, Orama, PGlite, LanceDB, Qdrant, Typesense — pick the best fit for your project |
+| 🗜️ **TurboQuant Embedding Compression** | Compresses embeddings 20–30× at index time using [Google's TurboQuant algorithm](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/) (Walsh-Hadamard rotation + Lloyd-Max quantization). A 768-dim `Float32` vector (3,072 bytes) becomes ~120 bytes — 300 MB of raw embeddings shrinks to ~12 MB in RAM. ANN search with **zero native dependencies**, pure TypeScript. Configurable via `turboquantBits`. Powered by [turboquant-js](https://github.com/danilodevhub/turboquant-js) by Danilo Dev. |
+| 🤖 **Custom Embedding Models** | Use any HuggingFace `feature-extraction` model — nomic, Gemma, MiniLM, BGE, or bring your own |
+| <h4>Architecture (KiroGraph-Arch opt-in  module)</h4> | |
+| 🏛️ **Architecture Analysis** | Package graph, layer detection, coupling metrics (Ca/Ce/instability) |
+| 📸 **Snapshots & Diff** | Save graph state before refactors, diff after to verify structural changes |
+| <h4>Security</h4> | |
+| 🔒 **Security (KiroGraph-Sec opt-in  module)** | Goes beyond "this dependency has a CVE" — uses the call graph to determine if vulnerable code is **actually reachable** from your entry points. Maps your **attack surface** (which HTTP routes reach vulnerable deps). Detects **hardcoded secrets** and shows how many entry points expose them. **SAST-lite** finds SQL injection, path traversal, and dangerous eval in your code. **AST-based SAST (opt-in via `enablePatterns`)** runs 10 bundled structural pattern rules via `@ast-grep/napi` — matches actual code structure, not just symbol names. **Supply chain health** checks OpenSSF Scorecard scores and detects dependency confusion attacks. Covers 14 ecosystems, outputs CycloneDX SBOM/VEX and CI-ready SARIF reports. |
+| <h4>Knowledge & Data</h4> | |
+| 🧠 **Persistent Memor (KiroGraph-Mem opt-in module)** | Cross-session observations — decisions, errors, patterns — auto-linked to code symbols |
+| 👁️ **Watchmen (KiroGraph-Watchmen opt-in module)** ⚠️ *experimental* | Auto-synthesizes accumulated memory observations into workspace briefs and `inclusion: manual` skill files. Fires via the `watchmenReady` signal in `kirograph_mem_store` when threshold is reached. **Local model** (default, `watchmenSynthesisMode: 'local'`): runs `gemma-4-E4B-it-ONNX` on-device via `@huggingface/transformers` — ~3–4 GB one-time download, ~3–5 GB RAM, 8–15 s on Apple Silicon M1+. No API key, no background daemon, no external calls. **Agent mode** also available for Kiro (`watchmenSynthesisMode: 'agent'`, uses active session). ⚠️ **Experimental:** output quality in local mode depends heavily on the model chosen and your hardware. Smaller models or slower machines may produce incomplete briefs and lower-quality skill files. Use `agent` mode for best results. |
+| 📖 **Documentation Indexing (KiroGraph-Doc opt-in  module)** | Section-level retrieval from Markdown, MDX, RST, AsciiDoc, OpenAPI — 92-97% token savings |
+| 📊 **Data Navigation (KiroGraph-Data opt-in  module)** | Query CSV/JSON/Excel/Parquet with filters, aggregations, joins — all server-side in SQLite |
+| <h4>Token Optimization</h4> | |
+| 🗜️ **Shell Compression (KiroGraph-RTK opt-in  module)** | Token-optimized command output (git, tests, linters, docker, AWS) — 60-90% savings |
+| 🪨 **Caveman Mode (KiroGraph-Caveman opt-in module)** 🪨 | Agent prose compression (lite → ultra) — fewer tokens on explanations without touching code |
+| 📈 **Token Analytics (KiroGraph-Gain core module)** | Track cumulative savings from graph tools and shell compression over time |
+| <h4>Integration (KiroGraph-Integration core module)</h4> | |
+| 🔌 **Multi-tool Support** | Native Kiro + 32 experimental targets (Cursor, Copilot, Claude Code, Codex, Windsurf, Cline, and more) |
 
 ## Quick Start
 
