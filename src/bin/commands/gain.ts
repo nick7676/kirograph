@@ -3,6 +3,7 @@
  */
 
 import { Command } from 'commander';
+import * as path from 'path';
 
 export function register(program: Command): void {
   program
@@ -98,13 +99,23 @@ export function register(program: Command): void {
       console.log(`  Saved:                    ~${stats.totalSaved.toLocaleString()} (${stats.savingsPercent}%)`);
 
       // Source breakdown
-      if (stats.bySource.exec.count > 0 || stats.bySource.graph.count > 0) {
+      const { readTurboQuantStats } = await import('../../vectors/turboquant-index');
+      const tqStats = readTurboQuantStats(path.join(process.cwd(), '.kirograph'));
+
+      if (stats.bySource.exec.count > 0 || stats.bySource.graph.count > 0 || tqStats) {
         console.log(`\n  By source:`);
         if (stats.bySource.graph.count > 0) {
           console.log(`    📊 Graph tools:  ${String(stats.bySource.graph.count).padStart(4)} calls  ~${stats.bySource.graph.saved.toLocaleString()} tokens saved (vs file reads/grep)`);
         }
         if (stats.bySource.exec.count > 0) {
           console.log(`    ⚡ Compression:  ${String(stats.bySource.exec.count).padStart(4)} calls  ~${stats.bySource.exec.saved.toLocaleString()} tokens saved (vs raw output)`);
+        }
+        if (tqStats) {
+          const totalEmbeddings = tqStats.count + tqStats.memCount + tqStats.docsCount;
+          const totalSavedBytes = tqStats.savedBytes + (tqStats.memRawBytes - tqStats.memActualBytes) + (tqStats.docsRawBytes - tqStats.docsActualBytes);
+          const totalSavedMB = (totalSavedBytes / 1_048_576).toFixed(1);
+          const avgRatio = tqStats.compressionRatio.toFixed(1);
+          console.log(`    🗜️  TurboQuant: ${String(totalEmbeddings).padStart(5)} embeddings — ${totalSavedMB} MB saved (${avgRatio}× avg compression)`);
         }
       }
 

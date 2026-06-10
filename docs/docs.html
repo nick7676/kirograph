@@ -70,14 +70,15 @@
     </div>
     <div class="sidebar-section">
       <div class="sidebar-heading">Advanced</div>
-      <a href="#memory" class="sidebar-link">Memory</a>
-      <a href="#watchmen" class="sidebar-link" style="padding-left:1.5rem;">↳ Watchmen</a>
-      <a href="#documentation" class="sidebar-link">Documentation</a>
-      <a href="#data" class="sidebar-link">Data</a>
-      <a href="#security" class="sidebar-link">Security</a>
-      <a href="#caveman-mode" class="sidebar-link">Caveman Mode</a>
-      <a href="#shell-compression" class="sidebar-link">Shell Compression</a>
+      <a href="#caveman-mode" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/caveman.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Caveman Mode</a>
+      <a href="#shell-compression" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/rtk.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Shell Compression</a>
       <a href="#compression-caveman" class="sidebar-link" style="padding-left:2rem">Coexistence with Caveman</a>
+      <a href="#memory" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/mem.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Memory</a>
+      <a href="#watchmen" class="sidebar-link" style="display:flex;align-items:center;gap:6px;padding-left:1.5rem;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/watchman.png" style="width:14px;height:14px;flex-shrink:0;border-radius:3px;">↳ Watchmen</a>
+      <a href="#documentation" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/docs.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Documentation</a>
+      <a href="#data" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/data.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Data</a>
+      <a href="#security" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/sec.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">Security</a>
+      <a href="#turboquant" class="sidebar-link" style="display:flex;align-items:center;gap:6px;"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/turboquadrant.png" style="width:16px;height:16px;flex-shrink:0;border-radius:3px;">TurboQuant</a>
       <a href="#savings-heuristics" class="sidebar-link">Savings Heuristics</a>
       <a href="#credits" class="sidebar-link">Credits</a>
     </div>
@@ -431,6 +432,7 @@ kirograph install --target kiro   # install for a specific platform only</code><
         <thead><tr><th>Engine</th><th>Store</th><th>Search type</th><th>Extra deps</th></tr></thead>
         <tbody>
           <tr><td><code>cosine</code> <em>(default)</em></td><td><code>kirograph.db</code></td><td>Exact cosine, linear scan</td><td>none</td></tr>
+          <tr><td><code>turboquant</code></td><td><code>.kirograph/turboquant.bin</code></td><td>ANN, sub-linear</td><td><code>turboquant-js</code> (pure JS)</td></tr>
           <tr><td><code>sqlite-vec</code></td><td><code>.kirograph/vec.db</code></td><td>ANN, sub-linear</td><td><code>better-sqlite3</code>, <code>sqlite-vec</code></td></tr>
           <tr><td><code>orama</code></td><td><code>.kirograph/orama.json</code></td><td>Hybrid (full-text + vector)</td><td><code>@orama/orama</code></td></tr>
           <tr><td><code>pglite</code></td><td><code>.kirograph/pglite/</code></td><td>Hybrid, exact (WASM pgvector)</td><td><code>@electric-sql/pglite</code></td></tr>
@@ -852,7 +854,9 @@ kirograph install --target cursor      # Install for a specific platform only</c
           <tr><td><code>enableEmbeddings</code></td><td>boolean</td><td><code>false</code></td><td>Enable semantic (vector) search</td></tr>
           <tr><td><code>embeddingModel</code></td><td>string</td><td><code>"nomic-ai/nomic-embed-text-v1.5"</code></td><td>HuggingFace model ID</td></tr>
           <tr><td><code>embeddingDim</code></td><td>number</td><td><code>768</code></td><td>Embedding dimension</td></tr>
-          <tr><td><code>semanticEngine</code></td><td>string</td><td><code>"cosine"</code></td><td>Engine: <code>cosine</code>, <code>sqlite-vec</code>, <code>orama</code>, <code>pglite</code>, <code>lancedb</code>, <code>qdrant</code>, <code>typesense</code></td></tr>
+          <tr><td><code>semanticEngine</code></td><td>string</td><td><code>"cosine"</code></td><td>Engine: <code>cosine</code>, <code>turboquant</code>, <code>sqlite-vec</code>, <code>orama</code>, <code>pglite</code>, <code>lancedb</code>, <code>qdrant</code>, <code>typesense</code></td></tr>
+          <tr><td><code>turboquantBits</code></td><td>number</td><td><code>3</code></td><td>TurboQuant bits per coordinate (1–8). Controls compression/quality tradeoff. Changing requires <code>kirograph index --force</code>.</td></tr>
+          <tr><td><code>turboquantMemDocs</code></td><td>boolean</td><td><code>false</code></td><td>Use TurboQuant ANN index for memory and doc search (requires <code>turboquant-js</code>).</td></tr>
           <tr><td><code>useVecIndex</code></td><td>boolean</td><td><code>false</code></td><td>Deprecated alias for <code>semanticEngine: "sqlite-vec"</code></td></tr>
           <tr><td><code>typesenseDashboard</code></td><td>boolean</td><td><code>false</code></td><td>Open Typesense dashboard after indexing</td></tr>
           <tr><td><code>qdrantDashboard</code></td><td>boolean</td><td><code>false</code></td><td>Open Qdrant dashboard after indexing</td></tr>
@@ -1336,6 +1340,65 @@ kirograph docs reembed                      # re-embed with current model</code>
 
     <p><a href="#comparison">Feature comparison →</a></p>
 
+    <!-- ── TurboQuant ── -->
+    <h2 id="turboquant">TurboQuant</h2>
+
+    <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/turboquant.png" alt="KiroGraph TurboQuant" style="border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 1.5rem; max-width: 100%;">
+
+    <p>TurboQuant is an optional upgrade that <strong>compresses your vector embeddings at storage time</strong> and replaces the default linear scan with an approximate nearest-neighbour (ANN) index — with <strong>zero native dependencies</strong>.</p>
+    <p>Built on <a href="https://github.com/danilodevhub/turboquant-js" target="_blank" rel="noopener">turboquant-js</a> by <a href="https://github.com/danilodevhub" target="_blank" rel="noopener">Danilo Dev</a>, a TypeScript implementation of <a href="https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/" target="_blank" rel="noopener">Google's TurboQuant algorithm</a>. Embeddings are compressed immediately on <code>kirograph index</code>:</p>
+    <ol>
+      <li><strong>Walsh-Hadamard rotation</strong> with random sign flips in O(d log d). Distributes energy uniformly across all coordinates before quantization.</li>
+      <li><strong>Lloyd-Max scalar quantization</strong> per rotated coordinate. Each value is encoded in <code>turboquantBits</code> bits (default: 3) using optimal codebooks.</li>
+    </ol>
+
+    <h3>Compression at a glance</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Vectors</th><th>Raw Float32 in RAM</th><th>TurboQuant (3 bit)</th><th>Reduction</th></tr></thead>
+        <tbody>
+          <tr><td>1,000</td><td>~3 MB</td><td>~120 KB</td><td>25×</td></tr>
+          <tr><td>10,000</td><td>~30 MB</td><td>~1.2 MB</td><td>25×</td></tr>
+          <tr><td>100,000</td><td>~300 MB</td><td>~12 MB</td><td>25×</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>When to use TurboQuant</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situation</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td>Small project, &lt; 5,000 symbols</td><td><code>cosine</code> is fine</td></tr>
+          <tr><td>Large project, native modules OK</td><td><code>sqlite-vec</code> or <code>lancedb</code></td></tr>
+          <tr><td>Large project, <strong>no native modules</strong> (CI, ARM, restricted env)</td><td><strong><code>turboquant</code></strong></td></tr>
+          <tr><td>Memory or docs search getting slow</td><td><code>turboquantMemDocs: true</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code>npm install turboquant-js</code></pre>
+    <pre><code>{
+  "enableEmbeddings": true,
+  "semanticEngine": "turboquant",
+  "turboquantBits": 4
+}</code></pre>
+    <p>Or select it interactively during <code>kirograph install</code> — the installer auto-runs <code>npm install turboquant-js</code> for you. Falls back silently to <code>cosine</code> if <code>turboquant-js</code> is not installed.</p>
+
+    <h3>Configuration</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>turboquantBits</code></td><td>number</td><td><code>3</code></td><td>Bits per coordinate (1–8). Lower = smaller, less accurate. Changing requires <code>kirograph index --force</code>.</td></tr>
+          <tr><td><code>turboquantMemDocs</code></td><td>boolean</td><td><code>false</code></td><td>Also use TurboQuant ANN index for memory observations and doc sections.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The compressed index is serialized to <code>.kirograph/turboquant.bin</code> at the end of indexing and reloaded in milliseconds on startup. Run <code>kirograph status</code> to see live compression stats.</p>
+
     <!-- ── Caveman Mode ── -->
     <h2 id="caveman-mode">Caveman Mode</h2>
 
@@ -1446,7 +1509,14 @@ kirograph gain --graph           # ASCII graph (last 30 days)</code></pre>
     <h3 id="credits-inspirations">Inspirations</h3>
     <ul>
       <li><a href="https://github.com/JuliusBrussee/cavemem" target="_blank" rel="noopener">cavemem</a> by <a href="https://www.linkedin.com/in/julius-brussee/" target="_blank" rel="noopener">Julius Brussee</a>: the memory module's hook-based observation capture, deterministic compression, and SQLite storage pattern.</li>
+      <li><a href="https://github.com/JuliusBrussee/caveman" target="_blank" rel="noopener">caveman</a> by <a href="https://www.linkedin.com/in/julius-brussee/" target="_blank" rel="noopener">Julius Brussee</a>: the caveman mode's agent prose compression concept, multi-level steering injection.</li>
+      <li><a href="https://github.com/firstbatchxyz/watchmen" target="_blank" rel="noopener">watchmen</a> by <a href="https://github.com/firstbatchxyz" target="_blank" rel="noopener">firstbatch</a>: the watchmen module's session-mining concept, workspace brief generation, and <code>AGENTS.md</code> mirroring pattern.</li>
       <li><a href="https://github.com/jgravelle/jdocmunch-mcp" target="_blank" rel="noopener">jDocMunch-MCP</a> by <a href="https://www.linkedin.com/in/j-gravelle-2778223/" target="_blank" rel="noopener">J. Gravelle</a>: the documentation module's section-first retrieval approach, stable section IDs, and byte-offset addressing.</li>
+      <li><a href="https://github.com/jgravelle/jdatamunch-mcp" target="_blank" rel="noopener">jDataMunch-MCP</a> by <a href="https://www.linkedin.com/in/j-gravelle-2778223/" target="_blank" rel="noopener">J. Gravelle</a>: the data module's column profiling, streaming parsers, and server-side aggregation approach.</li>
+      <li><a href="https://github.com/tirth8205/code-review-graph" target="_blank" rel="noopener">code-review-graph</a> by <a href="https://github.com/tirth8205" target="_blank" rel="noopener">Tirth Kanani</a>: community detection, execution flow tracing, refactoring tools, and multi-platform auto-detection patterns.</li>
+      <li><a href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">rtk</a> by <a href="https://github.com/rtk-ai" target="_blank" rel="noopener">rtk-ai</a>: the shell compression module's command-family approach and token-optimized output patterns.</li>
+      <li><a href="https://github.com/yvgude/lean-ctx" target="_blank" rel="noopener">lean-ctx</a> by <a href="https://github.com/yvgude" target="_blank" rel="noopener">Yves Gugger</a>: file read caching, multiple read modes, and context budget governance concepts.</li>
+      <li><a href="https://github.com/danilodevhub/turboquant-js" target="_blank" rel="noopener">turboquant-js</a> by <a href="https://github.com/danilodevhub" target="_blank" rel="noopener">Danilo Dev</a>: the TurboQuant engine — TypeScript implementation of Google's Walsh-Hadamard + Lloyd-Max quantization algorithm used for embedding compression.</li>
     </ul>
 
     <h3 id="credits-contributors">Contributors</h3>

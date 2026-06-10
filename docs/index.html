@@ -128,7 +128,7 @@
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Persistent memory</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td></tr>
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Documentation indexing</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
           <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">Shell + prose compression</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">7 semantic engines</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0.6rem;">8 semantic engines</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td></tr>
           <tr><td style="padding: 0.5rem 0.6rem;">Multi-platform (34 targets)</td><td style="padding:0.5rem;text-align:center;color:#4caf50;">✅</td><td style="padding:0.5rem;text-align:center;">7</td><td style="padding:0.5rem;text-align:center;">13</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;opacity:0.3;">—</td><td style="padding:0.5rem;text-align:center;">any</td><td style="padding:0.5rem;text-align:center;">28+</td></tr>
         </tbody>
       </table>
@@ -179,133 +179,246 @@
     <div class="section-header">
       <span class="label">Features</span>
       <h2>Everything you need to supercharge Kiro</h2>
-      <p>A complete semantic index with 26 node kinds, 13 edge types, and six indexing layers.</p>
+      <p>Core capabilities available out of the box — no extra configuration required.</p>
     </div>
     <div class="cards-grid">
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="wrench"></i></span>
-        <h3>45 MCP Tools</h3>
-        <p>Context building, symbol search, call graphs, type hierarchies, impact analysis, dead code, circular deps, architecture, coupling metrics, snapshots, memory, documentation navigation, data querying, security scanning, and more, all auto-approved in Kiro.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="terminal"></i></span>
-        <h3>Full CLI Reference</h3>
-        <p>Every capability available from the terminal: <code>kirograph index</code>, <code>sync</code>, <code>query</code>, <code>context</code>, <code>files</code>, <code>affected</code>, <code>path</code>, <code>hotspots</code>, <code>snapshot</code>, <code>export</code>, and more.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="webhook"></i></span>
-        <h3>Auto-sync Hooks</h3>
-        <p>A single <code>agentStop</code> hook keeps the index fresh automatically. An optional <code>preToolUse</code> hook reminds the agent to use <code>kirograph_exec</code> for shell compression. An optional memory hook prompts the agent to store observations at session end. No watcher process needed.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="building-2"></i></span>
-        <h3>Architecture Analysis</h3>
-        <p>Auto-detects packages and architectural layers (api, service, data, ui, shared). Computes coupling metrics (Ca, Ce, instability) across your entire package graph.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon">🔒</span>
-        <h3>Vulnerability Detection</h3>
-        <p>14 ecosystems · OSV batch queries · EPSS scores · call-graph reachability · attack surface mapping · secrets detection with blast radius · SAST-lite (SQL injection, eval, path traversal) · supply chain health (OpenSSF Scorecard) · dependency confusion · license compliance · staleness · remediation SLA · CI/CD SARIF export · CVE suppression · risk score · CycloneDX 1.5 SBOM/VEX. Opt-in via <code>enableSecurity</code>.</p>
-        <div class="card-media">
-          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/sec.png" alt="KiroGraph Security mascot">
+      <div class="card" style="--card-color: 167, 139, 250;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="wrench"></i></span>
+          <h3>61 MCP Tools</h3>
+        </div>
+        <div class="card-body">
+          <p>Context building, symbol search, call graphs, type hierarchies, impact analysis, dead code, circular deps, architecture, coupling metrics, snapshots, memory, documentation navigation, data querying, security scanning, and more, all auto-approved in Kiro.</p>
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="search"></i></span>
-        <h3>Semantic Search</h3>
-        <p>Opt-in embedding-based search with configurable models and seven pluggable engines: cosine, sqlite-vec, orama, pglite, lancedb, qdrant, typesense.</p>
+      <div class="card" style="--card-color: 63, 185, 80;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="terminal"></i></span>
+          <h3>Full CLI Reference</h3>
+        </div>
+        <div class="card-body">
+          <p>Every capability available from the terminal: <code>kirograph index</code>, <code>sync</code>, <code>query</code>, <code>context</code>, <code>files</code>, <code>affected</code>, <code>path</code>, <code>hotspots</code>, <code>snapshot</code>, <code>export</code>, and more.</p>
+        </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="cpu"></i></span>
-        <h3>Embedding Models</h3>
-        <p>Choose from curated models: <code>nomic-embed-text-v1.5</code> (default, 768d), <code>embeddinggemma-300m</code> (multilingual), <code>all-MiniLM-L6-v2</code> (lightweight), <code>bge-base-en-v1.5</code>, or any custom HuggingFace model.</p>
+      <div class="card" style="--card-color: 88, 166, 255;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="webhook"></i></span>
+          <h3>Auto-sync Hooks</h3>
+        </div>
+        <div class="card-body">
+          <p>A single <code>agentStop</code> hook keeps the index fresh automatically. An optional <code>preToolUse</code> hook reminds the agent to use <code>kirograph_exec</code> for shell compression. An optional memory hook prompts the agent to store observations at session end. No watcher process needed.</p>
+        </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="layers"></i></span>
-        <h3>Framework Detection</h3>
-        <p>Auto-detects React, Next.js, Express, Django, Flask, FastAPI, Rails, Spring, ASP.NET, Phoenix, Laravel, Flutter, SwiftUI, and more. Enriches the graph with routes, components, and lifecycle methods.</p>
+      <div class="card" style="--card-color: 56, 211, 180;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="search"></i></span>
+          <h3>Semantic Search</h3>
+        </div>
+        <div class="card-body">
+          <p>Opt-in embedding-based search with configurable models and eight pluggable engines: cosine, turboquant, sqlite-vec, orama, pglite, lancedb, qdrant, typesense.</p>
+        </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="bar-chart-3"></i></span>
-        <h3>Export Dashboard</h3>
-        <p>Interactive graph dashboard with search, two-click path finding, cluster view, minimap, heat map, and analytics charts. Run <code>kirograph export</code> to generate it.</p>
-        <div class="card-media">
+      <div class="card" style="--card-color: 120, 210, 60;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="layers"></i></span>
+          <h3>Framework Detection</h3>
+        </div>
+        <div class="card-body">
+          <p>Auto-detects React, Next.js, Express, Django, Flask, FastAPI, Rails, Spring, ASP.NET, Phoenix, Laravel, Flutter, SwiftUI, and more. Enriches the graph with routes, components, and lifecycle methods.</p>
+        </div>
+      </div>
+
+      <div class="card" style="--card-color: 255, 210, 50;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="bar-chart-3"></i></span>
+          <h3>Export Dashboard</h3>
+        </div>
+        <div class="card-body">
+          <p>Interactive graph dashboard with search, two-click path finding, cluster view, minimap, heat map, and analytics charts. Run <code>kirograph export</code> to generate it.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/export.gif" alt="Export dashboard demo">
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="message-square"></i></span>
-        <h3>Caveman Mode</h3>
-        <p>Compresses the agent's communication style to cut token usage on responses. Four levels: <code>lite</code>, <code>full</code>, <code>ultra</code>. Injected via steering file, no extra tool calls.</p>
-        <div class="card-media">
+      <div class="card" style="--card-color: 210, 153, 34;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="cpu"></i></span>
+          <h3>Embedding Models</h3>
+        </div>
+        <div class="card-body">
+          <p>Choose from curated models: <code>nomic-embed-text-v1.5</code> (default, 768d), <code>embeddinggemma-300m</code> (multilingual), <code>all-MiniLM-L6-v2</code> (lightweight), <code>bge-base-en-v1.5</code>, or any custom HuggingFace model.</p>
+        </div>
+      </div>
+
+      <div class="card" style="--card-color: 130, 180, 255;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="camera"></i></span>
+          <h3>Snapshots &amp; Diff</h3>
+        </div>
+        <div class="card-body">
+          <p>Save lightweight graph snapshots before refactors. Diff the current graph against any snapshot to see added/removed symbols and edges, available as both CLI and MCP tool.</p>
+        </div>
+      </div>
+
+      <div class="card" style="--card-color: 255, 100, 50;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="flame"></i></span>
+          <h3>Hotspots &amp; Surprising Links</h3>
+        </div>
+        <div class="card-body">
+          <p>Find the most-connected symbols and non-obvious cross-file coupling. Useful for identifying load-bearing code and unexpected dependencies before making changes.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Advanced opt-in modules ── -->
+<section class="section" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">Opt-in Modules</span>
+      <h2>Advanced opt-in modules</h2>
+      <p>Enable only what you need. Each module is independently opt-in via <code>kirograph install</code> or a single config flag.</p>
+    </div>
+    <div class="cards-grid">
+
+      <!-- v0.6.0 -->
+      <div class="card" style="--card-color: 255, 166, 87;">
+        <div class="card-header">
+          <span class="card-icon"><i data-lucide="building-2"></i></span>
+          <h3>Architecture Analysis</h3>
+          <span class="card-version">v0.6.0</span>
+        </div>
+        <div class="card-body">
+          <p>Auto-detects packages and architectural layers (api, service, data, ui, shared). Computes coupling metrics (Ca, Ce, instability) across your entire package graph. Enable via <code>enableArchitecture</code>.</p>
+        </div>
+      </div>
+
+      <!-- v0.9.0 -->
+      <div class="card" style="--card-color: 255, 160, 50;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/caveman.png"></span>
+          <h3>Caveman Mode</h3>
+          <span class="card-version">v0.9.0</span>
+        </div>
+        <div class="card-body">
+          <p>Compresses the agent's communication style to cut token usage on responses. Four levels: <code>lite</code>, <code>full</code>, <code>ultra</code>. Injected via steering file, no extra tool calls. Set via <code>cavemanMode</code>.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/caveman.png" alt="Caveman mode screenshot">
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="terminal"></i></span>
-        <h3>Shell Compression</h3>
-        <p>Run shell commands through <code>kirograph_exec</code> to get token-optimized output. Cuts 60–90% of tokens on git, test runners, linters, docker, and package managers. Three levels: normal, aggressive, ultra. Inspired by <a href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">rtk</a>.</p>
-        <div class="card-media">
+      <!-- v0.14.0 -->
+      <div class="card" style="--card-color: 50, 210, 120;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/rtk.png"></span>
+          <h3>Shell Compression</h3>
+          <span class="card-version">v0.14.0</span>
+        </div>
+        <div class="card-body">
+          <p>Run shell commands through <code>kirograph_exec</code> to get token-optimized output. Cuts 60–90% of tokens on git, test runners, linters, docker, and package managers. Three levels: normal, aggressive, ultra. Set via <code>shellCompressionLevel</code>.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/rtk.png" alt="KiroGraph shell compression mascot">
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="camera"></i></span>
-        <h3>Snapshots &amp; Diff</h3>
-        <p>Save lightweight graph snapshots before refactors. Diff the current graph against any snapshot to see added/removed symbols and edges, available as both CLI and MCP tool.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="flame"></i></span>
-        <h3>Hotspots &amp; Surprising Links</h3>
-        <p>Find the most-connected symbols and non-obvious cross-file coupling. Useful for identifying load-bearing code and unexpected dependencies before making changes.</p>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="brain"></i></span>
-        <h3>Persistent Memory</h3>
-        <p>Cross-session observations stored locally with zero LLM tokens on write. Decisions, errors, and patterns are auto-linked to code symbols and surfaced in <code>kirograph_context</code> when relevant. Opt-in via <code>enableMemory</code>.</p>
-        <div class="card-media">
+      <!-- v0.15.0 -->
+      <div class="card" style="--card-color: 188, 130, 255;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/mem.png"></span>
+          <h3>Persistent Memory</h3>
+          <span class="card-version">v0.15.0</span>
+        </div>
+        <div class="card-body">
+          <p>Cross-session observations stored locally with zero LLM tokens on write. Decisions, errors, and patterns are auto-linked to code symbols and surfaced in <code>kirograph_context</code> when relevant. Enable via <code>enableMemory</code>.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/mem.png" alt="KiroGraph Memory mascot">
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="eye"></i></span>
-        <h3>Watchmen</h3>
-        <p>Auto-synthesizes accumulated memory observations into workspace briefs and skill files. Fires via the <code>watchmenReady</code> signal in <code>kirograph_mem_store</code>. Local model synthesis — zero API cost, no data leaves your machine. Opt-in via <code>enableWatchmen</code>.</p>
-        <div class="card-media">
-          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/watchmen.png" alt="KiroGraph Watchmen mascot">
+      <!-- v0.16.0 -->
+      <div class="card" style="--card-color: 80, 195, 255;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/docs.png"></span>
+          <h3>Documentation Navigation</h3>
+          <span class="card-version">v0.16.0</span>
         </div>
-      </div>
-
-      <div class="card">
-        <span class="card-icon"><i data-lucide="book-open"></i></span>
-        <h3>Documentation Navigation</h3>
-        <p>Indexes project docs by heading hierarchy for section-level retrieval. 9 format parsers, code ↔ docs cross-references, FTS search, and stable section IDs. 92–97% token savings vs reading full files. Opt-in via <code>enableDocs</code>.</p>
-        <div class="card-media">
+        <div class="card-body">
+          <p>Indexes project docs by heading hierarchy for section-level retrieval. 9 format parsers, code ↔ docs cross-references, FTS search, and stable section IDs. 92–97% token savings vs reading full files. Enable via <code>enableDocs</code>.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/docs.png" alt="KiroGraph Documentation mascot">
         </div>
       </div>
 
-      <div class="card">
-        <span class="card-icon"><i data-lucide="table-2"></i></span>
-        <h3>Data Navigation</h3>
-        <p>Indexes tabular data files (CSV, TSV, JSONL, JSON, Excel, Parquet) for structured querying. Column profiling, server-side aggregations, and filtered row retrieval. 95–99% token savings vs reading raw data files. Opt-in via <code>enableData</code>.</p>
-        <div class="card-media">
+      <!-- v0.17.0 -->
+      <div class="card" style="--card-color: 64, 215, 185;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/data.png"></span>
+          <h3>Data Navigation</h3>
+          <span class="card-version">v0.17.0</span>
+        </div>
+        <div class="card-body">
+          <p>Indexes tabular data files (CSV, TSV, JSONL, JSON, Excel, Parquet) for structured querying. Column profiling, server-side aggregations, and filtered row retrieval. 95–99% token savings vs reading raw data files. Enable via <code>enableData</code>.</p>
+        </div>
+        <div class="card-footer">
           <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/data.png" alt="KiroGraph Data mascot">
+        </div>
+      </div>
+
+      <!-- v0.19.0 -->
+      <div class="card" style="--card-color: 248, 81, 73;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/sec.png"></span>
+          <h3>Vulnerability Detection</h3>
+          <span class="card-version">v0.19.0</span>
+        </div>
+        <div class="card-body">
+          <p>14 ecosystems · OSV batch queries · EPSS scores · call-graph reachability · attack surface mapping · secrets detection · SAST-lite · supply chain health · license compliance · CycloneDX 1.5 SBOM/VEX · CI/CD SARIF. Enable via <code>enableSecurity</code>.</p>
+        </div>
+        <div class="card-footer">
+          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/sec.png" alt="KiroGraph Security mascot">
+        </div>
+      </div>
+
+      <!-- v0.20.0 -->
+      <div class="card" style="--card-color: 110, 110, 210;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/watchman.png"></span>
+          <h3>Watchmen</h3>
+          <span class="card-version">v0.20.0</span>
+        </div>
+        <div class="card-body">
+          <p>Auto-synthesizes accumulated memory observations into workspace briefs and skill files. Local model synthesis — zero API cost, no data leaves your machine. Enable via <code>enableWatchmen</code>.</p>
+        </div>
+        <div class="card-footer">
+          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/watchmen.png" alt="KiroGraph Watchmen mascot">
+        </div>
+      </div>
+
+      <!-- v0.21.0 -->
+      <div class="card" style="--card-color: 99, 130, 255;">
+        <div class="card-header">
+          <span class="card-icon"><img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/icons/turboquadrant.png"></span>
+          <h3>TurboQuant Compression</h3>
+          <span class="card-version">v0.21.0</span>
+        </div>
+        <div class="card-body">
+          <p>Compresses embeddings <strong>20–30×</strong> using <a href="https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/" target="_blank" rel="noopener">Google's TurboQuant algorithm</a>. A 768-dim vector shrinks from 3,072 bytes to ~120 bytes. ANN search with zero native deps, pure TypeScript. Set <code>semanticEngine: "turboquant"</code>.</p>
+        </div>
+        <div class="card-footer">
+          <img src="https://raw.githubusercontent.com/davide-desio-eleva/kirograph/main/assets/turboquant.png" alt="KiroGraph TurboQuant compression stats">
         </div>
       </div>
 
@@ -314,11 +427,71 @@
 </section>
 
 <!-- ── How it works ── -->
+<!-- ── Release Timeline ── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">Changelog</span>
+      <h2>From v0.1 to v0.21 in three months</h2>
+      <p>Drag or scroll to explore every release.</p>
+    </div>
+  </div>
+  <div class="timeline-scroll" id="timeline-scroll">
+    <div class="timeline-track">
+      <div class="timeline-rule"></div>
+
+      <div class="tl-item above major"><div class="tl-content"><span class="tl-ver">v0.1.0</span><span class="tl-title">Initial Release</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.2.0</span><span class="tl-title">MCP Server &amp; Hooks</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.3.0</span><span class="tl-title">Pluggable Vector Engines</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.3.1</span><span class="tl-title">Orama Engine</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.3.2</span><span class="tl-title">PGlite Engine</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.3.3</span><span class="tl-title">LanceDB Engine</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.3.4</span><span class="tl-title">Qdrant Engine</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.3.5</span><span class="tl-title">Typesense Engine</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.4.0</span><span class="tl-title">Guided Installer</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.5.0</span><span class="tl-title">CLI Agent</span></div></div>
+      <div class="tl-item above major"><div class="tl-content"><span class="tl-ver">v0.6.0</span><span class="tl-title">Architecture Analysis</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.7.0</span><span class="tl-title">Embedding Model Selection</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.8.0</span><span class="tl-title">esbuild Migration</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.9.0</span><span class="tl-title">Caveman Mode</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.10.0</span><span class="tl-title">Hotspots, Snapshots &amp; Dead Code</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.11.0</span><span class="tl-title">Interactive Graph Dashboard</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.12.0</span><span class="tl-title">Elixir &amp; Phoenix</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.12.1</span><span class="tl-title">Sync Progress &amp; Stability</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.12.2</span><span class="tl-title">Documentation Site &amp; npm</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.13.0</span><span class="tl-title">Language &amp; Framework Expansion</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.13.1</span><span class="tl-title">Multi-client Support</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.14.0</span><span class="tl-title">Shell Compression</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.14.1</span><span class="tl-title">Hook Consolidation &amp; Uninit Fixes</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.15.0</span><span class="tl-title">Memory</span></div></div>
+      <div class="tl-item above major"><div class="tl-content"><span class="tl-ver">v0.16.0</span><span class="tl-title">Documentation Navigation</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.17.0</span><span class="tl-title">Data Navigation</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.17.1</span><span class="tl-title">Multi-Platform Auto-Detection</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.18.0</span><span class="tl-title">Multi-IDE Expansion</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.18.1</span><span class="tl-title">Tier 1 IDE Expansion</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.18.2</span><span class="tl-title">Tier 2 IDE Expansion</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.18.3</span><span class="tl-title">Tier 3 IDE Expansion</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.18.4</span><span class="tl-title">Tier 4 — Full Coverage</span></div></div>
+      <div class="tl-item above"><div class="tl-content"><span class="tl-ver">v0.18.5</span><span class="tl-title">Hooks &amp; Session Hygiene</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.18.6</span><span class="tl-title">Antigravity, Gemini CLI &amp; OpenCode Fixes</span></div></div>
+      <div class="tl-item above major"><div class="tl-content"><span class="tl-ver">v0.19.0</span><span class="tl-title">Security Module</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.19.1</span><span class="tl-title">KiroGraph-Patterns (ast-grep)</span></div></div>
+      <div class="tl-item above major"><div class="tl-content"><span class="tl-ver">v0.20.0</span><span class="tl-title">KiroGraph-Watchmen</span></div><div class="tl-connector"></div><div class="tl-dot"></div></div>
+      <div class="tl-item below major"><div class="tl-dot"></div><div class="tl-connector"></div><div class="tl-content"><span class="tl-ver">v0.21.0</span><span class="tl-title">TurboQuant Compression</span></div></div>
+
+    </div>
+  </div>
+  <div class="container" style="margin-top: 1rem; text-align: center;">
+    <a href="changelog.html" style="color: var(--accent); font-size: 0.85rem;">Full changelog →</a>
+  </div>
+</section>
+
+<!-- ── How It Works ── -->
 <section class="section" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
   <div class="container">
     <div class="section-header">
       <span class="label">How It Works</span>
-      <h2>Six indexing layers, one query interface</h2>
+      <h2>Seven indexing layers, one query interface</h2>
       <p>KiroGraph parses your codebase with tree-sitter, stores everything in SQLite, and exposes it through MCP tools and CLI commands.</p>
     </div>
 
@@ -346,9 +519,9 @@
           </div>
           <div class="diagram-row" style="margin-top: 0.5rem;">
             <span class="diagram-chip">type_hierarchy</span>
-            <span class="diagram-chip">path</span>
-            <span class="diagram-chip">architecture</span>
+            <span class="diagram-chip">security</span>
             <span class="diagram-chip">memory</span>
+            <span class="diagram-chip">docs</span>
           </div>
         </div>
         <div class="diagram-sub" style="margin: 0;">SQLite Graph DB (.kirograph/kirograph.db)</div>
@@ -357,7 +530,7 @@
 
       <!-- Indexing layers -->
       <div class="diagram-box">
-        <h4>Six Indexing Layers</h4>
+        <h4>Seven Indexing Layers</h4>
         <div class="box-content" style="display: grid; gap: 0.5rem;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="badge badge-green">Structural</span>
@@ -365,11 +538,15 @@
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="badge badge-purple">Semantic</span>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">768-dim embeddings · opt-in · 7 engine options</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">768-dim embeddings · opt-in · 8 engine options</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="badge badge-orange">Architecture</span>
             <span style="font-size: 0.85rem; color: var(--text-muted);">packages + layers + coupling metrics · opt-in</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span class="badge" style="background: rgba(188,130,255,0.15); color: #bc8cff; border: 1px solid rgba(188,130,255,0.3);">Memory</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">cross-session observations · symbol-linked · opt-in</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <span class="badge badge-blue">Documentation</span>
@@ -404,7 +581,7 @@
   <div class="container">
     <div class="section-header">
       <span class="label">Semantic Search</span>
-      <h2>Seven pluggable vector engines</h2>
+      <h2>Eight pluggable vector engines</h2>
       <p>Enable embeddings for natural-language search. Choose the engine that fits your project size and constraints; all fall back gracefully if deps are missing.</p>
     </div>
 
@@ -413,6 +590,7 @@
         <thead><tr><th>Engine</th><th>Search type</th><th>Native deps?</th><th>Best for</th></tr></thead>
         <tbody>
           <tr><td><code>cosine</code> <em>(default)</em></td><td>Exact cosine, linear scan</td><td>None</td><td>Small/medium projects, zero setup</td></tr>
+          <tr><td><code>turboquant</code></td><td>ANN, sub-linear</td><td>No (pure JS)</td><td>Large codebases, 20–30× RAM savings, no native deps</td></tr>
           <tr><td><code>sqlite-vec</code></td><td>ANN, sub-linear</td><td>Yes</td><td>Large codebases, fast ANN</td></tr>
           <tr><td><code>orama</code></td><td>Hybrid (full-text + vector)</td><td>No (pure JS)</td><td>Best result quality, no native deps</td></tr>
           <tr><td><code>pglite</code></td><td>Hybrid, exact (WASM pgvector)</td><td>No (WASM)</td><td>Exact results, PostgreSQL semantics</td></tr>
@@ -693,6 +871,93 @@
 </footer>
 
 <script>lucide.createIcons();</script>
+<script>
+(function() {
+  var el = document.getElementById('timeline-scroll');
+  if (!el) return;
+
+  var paused = false;
+  var dragging = false;
+  var startX, scrollLeft;
+  var speed = 0.6;
+  var rafId = null;
+  var running = false;
+  var litIdx = -1;
+  var trailIdx = -1;
+  var items = el.querySelectorAll('.tl-item');
+
+  function updateLit() {
+    var center = el.scrollLeft + el.clientWidth / 2;
+    var best = 0, bestDist = Infinity;
+    for (var i = 0; i < items.length; i++) {
+      var d = Math.abs((items[i].offsetLeft + items[i].offsetWidth / 2) - center);
+      if (d < bestDist) { bestDist = d; best = i; }
+    }
+    if (best === litIdx) return;
+    if (litIdx >= 0) items[litIdx].classList.remove('lit');
+    if (trailIdx >= 0) items[trailIdx].classList.remove('lit-trail');
+    trailIdx = litIdx;
+    litIdx = best;
+    items[litIdx].classList.add('lit');
+    if (trailIdx >= 0) items[trailIdx].classList.add('lit-trail');
+  }
+
+  function step() {
+    if (!paused && !dragging) {
+      el.scrollLeft += speed;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
+        el.scrollLeft = 0;
+        litIdx = -1; trailIdx = -1;
+      }
+    }
+    updateLit();
+    rafId = requestAnimationFrame(step);
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    rafId = requestAnimationFrame(step);
+  }
+
+  function stop() {
+    if (rafId) cancelAnimationFrame(rafId);
+    running = false; rafId = null;
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { e.isIntersecting ? start() : stop(); });
+  }, { threshold: 0.1 });
+  observer.observe(el.closest('section') || el);
+
+  el.addEventListener('mouseenter', function() { paused = true; });
+  el.addEventListener('mouseleave', function() { paused = false; dragging = false; });
+
+  el.addEventListener('mousedown', function(e) {
+    dragging = true;
+    startX = e.pageX - el.offsetLeft;
+    scrollLeft = el.scrollLeft;
+  });
+  el.addEventListener('mouseup', function() { dragging = false; });
+  el.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX) * 1.4;
+  });
+
+  el.addEventListener('touchstart', function(e) {
+    paused = true;
+    startX = e.touches[0].pageX - el.offsetLeft;
+    scrollLeft = el.scrollLeft;
+  }, { passive: true });
+  el.addEventListener('touchend', function() {
+    setTimeout(function() { paused = false; }, 1500);
+  });
+  el.addEventListener('touchmove', function(e) {
+    el.scrollLeft = scrollLeft - (e.touches[0].pageX - el.offsetLeft - startX) * 1.4;
+  }, { passive: true });
+})();
+</script>
 <script>
 (function() {
   var REPO = 'davide-desio-eleva/kirograph';

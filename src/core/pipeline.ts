@@ -331,8 +331,10 @@ export class IndexPipeline {
         await this.vectors.deleteEmbeddings(oldNodes.map(n => n.id));
         this.db.deleteFile(rel);
         this.db.deleteUnresolvedRefsByFile(rel);
-        // Clean up pattern matches for removed files
-        this.db.getRawDb().run('DELETE FROM pattern_matches WHERE file_path = ?', [rel]);
+        // Clean up pattern matches for removed files (only if patterns are enabled)
+        if ((this.config as any).enablePatterns) {
+          this.db.getRawDb().run('DELETE FROM pattern_matches WHERE file_path = ?', [rel]);
+        }
         result.removed.push(rel);
       };
 

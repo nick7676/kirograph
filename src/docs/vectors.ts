@@ -8,6 +8,7 @@
 import type { KiroGraphConfig } from '../config';
 import type { DocSection, DocSearchResult } from './types';
 import { logDebug, logWarn, logError } from '../errors';
+import { TurboQuantIndex, writeTurboQuantStats } from '../vectors/turboquant-index';
 
 const MAX_TOKEN_CHARS = 2000;
 
@@ -66,15 +67,32 @@ export class DocsVectorManager {
   private db: any; // raw SQLite handle
   private modelName: string;
   private cacheDir: string;
+  private tqIndex: TurboQuantIndex | null = null;
+  private tqInitialized = false;
+  private _kirographDir: string | undefined;
 
-  constructor(config: KiroGraphConfig, db: any) {
+  constructor(config: KiroGraphConfig, db: any, kirographDir?: string) {
     this.config = config;
     this.db = db;
     this.modelName = config.embeddingModel ?? 'nomic-ai/nomic-embed-text-v1.5';
 
     const { homedir } = require('os');
-    const path = require('path');
-    this.cacheDir = path.join(homedir(), '.kirograph', 'models');
+    const pathMod = require('path');
+    this.cacheDir = pathMod.join(homedir(), '.kirograph', 'models');
+
+    if (kirographDir && (config as any).turboquantMemDocs) {
+      const bits = (config as any).turboquantBits ?? 3;
+      const dim = config.embeddingDim ?? 768;
+      this.tqIndex = new TurboQuantIndex(kirographDir, 'turboquant-doc.bin', dim, bits);
+      this._kirographDir = kirographDir;
+    }
+  }
+
+  /** Lazily initialize the TurboQuant index on first use. */
+  private async ensureTQReady(): Promise<void> {
+    if (this.tqInitialized) return;
+    this.tqInitialized = true;
+    if (this.tqIndex) await this.tqIndex.initialize();
   }
 
   /**
@@ -99,6 +117,10 @@ export class DocsVectorManager {
           'INSERT OR REPLACE INTO doc_vectors (section_id, embedding, model, created_at) VALUES (?, ?, ?, ?)',
           [section.id, buffer, this.modelName, Date.now()],
         );
+        if (this.tqIndex) {
+          await this.ensureTQReady();
+          this.tqIndex.upsert(section.id, embedding);
+        }
       }
     } catch (err) {
       logWarn(`Failed to embed doc section ${section.id}: ${err}`);
@@ -135,7 +157,16 @@ export class DocsVectorManager {
       const queryEmbedding = await this.embed(query);
       if (!queryEmbedding) return [];
 
-      // Get all doc vectors with matching model
+      // ANN path: TurboQuant index replaces the O(n) linear scan
+      if (this.tqIndex) {
+        await this.ensureTQReady();
+        if (this.tqIndex.isAvailable()) {
+          const hits = this.tqIndex.searchWithScores(queryEmbedding, limit);
+          return hits.map(({ id, score }) => ({ sectionId: id, score }));
+        }
+      }
+
+      // Fallback: linear cosine scan over all stored embeddings
       const allVectors = this.db.all(
         'SELECT section_id, embedding FROM doc_vectors WHERE model = ?',
         [this.modelName],
@@ -143,7 +174,6 @@ export class DocsVectorManager {
 
       if (allVectors.length === 0) return [];
 
-      // Compute cosine similarity for each
       const scored: Array<{ sectionId: string; score: number }> = [];
       for (const { section_id, embedding } of allVectors) {
         const vec = new Float32Array(
@@ -151,11 +181,9 @@ export class DocsVectorManager {
           embedding.byteOffset,
           embedding.byteLength / 4,
         );
-        const score = cosine(queryEmbedding, vec);
-        scored.push({ sectionId: section_id, score });
+        scored.push({ sectionId: section_id, score: cosine(queryEmbedding, vec) });
       }
 
-      // Sort by score descending, take top N
       scored.sort((a, b) => b.score - a.score);
       return scored.slice(0, limit);
     } catch (err) {
@@ -194,6 +222,12 @@ export class DocsVectorManager {
     // Delete all existing doc vectors
     this.db.run('DELETE FROM doc_vectors');
 
+    // Reset TurboQuant index so it rebuilds from scratch
+    if (this.tqIndex) {
+      this.tqIndex.close();
+      this.tqInitialized = false;
+    }
+
     // Get all sections
     const rows = this.db.all('SELECT * FROM doc_sections ORDER BY file_path, position') as any[];
     const sections: DocSection[] = rows.map((row: any) => ({
@@ -215,6 +249,19 @@ export class DocsVectorManager {
     for (let i = 0; i < sections.length; i += batchSize) {
       const batch = sections.slice(i, i + batchSize);
       embedded += await this.embedBatch(batch);
+    }
+
+    if (this.tqIndex?.isAvailable() && this._kirographDir) {
+      await this.tqIndex.save();
+      const stats = this.tqIndex.memoryStats();
+      const dim = this.config.embeddingDim ?? 768;
+      const rawBytes = embedded * dim * 4;
+      writeTurboQuantStats(this._kirographDir, {
+        docsEnabled: true,
+        docsCount: embedded,
+        docsActualBytes: stats.actualBytes,
+        docsRawBytes: rawBytes,
+      });
     }
 
     return embedded;

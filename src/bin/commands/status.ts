@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import * as path from 'path';
 import { dim, reset, violet, bold, green, label, value, section, renderTable } from '../ui';
 import { loadConfig } from '../../config';
+import { readTurboQuantStats } from '../../vectors/turboquant-index';
 
 export function register(program: Command): void {
   program
@@ -67,7 +68,11 @@ export function register(program: Command): void {
       console.log();
       console.log(section('  Semantic Search'));
       if (stats.embeddingsEnabled) {
+        const tqStats = stats.semanticEngine === 'turboquant'
+          ? readTurboQuantStats(path.join(target, '.kirograph'))
+          : null;
         const engineLabel =
+          stats.semanticEngine === 'turboquant' ? `turboquant  ${dim}(${stats.vecIndexCount} entries · ${tqStats ? `${tqStats.bits} bits · ${tqStats.compressionRatio.toFixed(1)}× compression` : 'not yet indexed'})${reset}` :
           stats.semanticEngine === 'sqlite-vec' ? `sqlite-vec  ${dim}(${stats.vecIndexCount} entries in ANN index)${reset}` :
           stats.semanticEngine === 'orama'      ? `orama  ${dim}(hybrid — ${stats.vecIndexCount} docs in index)${reset}` :
           stats.semanticEngine === 'pglite'     ? `pglite+pgvector  ${dim}(hybrid — ${stats.vecIndexCount} rows in DB)${reset}` :
@@ -85,6 +90,26 @@ export function register(program: Command): void {
           console.log(`  ${'\x1b[33m'}⚠ engine fallback: ${stats.engineFallback}${reset}`);
         }
         console.log(`  ${label('Indexed')}    ${value(`${displayed} / ${total}`)}  ${dim}(${coverage}%)${reset}`);
+        if (tqStats) {
+          const rawMB = (tqStats.rawBytes / 1_048_576).toFixed(1);
+          const compMB = (tqStats.actualBytes / 1_048_576).toFixed(1);
+          const savedMB = (tqStats.savedBytes / 1_048_576).toFixed(1);
+          console.log(`  ${label('Raw size')}    ${dim}${rawMB} MB  →  compressed  ${compMB} MB  (${savedMB} MB saved)${reset}`);
+          if (tqStats.memEnabled && tqStats.memCount > 0) {
+            const mRawMB = (tqStats.memRawBytes / 1_048_576).toFixed(1);
+            const mCompMB = (tqStats.memActualBytes / 1_048_576).toFixed(1);
+            console.log(`  ${label('Memory')}     ${dim}${tqStats.memCount} observations  →  ${mRawMB} MB → ${mCompMB} MB${reset}`);
+          }
+          if (tqStats.docsEnabled && tqStats.docsCount > 0) {
+            const dRawMB = (tqStats.docsRawBytes / 1_048_576).toFixed(1);
+            const dCompMB = (tqStats.docsActualBytes / 1_048_576).toFixed(1);
+            console.log(`  ${label('Docs')}       ${dim}${tqStats.docsCount} sections  →  ${dRawMB} MB → ${dCompMB} MB${reset}`);
+          }
+          const totalSaved = tqStats.savedBytes + (tqStats.memRawBytes - tqStats.memActualBytes) + (tqStats.docsRawBytes - tqStats.docsActualBytes);
+          if (totalSaved > 0) {
+            console.log(`  ${label('Total RAM')}  ${green}${(totalSaved / 1_048_576).toFixed(1)} MB saved${reset}  ${dim}(TurboQuant compression)${reset}`);
+          }
+        }
       } else {
         console.log(`  ${label('Status')}     ${dim}disabled${reset}`);
       }

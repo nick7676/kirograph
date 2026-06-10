@@ -26,7 +26,11 @@ export interface KiroGraphConfig {
   embeddingDim: number;
   /** @deprecated Use semanticEngine instead. Kept for backwards compatibility. */
   useVecIndex: boolean;
-  semanticEngine: 'cosine' | 'sqlite-vec' | 'orama' | 'pglite' | 'lancedb' | 'qdrant' | 'typesense';
+  semanticEngine: 'cosine' | 'turboquant' | 'sqlite-vec' | 'orama' | 'pglite' | 'lancedb' | 'qdrant' | 'typesense';
+  /** Apply TurboQuant ANN index to memory observations and doc sections. Default: false. */
+  turboquantMemDocs: boolean;
+  /** TurboQuant bits per coordinate (1–8). Controls compression/quality tradeoff. Default: 3 (≈25×). */
+  turboquantBits: number;
   typesenseDashboard: boolean;
   qdrantDashboard: boolean;
   minLogLevel: 'debug' | 'info' | 'warn' | 'error';
@@ -153,7 +157,7 @@ const CONFIG_FILE = 'config.json';
 const KNOWN_FIELDS = new Set<string>([
   'version', 'languages', 'include', 'exclude', 'maxFileSize',
   'extractDocstrings', 'trackCallSites', 'enableEmbeddings', 'embeddingModel', 'embeddingDim',
-  'useVecIndex', 'semanticEngine', 'typesenseDashboard', 'qdrantDashboard',
+  'useVecIndex', 'semanticEngine', 'turboquantMemDocs', 'turboquantBits', 'typesenseDashboard', 'qdrantDashboard',
   'minLogLevel', 'frameworkHints', 'fuzzyResolutionThreshold',
   'enableArchitecture', 'architectureLayers', 'cavemanMode', 'shellCompressionLevel', 'syncWarningThreshold',
   'enableMemory', 'memorySearchAlpha', 'memoryKeepRaw', 'memoryMaxObservations',
@@ -203,6 +207,8 @@ export function createDefaultConfig(_projectRoot?: string): KiroGraphConfig {
     embeddingDim: 768,
     useVecIndex: false,
     semanticEngine: 'cosine',
+    turboquantMemDocs: false,
+    turboquantBits: 3,
     typesenseDashboard: false,
     qdrantDashboard: false,
     minLogLevel: 'warn',
@@ -296,11 +302,18 @@ export function validateConfig(config: unknown): KiroGraphConfig {
   const useVecIndex = typeof raw.useVecIndex === 'boolean'
     ? raw.useVecIndex
     : defaults.useVecIndex;
-  const SEMANTIC_ENGINES = new Set(['cosine', 'sqlite-vec', 'orama', 'pglite', 'lancedb', 'qdrant', 'typesense']);
+  const SEMANTIC_ENGINES = new Set(['cosine', 'turboquant', 'sqlite-vec', 'orama', 'pglite', 'lancedb', 'qdrant', 'typesense']);
   // useVecIndex is a legacy alias: if set and no explicit semanticEngine, map it
   const semanticEngine = typeof raw.semanticEngine === 'string' && SEMANTIC_ENGINES.has(raw.semanticEngine)
     ? (raw.semanticEngine as KiroGraphConfig['semanticEngine'])
     : useVecIndex ? 'sqlite-vec' : defaults.semanticEngine;
+  const turboquantMemDocs = typeof raw.turboquantMemDocs === 'boolean'
+    ? raw.turboquantMemDocs
+    : defaults.turboquantMemDocs;
+  const turboquantBits = typeof raw.turboquantBits === 'number'
+    && raw.turboquantBits >= 1 && raw.turboquantBits <= 8
+    ? Math.round(raw.turboquantBits)
+    : defaults.turboquantBits;
   const typesenseDashboard = typeof raw.typesenseDashboard === 'boolean'
     ? raw.typesenseDashboard
     : defaults.typesenseDashboard;
@@ -570,6 +583,8 @@ export function validateConfig(config: unknown): KiroGraphConfig {
     embeddingDim,
     useVecIndex,
     semanticEngine,
+    turboquantMemDocs,
+    turboquantBits,
     typesenseDashboard,
     qdrantDashboard,
     minLogLevel,

@@ -47,7 +47,8 @@ export class MemoryManager {
     this.db = db;
     this.projectRoot = projectRoot;
     this.memDb = new MemoryDatabase(db);
-    this.vectorMgr = new MemoryVectorManager(config, this.memDb);
+    const kirographDir = require('path').join(projectRoot, '.kirograph');
+    this.vectorMgr = new MemoryVectorManager(config, this.memDb, kirographDir);
     this.cavemanMode = (config as any).cavemanMode ?? 'off';
     this.excludePatterns = (config as any).memoryExcludePatterns ?? [];
     this.watchmenChecker = config.enableWatchmen

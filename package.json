@@ -1,6 +1,6 @@
 {
   "name": "kirograph",
-  "version": "0.20.1",
+  "version": "0.21.0",
   "description": "Semantic code knowledge graph for Kiro: fewer tool calls, instant symbol lookups, 100% local.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,8 +19,12 @@
     "test": "vitest --run",
     "test:watchmen": "bash scripts/watchmen/test.sh",
     "test:watchmen:skip-llm": "bash scripts/watchmen/test.sh --skip-llm",
+<<<<<<< HEAD
     "test:patterns": "bash scripts/patterns/test.sh",
     "test:sec": "bash scripts/sec/test.sh",
+=======
+    "test:turboquant": "bash scripts/turboquant/test.sh",
+>>>>>>> feature/turboquant
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "release": "./scripts/release.sh",
     "docs": "npx serve docs"
@@ -71,6 +75,7 @@
     "better-sqlite3": "^11.10.0",
     "qdrant-local": "^0.0.0-alpha.10",
     "sqlite-vec": "^0.1.9",
+    "turboquant-js": "^0.2.0",
     "typesense": "^3.0.6"
   },
   "devDependencies": {

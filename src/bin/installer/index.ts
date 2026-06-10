@@ -76,6 +76,20 @@ export async function runInstaller(target: InstallTarget = 'kiro', opts: { yes?:
         console.log(`  ✓ Reusing existing KiroGraph data in ${cwd}/.kirograph/`);
         console.log(`  • semanticEngine: ${config.semanticEngine}`);
         console.log(`  • enableEmbeddings: ${config.enableEmbeddings}`);
+        if (config.enableEmbeddings && config.semanticEngine === 'turboquant') {
+          let tqAvailable = false;
+          try { require('turboquant-js'); tqAvailable = true; } catch { /* not installed */ }
+          if (!tqAvailable) {
+            console.log(`\n  Installing TurboQuant dependencies...`);
+            const result = spawnSync('npm', ['install', 'turboquant-js'], { stdio: 'inherit', shell: true });
+            if (result.status === 0) {
+              console.log(`  ✓ turboquant-js installed`);
+            } else {
+              console.warn(`  ✗ npm install failed (exit ${result.status}). Run manually:`);
+              console.warn(`    npm install turboquant-js`);
+            }
+          }
+        }
         console.log(`  • enableArchitecture: ${config.enableArchitecture}`);
         console.log(`  • cavemanMode: ${cavemanMode}`);
         console.log(`  • shellCompressionLevel: ${shellCompressionLevel}`);
@@ -162,6 +176,15 @@ export async function runInstaller(target: InstallTarget = 'kiro', opts: { yes?:
             } else {
               console.warn(`  ✗ npm install failed (exit ${result.status}). Run manually:`);
               console.warn(`    npm install typesense`);
+            }
+          } else if (patch.semanticEngine === 'turboquant') {
+            console.log(`\n  Installing TurboQuant dependencies...`);
+            const result = spawnSync('npm', ['install', 'turboquant-js'], { stdio: 'inherit', shell: true });
+            if (result.status === 0) {
+              console.log(`  ✓ turboquant-js installed`);
+            } else {
+              console.warn(`  ✗ npm install failed (exit ${result.status}). Run manually:`);
+              console.warn(`    npm install turboquant-js`);
             }
           }
         }
